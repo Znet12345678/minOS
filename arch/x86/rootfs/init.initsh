@@ -1,0 +1,2 @@
+/base/exec/echo "Welcome To ZoS"
+/base/exec/shell
