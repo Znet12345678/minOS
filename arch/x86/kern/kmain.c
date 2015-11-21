@@ -215,7 +215,10 @@ int verbose_kmain(char *arg){
 	}
 	kprintf("Mounting filesystem\n");
 	//kprintf("Done\n");
-	kprintf("%s\n",request_file("/","hi"));
+	char s[10240];
+	kstrcat(s,request_file("/","hi"));
+	kprintf("%s\n",s);
+//	kprintf("%s",request_file("/","hi"));
 	kprintf("Done\n");
 	//int eoffset = zfs_scanend();
 	//int err = zfs_mount(offset,eoffset);

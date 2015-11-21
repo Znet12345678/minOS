@@ -9,7 +9,7 @@ int scan_for_sig(char *buf){
 			//kprintf("Started\n");
 			int i1 = 0;
 			if((buf[(i + 1)] == 0x01) && (buf[(i + 2)] == 0x03) && (buf[(i + 3)] == 0x08)){
-				//kprintf("Found Valid ZFS Signature!\n");
+				kprintf("Found Valid ZFS Signature!\n");
 				return (i+1);
 			}
 		}
@@ -21,9 +21,9 @@ int scan_for_esig(char *buf){
 	int i = 0;
 	while(i < 1024){
 		//kprintf("%c",buf[i]);
-		if(buf[i] == 0xAA){
-			kprintf("EXEC\n");
-			if((buf[(i + 1)] == 0x11) && (buf[(i + 2)] == 0x01) && (buf[(i + 3)] == 0x01)){
+		if(buf[i] == 0x23){
+			//kprintf("EXEC\n");
+			if((buf[(i + 1)] == 0x11) && (buf[(i + 2)] == 0x11) && (buf[(i + 3)] == 0x11)){
 				kprintf("[ESIG_SCAN]:Found Full ZFS Disk Partition\n");
 				return (i+1);
 			}
@@ -91,9 +91,9 @@ int zfs_scanend(uint16_t drive,int offset){
 	int b = 0;
 //	char buf[256];
 	//kprintf("exec\n");
-	int address = 0;
+	int address = offset;
 	while(1){
-		char *buf = malloc(512);
+		char *buf = malloc(1024);
 		//kprintf("%s\n",buf);
 		int i1 = 0;
 		//while(i1 < 256){
@@ -121,7 +121,7 @@ int scan_files(char *buf){
 	int i = 0;
 	int ret = 0;
 	while(i < 256){
-		if(buf[i] == 0xFF && buf[i + 1] == 0x00 && buf[i + 2] == 0xFF)
+		if(buf[i] == 0x31 && buf[i + 1] == 0x32 && buf[i + 2] == 0x33)
 			ret++;
 		i++;
 	}
@@ -146,11 +146,13 @@ int test_for_file(char *filename,char *buf){
 		while(i < 256){
 			//kprintf("%c",buf[i]);
 			if(i1 == strlen(filename))
-				if(buf[i + 1] == 0xFF && buf[i+2] == 0xBB)
+				//if(buf[i + 1] == 0xFF && buf[i+2] == 0xBB)
 					return (i+3);
-			else if(buf[i] == filename[i1])
+			else if(buf[i] == filename[i1]){
+				//kprintf(".");
 				i1++;
-			else
+			}
+			else if(i1 > 0)
 				i1 = 0;
 			i++;
 		}
@@ -162,8 +164,8 @@ int test_for_file(char *filename,char *buf){
 int scan_EOF(char *buf){
 	int i = 0;
 	while(i < 256){
-		if(buf[i] == 0xFF && buf[i + 1] == 0xFF && buf[i+2] == 0xAA)
-			return i;
+		if(buf[i] == '#' && buf[i + 1] == '#' && buf[i+2] == '#')
+			return (i - 3);
 		i++;
 	}
 	return -1;
@@ -171,7 +173,7 @@ int scan_EOF(char *buf){
 char *request_file(char *dir,char *file){
 	if(strcmp(dir,"/") == 0){
 		//kprintf("Exec\n");
-		char ret[1024];
+		char *ret = malloc(10240);
 		//kprintf("1\n");
 		int ba = zfs_scan(0);
 		kprintf("[REQUEST_FILE]:Found valid ZFS sig\n");
@@ -201,12 +203,17 @@ char *request_file(char *dir,char *file){
 			}*/
 			if(test_for_file(file,buf) > -1){
 				int i = test_for_file(file,buf);
-				kprintf(">");
+				//kprintf(">");
 				int eof = scan_EOF(buf);
+				///if(eof == -1)
+				//	panic();
 				if(eof != -1){
-					while(i < eof){
-						kprintf(")");
+					int j = 0;
+					while(i < (eof - 3)){
+						//kprintf("%c",buf[i]);
 						kstrcat(ret,&buf[i]);
+						//ret[j] = buf[i];
+						j++;
 						i++;
 					}
 				}
@@ -237,7 +244,7 @@ char *request_file(char *dir,char *file){
 			//kprintf(".");
 			ba++;
 		}
-		kprintf("%s\n",ret);
+		//kprintf("%s\n",ret);
 		kprintf("Looked for file %s/%s\n",dir,file);
 		return ret;
 	}
