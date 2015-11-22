@@ -220,7 +220,8 @@ int verbose_kmain(char *arg){
 	//kprintf("%s\n",s);
 //	kprintf("%s",request_file("/","hi"));
 	//kprintf("Mounting File Systems\n");
-	read("/init",s);
+	if(read("/init",s) < 1)
+		panic();
 	kprintf("%s\n",s);
 	kprintf("Done\n");
 	//kstrcat(s,request_file("/","init"));

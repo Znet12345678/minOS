@@ -176,7 +176,7 @@ int ata_read_cnt(uint8_t *buf,uint32_t lba,int cnt, uint16_t drive){
 	if(ide_wait_for_read(io) != 1)
 		panic();
 	int i = 0;
-	while(i < cnt){
+	while(i < 256){
 		uint16_t data = inw(io);
 		*(uint16_t *)(buf + i * 2) = data;
 		i++;
