@@ -9,7 +9,7 @@ int scan_for_sig(char *buf){
 			//kprintf("Started\n");
 			int i1 = 0;
 			if((buf[(i + 1)] == 0x01) && (buf[(i + 2)] == 0x03) && (buf[(i + 3)] == 0x08)){
-				kprintf("Found Valid ZFS Signature!\n");
+				kprintf("[SIG_SCAN]:Found Valid ZFS Signature!\n");
 				return (i+1);
 			}
 		}
@@ -132,7 +132,7 @@ int scan_dirs(char *buf){
 	int i = 0;
 	int ret = 0;
 	while(i < 256){
-		if(buf[i] == 0xEE && buf[i+1] == 0x01 && buf[i + 2] == 0xFF)
+		if(buf[i] == 0x03 && buf[i+1] == 0x01 && buf[i + 2] == 0x03)
 			ret++;
 		i++;
 	}
@@ -164,8 +164,8 @@ int test_for_file(char *filename,char *buf){
 int scan_EOF(char *buf){
 	int i = 0;
 	while(i < 256){
-		if(buf[i] == '#' && buf[i + 1] == '#' && buf[i+2] == '#')
-			return (i - 3);
+		if(buf[i] == 0x03 && buf[i + 1] == 0x03 && buf[i+2] == 0x03)
+			return i ;
 		i++;
 	}
 	return -1;
@@ -209,7 +209,7 @@ char *request_file(char *dir,char *file){
 				//	panic();
 				if(eof != -1){
 					int j = 0;
-					while(i < (eof - 3)){
+					while(i < (eof)){
 						//kprintf("%c",buf[i]);
 						kstrcat(ret,&buf[i]);
 						//ret[j] = buf[i];
@@ -245,7 +245,7 @@ char *request_file(char *dir,char *file){
 			ba++;
 		}
 		//kprintf("%s\n",ret);
-		kprintf("Looked for file %s/%s\n",dir,file);
+		kprintf("Looked for file %s%s\n",dir,file);
 		return ret;
 	}
 }
@@ -261,9 +261,101 @@ zfs_mount(int offset,int end){
 		}
 		int numoffiles = scan_files(buf);
 		int numofdirs = scan_dirs(buf);
-		if(numoffiles == 0 && contf == 1){
+		ba++;
+	}
+}
+char *dirs(char *buf){
+	int i = 0;
+	char *ret = malloc(1024);
+	while(i < strlen(buf)){
+		if(buf[i] == 0x08 && buf[i + 1] == 'D' && buf[i + 2] == 0x04 && buf[i + 3] == 'I' && buf[i + 4] == 'R'){
+			int i1 = i;
+			while(i1 < (strlen(buf) - i)){
+				if(buf[i1] == 'R' && buf[i1 + 1] == 'I' && buf[i1 + 2] == 0x04 && buf[i1 + 3] == 'D' && buf[i1 + 4] == 0x08)
+					break;
+				i1++;
+			}
+			while(i < i1){
+				kstrcat(ret,&buf[i]);
+				i++;
+			}
+			char br = 0x4F;
+			kstrcat(ret,&br);
+			i1 = 0;
+			i+=4;
+			continue;
+		}
+		i++;
+	}
+	return ret;
+}
+int cont_file(char *filename,char *buf){
+	int i = 0;
+	while(i < 256){
+		int i1 = 0;
+	//	kprintf(".");
+		while(i1 < strlen(filename)){
+			if(!(buf[i] == 0x06 && buf[i + 1] == filename[i1]))
+				break;
+			i1++;
+		}
+		if(i1 == (strlen(filename)))
+			return (i + i1);
+		i++;
+	}
+	return 0;
+}
+int read(char *filename,char *buf){
+	int i = 0;
+	int i1 = 0;
+	int read = 0;
+	int cont = 0;
+	int start = zfs_scan(0);
+	int end = zfs_scanend(0x00,start);
+	while(start < end){
+		char *tmpbuf = malloc(1024);
+		if(ata_read_master(tmpbuf,start,0x00) < 0){
+			kprintf("[READ] Failed to read file\n");
+			return -1;
+		}
+		if(cont_file(filename,tmpbuf) > 0 || cont == 1){
+			int j;
+			if(cont_file(filename,tmpbuf) > 0)
+				j = cont_file(filename,tmpbuf);
+			else
+				j = 0;
+			int k = 0;
+			while(j < 256){
+				if(tmpbuf[j] == 0x06 && tmpbuf[j + 1] == 0x07 && tmpbuf[j + 2] == 0x08)
+					break;
+				else
+					kstrcat(buf,&tmpbuf[j]);
+				read++;
+				k++;
+				kprintf("!");
+				j++;
+			}
+			if(j < strlen(buf))
+				cont = 1;
+		}
+		else
+			break;
+		start++;
+	}
+	return read;
+}
+void mount(int offset,int end){
+	int i = offset;
+	char *dir = "/";
+	char *set = malloc(1024);
+	while(i < end){
+		char *buf = malloc(1024);
+		if(ata_read_master(buf,i,0x00) == -1){
+			kprintf("[ERR]Couldn't mount FS:I/O Error\n");
+			panic();
+		}
+		if(strcmp(dir,"/") == 0){
 			
 		}
-		ba++;
 	}
 }

@@ -215,13 +215,17 @@ int verbose_kmain(char *arg){
 	}
 	kprintf("Mounting filesystem\n");
 	//kprintf("Done\n");
-	char s[10240];
-	kstrcat(s,request_file("/","hi"));
-	kprintf("%s\n",s);
+	char *s = malloc(10240);
+	//kstrcat(s,request_file("/","hi"));
+	//kprintf("%s\n",s);
 //	kprintf("%s",request_file("/","hi"));
+	//kprintf("Mounting File Systems\n");
+	read("/init",s);
+	kprintf("%s\n",s);
 	kprintf("Done\n");
-	//int eoffset = zfs_scanend();
-	//int err = zfs_mount(offset,eoffset);
+	//kstrcat(s,request_file("/","init"));
+	//kprintf("%s\n",s);
+
 }
 int graphical_kmain(char *arg){
 	t_init();

@@ -1,0 +1,7 @@
+/
+	/boot
+		/boot/minOS_kern
+	/exec
+		/exec/shell
+	/home
+		/home/admin
