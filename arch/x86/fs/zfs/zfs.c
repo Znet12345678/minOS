@@ -293,14 +293,15 @@ int cont_file(char *filename,char *buf){
 	int i = 0;
 	int i1 = 0;
 	int k = 0;
+	int j = 0;
 	while(i < 256){
 		//int i1 = 0;
 	//	kprintf(".");
-		while(k < ((strlen(filename) * 2))){
-			kprintf(".");
+		while(j < ((strlen(filename)))){
+			//kprintf(".");
 			if(i1 == (strlen(filename))){
 				//kprintf("(:");
-				break;
+				return (i + i1);
 			}
 			else if(buf[k] == 0x06 && buf[k + 1] == filename[i1]){
 				//kprintf("EXEC\n");
@@ -313,9 +314,11 @@ int cont_file(char *filename,char *buf){
 				break;
 			}
 			//k+=2;
-			k++;
+			//k+=2;
+			j++;
 		}
-		k = 0;
+		k = i;
+		j = 0;
 		//if(i1 > 0)
 			//kprintf("MEH\n");
 		if(i1 == (strlen(filename)))
@@ -339,28 +342,42 @@ int read(char *filename,char *buf){
 		}
 		if(cont_file(filename,tmpbuf) > 0|| cont == 1){
 			int j = 0;
-			if(cont_file(filename,tmpbuf) > 0)
+			if(cont != 1)
 				j = cont_file(filename,tmpbuf);
 			else
 				j = 0;
-			if(j < 1){
+			if(j < 1 && cont != 1){
 				kprintf("[ZFS_READ]I/O Error\n");
 				return -1;
 			}
 			int k = 0;
+			int m = -1;
 			while(j < 256){
-				if(tmpbuf[j] == 0x06 && tmpbuf[j + 1] == 0x07 && tmpbuf[j + 2] == 0x08)
+				if(tmpbuf[j] == 0x06 && tmpbuf[j+1] == 0x07 && tmpbuf[j+2] == 0x08){
+					m = j;
 					break;
+				}
+				j++;
+			}
+			if(m == -1)
+				m = 256;
+			if(cont != 1)
+				j = cont_file(filename,tmpbuf);
+			else
+				j = 0;
+			while(j < (m - 3)){
 				kstrcat(buf,&tmpbuf[j]);
 				//kprintf("%c",tmpbuf[j]);
 				read++;
 				k++;
-				kprintf(".");
+				//kprintf(".");
 				//kprintf("!");
 				j++;
 			}
-			if(j < (strlen(buf) - cont_file(filename,tmpbuf)))
+			if(j == (256 - cont_file(filename,tmpbuf))){
 				cont = 1;
+				kprintf("Exec\n");
+			}
 		}
 		else
 			break;
