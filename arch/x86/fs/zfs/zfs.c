@@ -301,7 +301,7 @@ int cont_file(char *filename,char *buf){
 			//kprintf(".");
 			if(i1 == (strlen(filename))){
 				//kprintf("(:");
-				return (i + i1);
+				return (k);
 			}
 			else if(buf[k] == 0x06 && buf[k + 1] == filename[i1]){
 				//kprintf("EXEC\n");
@@ -332,7 +332,9 @@ int read(char *filename,char *buf){
 	int i1 = 0;
 	int read = 0;
 	int cont = 0;
+	int k = 0;
 	int start = zfs_scan(0);
+	char *buf1 = malloc(10240);
 	int end = zfs_scanend(0x00,start);
 	while(start < end){
 		char *tmpbuf = malloc(1024);
@@ -350,11 +352,11 @@ int read(char *filename,char *buf){
 				kprintf("[ZFS_READ]I/O Error\n");
 				return -1;
 			}
-			int k = 0;
+			//int k = 0;
 			int m = -1;
 			while(j < 256){
 				if(tmpbuf[j] == 0x06 && tmpbuf[j+1] == 0x07 && tmpbuf[j+2] == 0x08){
-					m = j;
+					m = (j);
 					break;
 				}
 				j++;
@@ -365,8 +367,16 @@ int read(char *filename,char *buf){
 				j = cont_file(filename,tmpbuf);
 			else
 				j = 0;
-			while(j < (m - 3)){
-				kstrcat(buf,&tmpbuf[j]);
+			k = 0;
+			int l = 0;
+			while(l < 256){
+				buf[l] = 0;
+				l++;
+			}
+			while(j < m){
+				//kstrcat(buf1,&tmpbuf[j]);
+				buf[k - 1] = tmpbuf[j];
+				//buf[k] = tmpbuf[j];
 				//kprintf("%c",tmpbuf[j]);
 				read++;
 				k++;
@@ -376,13 +386,17 @@ int read(char *filename,char *buf){
 			}
 			if(j == (256 - cont_file(filename,tmpbuf))){
 				cont = 1;
-				kprintf("Exec\n");
+				//kprintf("Exec\n");
 			}
+			else
+				break;
 		}
 		else
 			break;
 		start++;
 	}
+	//buf = buf1;
+	//kprintf("%s\n",buf1);
 	return read;
 }
 void mount(int offset,int end){

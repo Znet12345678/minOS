@@ -6,6 +6,8 @@ all:
 	@$(CC) -c kmain.c -o kmain.o -nostdlib -I../include -ffreestanding -std=gnu99 -I../fs/zfs -g
 	@echo "CC kloader.o"
 	@$(CC) -c kloader.c -o kloader.o -nostdlib -I../include -ffreestanding -std=gnu99 -g
+	@echo "AS bootloader.o"
+	@$(NASM) -f elf bootloader.asm -o bootloader.o -g
 	@echo "CC kernel.o"
 	@$(CC) -c kernel.c -o kernel.o -nostdlib -I../include -ffreestanding -std=gnu99 -g
 	@echo "CC tty.o"

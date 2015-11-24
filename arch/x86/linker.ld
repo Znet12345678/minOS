@@ -2,7 +2,7 @@ ENTRY(_start)
 
 SECTIONS
 {
-	. = 1M;
+	. = 0x7c00;
 	.text BLOCK(4K) : ALIGN(4K){
 		*(.multiboot)
 		*(.text)
@@ -20,5 +20,6 @@ SECTIONS
 		*(.bss)
 		*(.bootstrap_stack)
 	}
+	
 }
 
