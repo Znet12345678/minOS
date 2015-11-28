@@ -9,6 +9,7 @@
 #include <kernel/tty.h>
 #include <zfs.h>
 #include "../fs/zfs/zfs.h"
+#include "../fs/ext2/ext2.h"
 unsigned long __strlen(const char *s1){
 	int len = 0;
 	while(s1[len] != 0)
@@ -191,6 +192,12 @@ void dump_args(){
 }
 int verbose_kmain(char *arg){
 	t_init();
+	//int i = atoi("4");
+	//if(i == 4)
+	//	kprintf("Yeah!\n");
+	//i = atoi("123");
+	//if(i == 123)
+	//	kprintf("YEAH!\n");
 	//ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
 	int io = 0x1F0;
         outb(io + 0x02,0);
@@ -204,7 +211,8 @@ int verbose_kmain(char *arg){
 	kprintf("[WRN]:Not implemented\n");
 	kprintf("Loading disk partitions\n");
 	//panic();
-	int offset = zfs_scan(0);
+	int offset = 0;
+	//int offset = zfs_scan(0);
 	if(offset  == -1){
 		kprintf("[NFE]I/O ERROR on main I/O Port\n");
 		int offset = zfs_scan(1);
@@ -215,14 +223,19 @@ int verbose_kmain(char *arg){
 	}
 	kprintf("Mounting filesystem\n");
 	//kprintf("Done\n");
-	char *s = malloc(10240);
+//	char *s = malloc(10240);
+	struct ext2_superblock *sb;
+	sb = parse_sblk(0);
 	//kstrcat(s,request_file("/","hi"));
 	//kprintf("%s\n",s);
 //	kprintf("%s",request_file("/","hi"));
 	//kprintf("Mounting File Systems\n");
-	if(read("/init",s) < 1)
-		panic();
-	kprintf("%s\n",s);
+	//if(read("/init",s) < 1)
+	//	panic();
+	//kprintf("%s\n",s);
+	if(sb->ninode == 65536)
+		kprintf("!");
+//	kprintf("%d\n",sb->ninode);
 	kprintf("Done\n");
 	//kstrcat(s,request_file("/","init"));
 	//kprintf("%s\n",s);

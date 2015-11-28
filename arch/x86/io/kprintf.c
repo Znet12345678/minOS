@@ -25,8 +25,9 @@ static void print(const char *str,ksize_t len){
 int intlen(int n){
 	int ret = 0;
 	while(n > 0){
-		ret++;
+	//	ret++;
 		n/=10;
+		ret++;
 	}
 	return ret;
 }

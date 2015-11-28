@@ -141,7 +141,7 @@ int ata_read_master(uint8_t *buf,uint32_t _lba,uint16_t drive){
 		//return -1;
 	//kprintf("@");
 	int i = 0;
-	while(i < 256){
+	while(i < 512){
 		uint16_t data = inw(io);
 		//kstrcat(buf,&(data));
 		//buf[i] = 0x00;

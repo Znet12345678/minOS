@@ -1,2 +1,3 @@
 all:
-	make -C zfs
+	@make -C zfs
+	@make -C ext2
