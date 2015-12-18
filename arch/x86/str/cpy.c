@@ -12,6 +12,49 @@ void kstrcpy(char *dest,const char *src){
 void kstrcat(char *dest,const char *src){
 	kstrcpy(&dest[strlen(dest)],src);
 }
+struct div{
+	int quot;
+	int rem;
+};
+struct div *div(int num, int denom)
+{
+	int r;
+	int k;
+	int j;
+	k = num/denom;
+	j = num % denom;
+	if(num >=0 && j < 0){
+		k++;
+		j -= denom;
+	}
+	struct div ret;
+	ret.quot = k;
+	ret.rem = j;
+	return &ret;
+
+}
+struct ldiv{
+	long quot;
+	long rem;
+};
+struct ldiv *ldiv(long num,long denom){
+	struct ldiv ret;
+	ret.quot = num / denom;
+	ret.rem = num % denom;
+	if(num >= 0 && ret.rem < 0){
+		ret.quot++;
+		ret.rem -=denom;
+	}
+	return &ret;
+};
+char *strncpy(char *dest,const char *src,size_t n){
+	int i = 0;
+	int i1 = strlen(dest);
+	while(i < n){
+		dest[i1] = src[i];
+		i++;
+	}
+}
 void *memcpy(void *dest,const void *src,ksize_t s){
 	unsigned char *d = (unsigned char *)dest;
 	const unsigned char *sr = (const unsigned char *)src;

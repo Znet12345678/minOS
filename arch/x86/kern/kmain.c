@@ -7,9 +7,10 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <kernel/tty.h>
-#include <zfs.h>
-#include "../fs/zfs/zfs.h"
-#include "../fs/ext2/ext2.h"
+//#include "../fs/broken/zfs/zfs.h"
+#include "../fs/broken/zfs/zfs.h"
+#include "../fs/broken/ext2/ext2.h"
+//#include "../fs/fat32/dosfs.h"
 unsigned long __strlen(const char *s1){
 	int len = 0;
 	while(s1[len] != 0)
@@ -233,13 +234,28 @@ int verbose_kmain(char *arg){
 	//if(read("/init",s) < 1)
 	//	panic();
 	//kprintf("%s\n",s);
-	if(sb->ninode == 65536)
-		kprintf("!");
+	//if(sb->ninode == 65536)
+	//	kprintf("!");
 //	kprintf("%d\n",sb->ninode);
 	kprintf("Done\n");
+	struct block_group *bg;
+	bg = read_bg();
+	struct inode *in = read_inode(2,sb,bg);
 	//kstrcat(s,request_file("/","init"));
 	//kprintf("%s\n",s);
-
+	/*PVOLINFO volinfo;
+	uint8_t *buf = malloc(1024);
+	uint8_t *sec = malloc(1024);
+	uint32_t ss = DFS_GetPtnStart(512,buf,0,NULL,NULL,sec);
+	if(ss == 0xffffffff)
+		panic();
+	uint8_t *buf1 = malloc(1024);
+	DFS_GetVolInfo(512,buf,ss,volinfo);
+	PFILEINFO fileinfo;
+	if(DFS_OpenFile(volinfo,"/test",DFS_READ,buf1,fileinfo)!= DFS_OK)
+		panic();
+	char *buffer = malloc(1024);
+	DFS_ReadFile(fileinfo,NULL,buffer,sec,5);*/
 }
 int graphical_kmain(char *arg){
 	t_init();

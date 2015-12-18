@@ -157,6 +157,36 @@ int ata_read_master(uint8_t *buf,uint32_t _lba,uint16_t drive){
 	}
 	return 1;
 }
+int ata_write_master(uint8_t *buf,uint16_t _lba){
+	        uint16_t io;
+        uint32_t lba = _lba;
+	int drive = 0x00;
+        if(drive == 0x00)
+                io = 0x1F0;
+        else if(drive == 0x01)
+                io = 0x170;
+        else if(drive == 0x02)
+                io = 0x4138;
+        uint8_t cmd = 0xE0;
+        uint8_t slavebit = 0x00;
+        //kprintf("Sending LBA and CMD\n");
+        outb(io + 0x06,(cmd | (uint8_t)((lba >> 24 & 0x0F))));
+        outb(io + 1,0x00);
+        outb(io + 0x02,1);
+        outb(io + 0x03,(uint8_t)lba);
+        outb(io + 0x04,(uint8_t)((lba) >> 8));
+        outb(io + 0x05,(uint8_t)((lba) >> 16));
+        outb(io + 0x07,0x30);
+        //ide_wait_for_read();
+        //ide_wait_for_read(io);
+        if(ide_wait_for_read(io) < 0)
+                return -1;
+	int i = 0;
+	while(i < 512){
+		outb(*(uint16_t *)buf + i * 2);
+		i++;
+	}
+}
 int ata_read_cnt(uint8_t *buf,uint32_t lba,int cnt, uint16_t drive){
 	int io;
 	if(drive == 0x00)

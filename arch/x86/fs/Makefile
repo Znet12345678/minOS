@@ -1,3 +1,4 @@
 all:
-	@make -C zfs
-	@make -C ext2
+	@make -C broken/zfs
+	@make -C broken/ext2
+#	@make -C fat32

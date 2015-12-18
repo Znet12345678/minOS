@@ -94,7 +94,7 @@ void kernel_loader_main(){
 	else if(strcmp(s,"-g") == 0)
 		graphical_kmain(s);
 	else
-		kernel_main();
+		verbose_kmain(s);
 	//int hd = (int)0x00000475;
 	/*if(strcmp(s,"s") == 0)
 		zsh();
