@@ -4,6 +4,7 @@
 * zos.kernel
 */
 #include <stdio.h>
+#include "module.h"
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -18,6 +19,12 @@ unsigned long __strlen(const char *s1){
 	while(s1[len] != 0)
 		len++;
 	return len;
+}
+void test_init(){
+	kprintf("{[TESTM-INIT] Module Successfully loaded}\n");
+}
+void test_main(){
+	kprintf("{[TESTM-MAIN] Module Successfully loaded}\n");
 }
 int char2int(char c){
 	if(c == 'a')
@@ -194,7 +201,7 @@ void dump_args(){
 	int offset = zfs_scan(drive);
 }
 int verbose_kmain(char *arg){
-	//t_init();
+	t_init();
 	//int i = atoi("4");
 	//if(i == 4)
 	//	kprintf("Yeah!\n");
@@ -203,6 +210,7 @@ int verbose_kmain(char *arg){
 	//	kprintf("YEAH!\n");
 	//ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
 	int io = 0x1F0;
+	char *modules[MAX_MODULES];
      outb(io + 0x02,0);
      outb(io + 0x03,0);
      outb(io + 0x04,0);
@@ -391,8 +399,16 @@ int verbose_kmain(char *arg){
 	struct block *_block;
 	_block = read_blk(0,superblk->starting_block,_inode,superblk);
 	kprintf("[FINALIZING] Mounting FileSystems\n");
+	kprintf("[KERNEL] Initializing modules\n");
+	mod_init(modules);
+	kprintf("[KERNEL] Done initializing modules\n");
+	kprintf("[KERNEL] regerstring test module\n");
+	int pos = 0;
+	register_module("test",pos);
 	//kprintf("[FATAL ERROR]UNDEFINED!Nothing to do.\nDropping into panic shell\n");
-	panic();
+	call_module("test",modules);
+	kprintf("Done\n");
+//	panic();
 }
 int graphical_kmain(char *arg){
 	t_init();

@@ -25,16 +25,26 @@ char *kgets(){
 
 	while(1){
 		outb(0x60,0x00);
-		c = kgetc(c);
+		///c = kgetc(c);
 		//if(c == '\n');
 		//	break;
+		//c = kgetc();
+		if(!(inportb(0x64) & 1)){
+			//c = kgetc();
+			oldc = c;
+			continue;
+		}
+		c = kgetc();
+	//	if(c == oldc)
+	//		continue;
 		if(c == '\001')
 			continue;
-
 		//oldc = c;
 		//if(c == oldc)
 		//	continue;
+//		c = kgetc();
 		oldc = c;
+		//c = kgetc();
 		if(c == '\n')
 			break;
 		//if(inportb(0x60) == 0x1C)
@@ -95,9 +105,9 @@ void kernel_loader_main(){
 	kprintf("[-v] [-m] offset=#ofblocks\n");
 	kprintf("___________________________________________________________________________\n%)");
 	char *s = malloc(1024);
-	//kstrcpy(s,kgets());
-	kprintf("Defaulting arguments!\n");
-	verbose_kmain(NULL);
+	kstrcpy(s,kgets());
+	//kprintf("Defaulting arguments!\n");
+	//verbose_kmain(NULL);
 	if(strcmp(s,"-v") == 0)
 		verbose_kmain(s);
 	else if(strcmp(s,"-g") == 0)
