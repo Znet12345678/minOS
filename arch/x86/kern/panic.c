@@ -29,9 +29,11 @@ char *__kgets(){
 	return buf;
 }
 void panic_shell(){
+	//char *buf;
 	kprintf("A semi-fatal panic has been encountered.\nYou will be dropped into a minimalistic shell\n");
 	while(1){
-		char *buf = malloc(80);
+		char buf[80];
+		//char *buf = malloc(1024);
 		kprintf("panic-sh@minOS#");
 		kstrcpy(buf,kgets());
 		//kprintf("ISSUE:%s\n",buf);
@@ -43,6 +45,9 @@ void panic_shell(){
 		}
 		else if(strncmp(buf,"halt",4) == 0){
 			halt();
+		}
+		else{
+			kprintf("Invalid command:%s\n",buf);
 		}
 		kprintf("\n");
 	}

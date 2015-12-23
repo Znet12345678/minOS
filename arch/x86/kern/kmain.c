@@ -30,96 +30,96 @@ int char2int(char c){
 		return 3;
 	else if(c == 'e')
 		return 4;
-        else if(c == 'f')
-                return 5;
+     else if(c == 'f')
+    return 5;
 
-        else if(c == 'g')
-                return 6;
+     else if(c == 'g')
+    return 6;
 
-        else if(c == 'h')
-                return 7;
+     else if(c == 'h')
+    return 7;
 
-        else if(c == 'i')
-                return 8;
+     else if(c == 'i')
+    return 8;
 
-        else if(c == 'j')
-                return 9;
+     else if(c == 'j')
+    return 9;
 
-        else if(c == 'k')
-                return 10;
+     else if(c == 'k')
+    return 10;
 
-        else if(c == 'l')
-                return 11;
+     else if(c == 'l')
+    return 11;
 
-        else if(c == 'm')
-                return 12;
+     else if(c == 'm')
+    return 12;
 
-        else if(c == 'n')
-                return 13;
+     else if(c == 'n')
+    return 13;
 
-        else if(c == 'o')
-                return 14;
+     else if(c == 'o')
+    return 14;
 
-        else if(c == 'p')
-                return 15;
+     else if(c == 'p')
+    return 15;
 
-        else if(c == 'q')
-                return 16;
+     else if(c == 'q')
+    return 16;
 
-        else if(c == 'r')
-                return 17;
+     else if(c == 'r')
+    return 17;
 
-        else if(c == 's')
-                return 18;
+     else if(c == 's')
+    return 18;
 
-        else if(c == 't')
-                return 19;
+     else if(c == 't')
+    return 19;
 
-        else if(c == 'u')
-                return 20;
+     else if(c == 'u')
+    return 20;
 
-        else if(c == 'v')
-                return 21;
+     else if(c == 'v')
+    return 21;
 
-        else if(c == 'w')
-                return 22;
+     else if(c == 'w')
+    return 22;
 
-        else if(c == 'x')
-                return 23;
+     else if(c == 'x')
+    return 23;
 
-        else if(c == 'y')
-                return 24;
+     else if(c == 'y')
+    return 24;
 
-        else if(c == 'z')
-                return 25;
+     else if(c == 'z')
+    return 25;
 	else if(c == '1')
 		return 26;
 	else if(c == '2')
-                return 27;
+    return 27;
 
 	else if(c == '3')
-                return 28;
+    return 28;
 
 	else if(c == '4')
-                return 29;
+    return 29;
 
 	else if(c == '5')
-                return 30;
+    return 30;
 
 	else if(c == '6')
-                return 31;
+    return 31;
 
 	else if(c == '7')
-                return 32;
+    return 32;
 
 	else if(c == '8')
-                return 33;
+    return 33;
 
 	else if(c == '9')
-                return 34;
+    return 34;
 
 	else if(c == '0')
-                return 35;
+    return 35;
 	else
 		return -1;
 
@@ -194,7 +194,7 @@ void dump_args(){
 	int offset = zfs_scan(drive);
 }
 int verbose_kmain(char *arg){
-	t_init();
+	//t_init();
 	//int i = atoi("4");
 	//if(i == 4)
 	//	kprintf("Yeah!\n");
@@ -203,15 +203,137 @@ int verbose_kmain(char *arg){
 	//	kprintf("YEAH!\n");
 	//ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
 	int io = 0x1F0;
-        outb(io + 0x02,0);
-        outb(io + 0x03,0);
-        outb(io + 0x04,0);
-        outb(io + 0x05,0);
+     outb(io + 0x02,0);
+     outb(io + 0x03,0);
+     outb(io + 0x04,0);
+     outb(io + 0x05,0);
 	//ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
 	kprintf("Kernel args:%s\n",arg);
 	kprintf("minOS libzOS kernel\n");
 	kprintf("Loading drivers...\n");
 	kprintf("[WRN]:Not implemented\n");
+	kprintf("Searching for usable disks\n");
+	kprintf("*Searching Primary Address\n");
+	int i = 0;
+	while(i < 4){
+		inb(io + 0x0C);
+		i++;
+	}
+	i = 0;
+	while(i < 4){
+		uint8_t status = inb(io + 0x07);
+		if(!(status & 0x80)){
+			kprintf(" Stage 1 passed\n");
+			break;
+		}
+		kprintf("	[WRN]Attempt failed for Primary drive\n");
+		i++;
+	}
+	if(i < 4){
+		i = 0;
+		int err = -1;
+		while(1){
+			uint8_t status = inb(0x1F7);
+			if(status & 0x01){
+				kprintf("Primary Drive error moving on\n");
+				err = 1;
+				break;
+			}
+			if(1){
+				kprintf("Primary drive in good shape!\n");
+				err = 0;
+				break;
+			}
+			kprintf("[WRN] Primary drive failed a test\n");
+			i++;
+		}
+		if(err == 0){
+			kprintf("Using Primary I/O address\n");
+			io = 0x1F0;
+		}
+		else{
+			kprintf("Trying Secondary I/O port\n");
+			io = 0x170;
+			i = 0;
+			while(i < 4){
+				inb(io + 0x07);
+				i++;
+			}
+			i = 0;
+			while(i < 4){
+				uint8_t status = inb(io + 0x07);
+				if(!(status & 0x80))
+					break;
+				kprintf(" [WRN]Attempt failed for secondary drive\n");
+				i++;
+			}
+			if(i < 4){
+				i = 0;
+				while(i < 400){
+					uint8_t status = inb(io + 0x07);
+					if(status & 0x01){
+						kprintf(" [ERR]I/O Error on secondary drive!\n");
+						kprintf("Panicing\n");
+						panic();
+					}
+					if(1)
+						break;
+					i++;
+				}
+				if(i == 400){
+					kprintf(" [ERR]No usable drives found!\n");
+					kprintf("Panicing\n");
+					panic();
+				}
+				else{
+					kprintf("Secondary drive is working!\n");
+					io = 0x170;
+				}
+			}
+			else{
+				kprintf(" [ERR] No usable drives found!\n");
+				kprintf("Panicing\n");
+				panic();
+			}
+		}
+	}
+	else{
+		kprintf(" [WRN] Problem with primary ATA device\n");
+		int i = 0;
+		io = 0x170;
+		while(i < 4){
+			inb(io + 7);
+			i++;
+		}
+		i = 0;
+		while(i < 4){
+			uint8_t status = inb(io + 7);
+			if(!(status & 0x80))
+				break;
+			kprintf("     [WRN]Attempt failed for secondary drive\n");
+			i++;
+		}
+		i = 0;
+		while(i < 4){
+			uint8_t status = inb(io + 7);
+			if(status & 0x01){
+				kprintf("     [ERR] I/O Error on secondary drive\n");
+				panic();
+			}
+			if(1)
+				break;
+			i++;
+		}
+		if(i == 4){
+			kprintf(" [ERR] No usable drives found!\n");
+			panic();
+		}
+		else{
+			kprintf(" Secondary Drive works!\n");
+			io = 0x170;
+		}
+	}
+	
 	kprintf("Loading disk partitions\n");
 	//panic();
 	int offset = 0;
@@ -269,22 +391,22 @@ int verbose_kmain(char *arg){
 	struct block *_block;
 	_block = read_blk(0,superblk->starting_block,_inode,superblk);
 	kprintf("[FINALIZING] Mounting FileSystems\n");
-	kprintf("[FATAL ERROR]UNDEFINED!Nothing to do.\nDropping into panic shell\n");
-	panic_shell();
+	//kprintf("[FATAL ERROR]UNDEFINED!Nothing to do.\nDropping into panic shell\n");
+	panic();
 }
 int graphical_kmain(char *arg){
 	t_init();
-	/*kprintf("                                 __________________\n");
-	kprintf("                                                   /\n");
-	kprintf("                                                 /\n");
-	kprintf("           		      /\n");
-	kprintf(" 		             /\n");
-	kprintf(" 		            /\n");
-	kprintf("		           /\n");
-	kprintf("		          /\n");
-	kprintf("		         /\n");
-	kprintf("		        /\n");
-	kprintf("		       /\n");
+	/*kprintf("   __________________\n");
+	kprintf("      /\n");
+	kprintf("    /\n");
+	kprintf("  		      /\n");
+	kprintf(" 		    /\n");
+	kprintf(" 		   /\n");
+	kprintf("		  /\n");
+	kprintf("		 /\n");
+	kprintf("		      /\n");
+	kprintf("		     /\n");
+	kprintf("		    /\n");
 	kprintf("		      /\n");
 	kprintf("		     /\n");
 	kprintf("		    /\n");
@@ -298,24 +420,24 @@ int graphical_kmain(char *arg){
 	kprintf("  /\n");
 	kprintf(" /\n");
 	kprintf("/\n");*/
-	kprintf("                                 __________________\n");
-        kprintf("                                                   /\n");
-        kprintf("                                                 /\n");
-        kprintf("                                                /\n");
-        kprintf("                                               /\n");
-        kprintf("                                              /\n");
-        kprintf("                                             /\n");
-        kprintf("                                            /\n");
-        kprintf("                                           /\n");
-        kprintf("                                          /\n");
-        kprintf("                                         /\n");
-        kprintf("                                        /\n");
-        kprintf("                                       /\n");
-        kprintf("                                      /\n");
-        kprintf("                                     /\n");
-        kprintf("                                    /\n");
-        kprintf("                                   /\n");
-	kprintf("                               _________________\n");
+	kprintf("   __________________\n");
+     kprintf("      /\n");
+     kprintf("    /\n");
+     kprintf("      /\n");
+     kprintf("     /\n");
+     kprintf("    /\n");
+     kprintf("         /\n");
+     kprintf("        /\n");
+     kprintf("       /\n");
+     kprintf("      /\n");
+     kprintf("        /\n");
+     kprintf("       /\n");
+     kprintf("      /\n");
+     kprintf("     /\n");
+     kprintf("    /\n");
+     kprintf("   /\n");
+     kprintf("        /\n");
+	kprintf("       _________________\n");
 	kprintf("Begining startup\n");
 	kprintf(" =");
 	int port = 0x1F0;
@@ -447,10 +569,10 @@ void kernel_main_old(int a,char *b){
 		}
 		else if(nstrcmp(str,"help") == 0){
 			i = 0;
-                        while (i < commandnum){
-                                kprintf("%s\n",commands[i]);
-                                i++;
-                        }
+   while (i < commandnum){
+        kprintf("%s\n",commands[i]);
+        i++;
+   }
 		}
 		else if(nstrcmp(str,"memlist") == 0){
 			i = 0;

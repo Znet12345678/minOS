@@ -58,6 +58,8 @@ void t_putc(char c){
 	outb(0x3D5,(unsigned char) ((pos >> 8)&0xFF));
 	if(c != '\n')
 		putent(c,tcolour,tc,tr);
+	if(c == '	')
+		c = ' ';
 	if(++tc == 80 || c == '\n'){
 		tc = 0;
 		if(++tr == 25){
