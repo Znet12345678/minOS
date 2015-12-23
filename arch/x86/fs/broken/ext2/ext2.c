@@ -137,7 +137,7 @@ int comb(const char *str,int n){
 int _comb(const char *str,int n){
 	return ((uint32_t)str[2] << 8) |str[1];
 }
-struct ext2_superblock *parse_sblk(int partnum){
+struct ext2_superblock *ext2_parse_sblk(int partnum){
 	int i = get_partition(partnum);
 	if(i > 0)
 		kprintf("[EXT2_SUPERBLOCK]Found partition!\n");
@@ -215,7 +215,7 @@ struct block_group *read_bg(){
 	
 	return &ret;
 }
-struct inode *read_inode(int ia,struct ext2_superblock *sb,struct block_group *bg){
+struct inode *ext2_read_inode(int ia,struct ext2_superblock *sb,struct block_group *bg){
 	int g = ((ia - 1) / sb->numofinpbg);
 	int index = ((ia - 1) % sb->numofinpbg);
 	int contblk = (index * 128) / 512;

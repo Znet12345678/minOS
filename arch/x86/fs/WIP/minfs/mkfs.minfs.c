@@ -32,8 +32,44 @@ int mkfs_minfs(struct minfs_superblock *sblk,struct inode *inode,char *output){
 	char blksz[] = {sblk->blocksize / 100,sblk->blocksize % 100};
 	fputc(blksz[0],f);
 	fputc(blksz[1],f);
-	fputc(sblk->starting_block,f);
-	fputc(sblk->starting_inode,f);
+	if(sblk->starting_block < 10){
+		fputc(0,f);
+		fputc(0,f);
+		fputc(sblk->starting_block,f);
+	}
+	else if(sblk->starting_block < 100){
+		fputc(0,f);
+		fputc(sblk->starting_block / 10,f);
+		fputc(sblk->starting_block % 10,f);
+	}
+	else if(sblk->starting_block < 1000){
+		fputc(sblk->starting_block / 100,f);
+		fputc((sblk->starting_block % 100) / 10,f);
+		fputc(sblk->starting_block % 10,f);
+	}
+	else{
+		printf("Starting Block too large!\n");
+		return -1;
+	}
+	if(sblk->starting_inode < 10){
+		fputc(0,f);
+		fputc(0,f);
+		fputc(sblk->starting_inode,f);
+	}
+	else if(sblk->starting_inode < 100){
+		fputc(0,f);
+		fputc(sblk->starting_inode /10,f);
+		fputc(sblk->starting_inode %10,f);
+	}
+	else if(sblk->starting_inode < 1000){
+		fputc(sblk->starting_inode / 100,f);
+		fputc((sblk->starting_inode % 100) / 10,f);
+		fputc(sblk->starting_block % 10,f);
+	}
+	else{
+		printf("Starting inode too large!\n");
+		return -1;
+	}
 	fclose(f);
 }
 int main(int argc,char *argv[]){

@@ -18,21 +18,26 @@ void *fmalloc(unsigned long s){
 	return (void *)ret;
 }
 char *kgets(){
-	char *args =fmalloc(80);
-	char oldc;
+	char args[80];
+	char oldc = '\n';
 	char c;
 	int i = 0;
+
 	while(1){
-		c = kgetc();
-		if(c == oldc)
-			continue;
+		c = kgetc(c);
+		//if(c == '\n');
+		//	break;
 		if(c == '\001')
 			continue;
-		oldc = kgetc();
+
+		//oldc = c;
+		if(c == oldc)
+			continue;
+		oldc = c;
 		if(c == '\n')
 			break;
-		if(inportb(0x60) == 0x1C)
-			break;
+		//if(inportb(0x60) == 0x1C)
+		//	break;
 		t_putc(c);
 		args[i] = c;
 		i++;
@@ -87,7 +92,7 @@ void kernel_loader_main(){
 	kprintf("[ ] means optional * * means required\n");
 	kprintf("[-v] [-m] offset=#ofblocks\n");
 	kprintf("___________________________________________________________________________\n%)");
-	char s[80];
+	char *s = malloc(1024);
 	kstrcpy(s,kgets());
 	if(strcmp(s,"-v") == 0)
 		verbose_kmain(s);

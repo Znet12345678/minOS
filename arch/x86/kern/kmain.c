@@ -6,11 +6,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
+#include <string.h>
 #include <kernel/tty.h>
 //#include "../fs/broken/zfs/zfs.h"
 #include "../fs/broken/zfs/zfs.h"
 #include "../fs/broken/ext2/ext2.h"
 //#include "../fs/fat32/dosfs.h"
+#include "../fs/WIP/minfs/minfs.h"
 unsigned long __strlen(const char *s1){
 	int len = 0;
 	while(s1[len] != 0)
@@ -206,7 +208,7 @@ int verbose_kmain(char *arg){
         outb(io + 0x04,0);
         outb(io + 0x05,0);
 	//ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
-
+	kprintf("Kernel args:%s\n",arg);
 	kprintf("minOS libzOS kernel\n");
 	kprintf("Loading drivers...\n");
 	kprintf("[WRN]:Not implemented\n");
@@ -222,11 +224,11 @@ int verbose_kmain(char *arg){
 			panic();
 		}
 	}
-	kprintf("Mounting filesystem\n");
+	//kprintf("Mounting filesystem\n");
 	//kprintf("Done\n");
 //	char *s = malloc(10240);
 	struct ext2_superblock *sb;
-	sb = parse_sblk(0);
+	//sb = parse_sblk(0);
 	//kstrcat(s,request_file("/","hi"));
 	//kprintf("%s\n",s);
 //	kprintf("%s",request_file("/","hi"));
@@ -237,10 +239,10 @@ int verbose_kmain(char *arg){
 	//if(sb->ninode == 65536)
 	//	kprintf("!");
 //	kprintf("%d\n",sb->ninode);
-	kprintf("Done\n");
-	struct block_group *bg;
-	bg = read_bg();
-	struct inode *in = read_inode(2,sb,bg);
+//	kprintf("Done\n");
+	//struct block_group *bg;
+	//bg = read_bg();
+	//struct inode *in = read_inode(2,sb,bg);
 	//kstrcat(s,request_file("/","init"));
 	//kprintf("%s\n",s);
 	/*PVOLINFO volinfo;
@@ -256,6 +258,19 @@ int verbose_kmain(char *arg){
 		panic();
 	char *buffer = malloc(1024);
 	DFS_ReadFile(fileinfo,NULL,buffer,sec,5);*/
+	kprintf("[START] Mounting FileSystems\n");
+	kprintf("	*Parsing Superblock\n");
+	struct minfs_superblock *superblk;
+	superblk = parse_superblk(0);
+	kprintf("	*Reading Initial inode\n");
+	struct inode *_inode;
+	_inode = read_inode(0,superblk->starting_inode,superblk);
+	kprintf("	*Reading Initial Block\n");
+	struct block *_block;
+	_block = read_blk(0,superblk->starting_block,_inode,superblk);
+	kprintf("[FINALIZING] Mounting FileSystems\n");
+	kprintf("[FATAL ERROR]UNDEFINED!Nothing to do.\nDropping into panic shell\n");
+	panic_shell();
 }
 int graphical_kmain(char *arg){
 	t_init();

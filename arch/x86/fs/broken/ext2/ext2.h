@@ -50,7 +50,7 @@ struct ext_superblock{
 	short bgroup;
 };
 /*End skipped*/
-struct inode{
+struct ext2_inode{
 	int perms;
 	int uid;
 	int l32s;

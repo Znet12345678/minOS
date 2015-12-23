@@ -6,13 +6,20 @@ struct minfs_superblock{
 	unsigned long starting_inode;
 };
 struct inode{
+	char *sig;
 	int numofdirs;
 	int numoffiles;
 	int dirpnt;
+	int fpnt;
 };
 struct block{
-	struct file **fptr;
-	struct dir **dptr;
+	char *sig;
+	char *cont;
+	char *strip;
+	int isdir;
+	int isfile;
+	int foff;
+	int doff;
 };
 struct dir{
 	char *dirname;

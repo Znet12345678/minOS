@@ -13,3 +13,37 @@ void _panic(){
 	}
 	void *unreachable = malloc(1024);
 }
+char *__kgets(){
+	int i = 0;
+	int c;
+	int oldc;
+	char *buf = malloc(1024);
+	while(1){
+		if(c == '\n')
+			break;
+		if(c == oldc)
+			break;
+		c = oldc;
+		kstrcat(buf,&c);
+	}
+	return buf;
+}
+void panic_shell(){
+	kprintf("A semi-fatal panic has been encountered.\nYou will be dropped into a minimalistic shell\n");
+	while(1){
+		char *buf = malloc(80);
+		kprintf("panic-sh@minOS#");
+		kstrcpy(buf,kgets());
+		//kprintf("ISSUE:%s\n",buf);
+		if(strncmp(buf,"help",4) == 0){
+			kprintf("\npanic\nhalt");
+		}
+		else if(strncmp(buf,"panic",5) == 0){
+			panic();
+		}
+		else if(strncmp(buf,"halt",4) == 0){
+			halt();
+		}
+		kprintf("\n");
+	}
+}
