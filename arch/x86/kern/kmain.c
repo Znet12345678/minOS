@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <kernel/tty.h>
+#include "../lib/panic.h"
+
 //#include "../fs/broken/zfs/zfs.h"
 #include "../fs/broken/zfs/zfs.h"
 #include "../fs/broken/ext2/ext2.h"
@@ -22,9 +24,11 @@ unsigned long __strlen(const char *s1){
 }
 void test_init(){
 	kprintf("{[TESTM-INIT] Module Successfully loaded}\n");
+	_kill();
 }
 void test_main(){
 	kprintf("{[TESTM-MAIN] Module Successfully loaded}\n");
+	_kill();
 }
 int char2int(char c){
 	if(c == 'a')
@@ -180,10 +184,9 @@ int nstrcmp(const char *s1,const char *s2){
 	}
 	return 0;
 }
-void dump_args(){
-	
+void dump_args(char *reason){	
 	kprintf("Drive Selection:");
-	int drive = ddrive();
+	int drive = -1;
 	if(drive == 0x00)
 		kprintf("0/PRIMARY\n");
 	else if(drive == 0x01)
@@ -197,11 +200,19 @@ void dump_args(){
 		kprintf("0x17X\n");
 	else
 		kprintf("Unkown\n");
-	kprintf("ZFS Offset\n");
-	int offset = zfs_scan(drive);
+	//kprintf("ZFS Offset\n");
+	//int offset = zfs_scan(drive);
+	kprintf("File System:\n");
+	kprintf("Not yet defined\n");
+	kprintf("Memmory allocator:Built-In\n");
+	kprintf("Modules: \n");
+	kprintf("Not Defined\n");
+	kprintf("minOS kernel is in alpha\n");
+	kprintf("Reason for panic: %s\n",reason);
 }
 int verbose_kmain(char *arg){
 	t_init();
+	debug("KERNEL","Version 0.2-Alpha");
 	//int i = atoi("4");
 	//if(i == 4)
 	//	kprintf("Yeah!\n");
@@ -216,12 +227,12 @@ int verbose_kmain(char *arg){
      outb(io + 0x04,0);
      outb(io + 0x05,0);
 	//ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
-	kprintf("Kernel args:%s\n",arg);
+	debug("KERNEL",arg);
 	kprintf("minOS libzOS kernel\n");
-	kprintf("Loading drivers...\n");
+	debug("DRIVERS","init");
 	kprintf("[WRN]:Not implemented\n");
 	kprintf("Searching for usable disks\n");
-	kprintf("*Searching Primary Address\n");
+	debug("DSKSCAN","*Scanning Primary");
 	int i = 0;
 	while(i < 4){
 		inb(io + 0x0C);
@@ -231,10 +242,10 @@ int verbose_kmain(char *arg){
 	while(i < 4){
 		uint8_t status = inb(io + 0x07);
 		if(!(status & 0x80)){
-			kprintf(" Stage 1 passed\n");
+			debug("DSKSCAN","Stage 1 Success");
 			break;
 		}
-		kprintf("	[WRN]Attempt failed for Primary drive\n");
+		//kprintf("	[WRN]Attempt failed for Primary drive\n");
 		i++;
 	}
 	if(i < 4){
@@ -243,16 +254,18 @@ int verbose_kmain(char *arg){
 		while(1){
 			uint8_t status = inb(0x1F7);
 			if(status & 0x01){
+				debug("DSKSCAN","ERR");
 				kprintf("Primary Drive error moving on\n");
 				err = 1;
 				break;
 			}
 			if(1){
+				debug("DSKSCAN_PRIMARY","SUCC");
 				kprintf("Primary drive in good shape!\n");
 				err = 0;
 				break;
 			}
-			kprintf("[WRN] Primary drive failed a test\n");
+		//	kprintf("[WRN] Primary drive failed a test\n");
 			i++;
 		}
 		if(err == 0){
@@ -272,7 +285,7 @@ int verbose_kmain(char *arg){
 				uint8_t status = inb(io + 0x07);
 				if(!(status & 0x80))
 					break;
-				kprintf(" [WRN]Attempt failed for secondary drive\n");
+		//		kprintf(" [WRN]Attempt failed for secondary drive\n");
 				i++;
 			}
 			if(i < 4){
@@ -280,28 +293,32 @@ int verbose_kmain(char *arg){
 				while(i < 400){
 					uint8_t status = inb(io + 0x07);
 					if(status & 0x01){
+						debug("DSKSCAN","ERR");
 						kprintf(" [ERR]I/O Error on secondary drive!\n");
-						kprintf("Panicing\n");
-						panic();
+						//kprintf("Panicing\n");
+						goto a;
+						//panic();
 					}
 					if(1)
 						break;
 					i++;
 				}
 				if(i == 400){
-					kprintf(" [ERR]No usable drives found!\n");
-					kprintf("Panicing\n");
-					panic();
+					debug("DSKSCAN","ERR");
+		//			kprintf(" [ERR]No usable drives found!\n");
+					debug("KERNEL","PANIC");
+					__panic("No usable drive");
 				}
 				else{
-					kprintf("Secondary drive is working!\n");
+		//			kprintf("Secondary drive is working!\n");
 					io = 0x170;
 				}
 			}
 			else{
-				kprintf(" [ERR] No usable drives found!\n");
-				kprintf("Panicing\n");
-				panic();
+				debug("DSKSCAN","ERR");
+		//		kprintf(" [ERR] No usable drives found!\n");
+				debug("KERNEL","PANIC");
+				__panic("No Usable Drives");
 			}
 		}
 	}
@@ -318,23 +335,119 @@ int verbose_kmain(char *arg){
 			uint8_t status = inb(io + 7);
 			if(!(status & 0x80))
 				break;
-			kprintf("     [WRN]Attempt failed for secondary drive\n");
+		//	kprintf("     [WRN]Attempt failed for secondary drive\n");
 			i++;
 		}
 		i = 0;
 		while(i < 4){
 			uint8_t status = inb(io + 7);
 			if(status & 0x01){
-				kprintf("     [ERR] I/O Error on secondary drive\n");
-				panic();
+				debug("DSKSCAN","ERR");
+		//		kprintf("     [ERR] I/O Error on secondary drive\n");
+				//panic();
+				goto a;
 			}
 			if(1)
 				break;
 			i++;
 		}
 		if(i == 4){
-			kprintf(" [ERR] No usable drives found!\n");
-			panic();
+		//	kprintf(" [WRN] secondary Drive doesn't work\n");
+		//	kprintf(" [INF] Searching port 0x3F6\n");
+			io = 0x3F6;
+			i = 0;
+			while(i < 4){
+				inb(io + 7);;
+				i++;
+			}
+			i = 0;
+			while(i < 4){
+				uint8_t status = inb(io + 7);
+				if(!(status & 0x80))
+					break;
+				kprintf(" [WRN] IDE FAILED TEST\n");
+				i++;
+			}
+			if(i == 4){
+				a:kprintf(" [WRN] 0x3F6 Unusable searching final address\n");
+				io = 0x376;
+				i = 0;
+				while(i < 4){
+					inb(io + 7);
+					i++;
+				}
+				i  =0;
+				while(i < 4){
+					uint8_t stat = inb(io + 7);
+					if(!(stat & 0x80))
+						break;
+					kprintf(" [WRN] IDE FAILED TEST\n");
+					i++;
+				}
+				if(i == 4){
+					debug("DSKSCAN","ERR");
+					kprintf(" [ERR]No usable drives found!\n");
+					debug("KERNEL","PANIC");
+					__panic("No Usable Drives\n");
+				}
+				i = 0;
+				while(i < 4){
+					int stat = inb(io + 7);
+					if(stat & 0x01){
+						kprintf("DSKSCAN","ERR");
+						kprintf(" [ERR] I/O Error\n");
+						debug("KERNEL","I/O Error");
+						__panic("Fatal I/O Error");
+					}
+					i++;
+				}
+
+			}
+			else{
+				kprintf(" [INF] 0x3F6 Passed 1st stage\n");
+				i = 0;
+				int err = 0;
+				while(i < 4){
+					uint8_t stat = inb(io + 7);
+					if(stat & 0x01){
+						kprintf(" [WRN] I/O Error\n");
+						err = 1;
+						break;
+					}
+					i++;
+				}
+				if(err == 1){
+					kprintf(" [WRN] I/O Error\n");
+					kprintf(" [INF] Using port 0x376\n");
+					io = 0x376;
+					i = 0;
+					while(i < 4){
+						inb(io + 7);
+						i++;
+					}
+					i = 0;
+					while(i < 4){
+						uint8_t stat = inb(io + 7);
+						if(!(stat & 0x80))
+							break;
+						kprintf(" [WRN] I/O Not ready!\n");
+						i++;
+					}
+					if(i == 4)
+						__panic("No drives found\n");
+					i = 0;
+					while(i < 4){
+						uint8_t stat = inb(io + 7);
+						if(stat & 0x01){
+							kprintf(" [ERR] I/O Error\n");
+							debug("KERNEL","I/O ERROR");
+							__panic("I/O Error");
+						}
+						i++;
+					}
+				}
+				
+			}
 		}
 		else{
 			kprintf(" Secondary Drive works!\n");
@@ -398,16 +511,20 @@ int verbose_kmain(char *arg){
 	kprintf("	*Reading Initial Block\n");
 	struct block *_block;
 	_block = read_blk(0,superblk->starting_block,_inode,superblk);
-	kprintf("[FINALIZING] Mounting FileSystems\n");
-	kprintf("[KERNEL] Initializing modules\n");
+	//kprintf("[FINALIZING] Mounting FileSystems\n");
+	//kprintf("[KERNEL] Initializing modules\n");
 	mod_init(modules);
-	kprintf("[KERNEL] Done initializing modules\n");
-	kprintf("[KERNEL] regerstring test module\n");
+	//kprintf("[KERNEL] Done initializing modules\n");
+	//kprintf("[KERNEL] regerstring test module\n");
 	int pos = 0;
 	register_module("test",pos);
 	//kprintf("[FATAL ERROR]UNDEFINED!Nothing to do.\nDropping into panic shell\n");
 	call_module("test",modules);
 	kprintf("Done\n");
+	kprintf("Nothing to do\n");
+	while(1){ }
+	//__panic("Nothing to do");
+	//panic("Nothing to do");
 //	panic();
 }
 int graphical_kmain(char *arg){

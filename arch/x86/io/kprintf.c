@@ -114,3 +114,6 @@ void kprintf(const char *format,...){
 	va_end(args);
 	//place_cursor();
 }
+void debug(char *proccess,char *output){
+	kprintf("[%s](debug):%s\n",proccess,output);
+}

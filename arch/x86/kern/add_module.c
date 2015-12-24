@@ -7,6 +7,7 @@ int mod_init(char *modules[]){
 	char *_modules[MAX_MODULES] = {malloc(1024)};
 	modules = _modules;
 }
+
 int scan(char *name,char **modules,int max){
 	int i = 0;
 	while (i < max){
@@ -17,7 +18,10 @@ int scan(char *name,char **modules,int max){
 	return 0;
 }
 void _call(char *name){
-	 asm volatile("call %%eax" : :"a"(name));
+	//asm("call %0" : : "r"(name));
+}
+void _kill(){
+	asm volatile("ret");
 }
 int call_module(char *name,char **modules){
 	if(scan(name,modules,MAX_MODULES) != 0){
@@ -27,9 +31,10 @@ int call_module(char *name,char **modules){
 		kstrcpy(main,name);
 		kstrcat(init,"_init");
 		kstrcat(main,"_main");
-		kprintf("[MOD] JMP %s %s\n",init,main);
+		kprintf("[start][MOD] CALL %s %s\n",init,main);
 		_call(init);
 		_call(main);
+		kprintf("[END][MOD] CALL\n");
 	}
 	else{
 		return -1;

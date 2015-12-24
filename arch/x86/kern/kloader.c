@@ -105,12 +105,12 @@ void kernel_loader_main(){
 	kprintf("[-v] [-m] offset=#ofblocks\n");
 	kprintf("___________________________________________________________________________\n%)");
 	char *s = malloc(1024);
-	kstrcpy(s,kgets());
-	//kprintf("Defaulting arguments!\n");
-	//verbose_kmain(NULL);
+	//kstrcpy(s,kgets());
+	kprintf("Defaulting arguments!\n");
+	verbose_kmain(NULL);
 	if(strcmp(s,"-v") == 0)
 		verbose_kmain(s);
-	else if(strcmp(s,"-g") == 0)
+	else if(strncmp(s,"-g",2) == 0)
 		graphical_kmain(s);
 	else
 		verbose_kmain(s);
