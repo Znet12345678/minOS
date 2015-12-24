@@ -1,7 +1,7 @@
 /*
 *(C)2015 Zachary James Schlotman
-*ZOS kernel Loader
-*zos.kernel
+*minOS kernel Loader
+*minOS kernel
 *Used to append args to kernel
 */
 #include <stdio.h>

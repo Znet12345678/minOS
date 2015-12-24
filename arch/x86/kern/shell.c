@@ -1,3 +1,8 @@
+/*
+*broken
+*public domain
+*Zachary James Schlotman
+*/
 #include <stdio.h>
 #include <string.h>
 void *_fmalloc(unsigned long s){

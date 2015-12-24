@@ -1,3 +1,8 @@
+/*
+*broken functions
+*Public Domain
+*Zachary Schlotman
+*/
 void msleep(unsigned long time){
 	int mtime = time * 10000;
 	for(int i = 0; i < mtime; i++)

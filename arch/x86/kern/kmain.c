@@ -1,7 +1,7 @@
 /*
 * (C) 2015 Zachary James Schlotman
 * Kernel Main
-* zos.kernel
+* minOS_kern
 */
 #include <stdio.h>
 #include "module.h"
@@ -213,6 +213,7 @@ void dump_args(char *reason){
 int verbose_kmain(char *arg){
 	t_init();
 	debug("KERNEL","Version 0.2-Alpha");
+	kprintf("(c) 2015 Zachary James Schlotman\n");
 	//int i = atoi("4");
 	//if(i == 4)
 	//	kprintf("Yeah!\n");
@@ -304,9 +305,9 @@ int verbose_kmain(char *arg){
 					i++;
 				}
 				if(i == 400){
-					debug("DSKSCAN","ERR");
+					//debug("DSKSCAN","ERR");
 		//			kprintf(" [ERR]No usable drives found!\n");
-					debug("KERNEL","PANIC");
+					//debug("KERNEL","PANIC");
 					b:io = 0x3F0;
 					i = 0;
 					while(i < 4){
@@ -320,8 +321,10 @@ int verbose_kmain(char *arg){
 							break;
 						i++;
 					}
-					if(i == 4)
+					if(i == 4){
+						debug("DSKSCAN","ERR");
 						panic();
+					}
 					i = 0;
 					while(i < 4){
 						uint8_t status = inb(io + 0x07);
@@ -406,7 +409,7 @@ int verbose_kmain(char *arg){
 					uint8_t stat = inb(io + 0x07);
 					if(!(stat & 0x80))
 						break;
-					kprintf(" [WRN] IDE FAILED TEST\n");
+					//kprintf(" [WRN] IDE FAILED TEST\n");
 					i++;
 				}
 				if(i == 4){
@@ -437,7 +440,7 @@ int verbose_kmain(char *arg){
 				while(i < 4){
 					uint8_t stat = inb(io + 0x07);
 					if(stat & 0x01){
-						kprintf(" [WRN] I/O Error\n");
+						//kprintf(" [WRN] I/O Error\n");
 						err = 1;
 						break;
 					}

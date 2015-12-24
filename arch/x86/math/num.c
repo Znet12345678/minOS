@@ -1,3 +1,8 @@
+/*
+*Partialy working
+*public domain
+*Zachary James schlotman
+*/
 #include "math.h"
 int abs(int x){
 	if(x > 0)

@@ -1,3 +1,9 @@
+/*
+*Some string operations
+*Not sure if they work
+*public domain
+*Zachary James Schlotman
+*/
 #include <stdlib.h>
 #include <string.h>
 char *bchar(char *str,char c){

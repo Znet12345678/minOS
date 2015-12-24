@@ -1,3 +1,8 @@
+/*
+*Fat Driver
+*Not working
+*Partially done
+*/
 #include <stdlib.h>
 #include <string.h>
 int fat32_init(struct fat32_bootsect *bs,struct fat32_ebr *_ebr){

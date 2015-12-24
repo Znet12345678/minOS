@@ -1,3 +1,8 @@
+/*
+*strlen function
+*linked into kernel
+*Public domain
+*/
 #include <string.h>
 #include <kernel/types.h>
 ksize_t strlen(const char *str){

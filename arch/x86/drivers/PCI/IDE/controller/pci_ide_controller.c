@@ -1,4 +1,13 @@
 //OBSOLETE
+/*
+*PCI IDE CONTROLLER
+*LIMITED FLEXIBILITY
+*The Code works,so if you wish to use this instead of the ata controller redirect the kloader to the original kmain
+*Public Domain
+*You can use this code in your own projects.
+*Redistribute at will
+*No credit needed
+*/
 #include "pci_ide_controller.h"
 #include <stdio.h>
 #include <stdlib.h>

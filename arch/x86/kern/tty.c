@@ -1,6 +1,8 @@
 /*
 *Terminal code
 *Borrowed a little from OSDev wiki can't lie
+*Public domain
+*Zachary Schlotman and OSDev
 */
 #include <kernel/tty.h>
 #include <kernel/vga.h>

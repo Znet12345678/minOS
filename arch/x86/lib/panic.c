@@ -1,12 +1,13 @@
+/*
+*More panic Functions
+*(c) 2015 Zachary James Schlotman
+*Zachary Schlotman
+*/
 #include "panic.h"
 void panic(){
 	kprintf("A fatal error has been encountered in the kernel. Panic has been called.\n");
-	kprintf("minOS Alpha\n");
-	kprintf("panic()\n");
-	//#ifdef DEV
-	kprintf("Development build dumping Kernel Arguments\n");
-	//dump_args("Unkown");
-//	#endif
+	kprintf("Continuing is not possible or is dangerous\n");
+	kprintf("minOS kernel\n");
 	while(1){ }
 	_panic();
 }

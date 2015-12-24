@@ -1,3 +1,7 @@
+/*
+*MinFS maker
+*(c)2015 Zachary James Schlotman
+*/
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>

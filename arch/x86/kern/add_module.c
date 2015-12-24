@@ -1,3 +1,8 @@
+/*
+*broken
+*public domain
+*Zachary Schlotman
+*/
 #include <string.h>
 #include <stdio.h>
 #include "module.h"

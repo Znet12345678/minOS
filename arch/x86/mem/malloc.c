@@ -1,7 +1,7 @@
 /*
 * (C) 2015 Zach Schlotman
-* ZOS Memory allocator
-* ZOS Project
+* ZOS/minOS Memory allocator
+* ZOS/minOS Project
 * liballoc
 * Probaly broken will provide working i386 binary if it is.
 */

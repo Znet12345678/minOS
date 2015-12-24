@@ -1,6 +1,7 @@
 /*
 *kprintf function
 *libio
+*(c) 2015 zachary james schlotman
 */
 #include <stdio.h>
 #include <string.h>

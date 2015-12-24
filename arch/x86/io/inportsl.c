@@ -1,3 +1,8 @@
+/*
+*inportsl
+*Public Domain
+*Zachary Schlotman
+*/
 #include <stdint.h>
 #include <asm.h>
 void inportsl(unsigned short _port,unsigned long *_buff,unsigned _len){

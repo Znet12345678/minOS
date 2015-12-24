@@ -1,4 +1,7 @@
-
+/*
+*minOS kernel (c) 2015 Zachary James Schlotman
+*panic functions
+*/
 #include <stdio.h>
 void _panic(){
 	kprintf("Secondary Kernel panic{_panic();} has been called. It is recommended to reboot. If this is a development build please submit the issue to the developer.\n\n\n\n");

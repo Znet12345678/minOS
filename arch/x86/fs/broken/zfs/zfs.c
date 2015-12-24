@@ -1,3 +1,8 @@
+/*
+*ZFS 
+*Public domain as of December 24 2015
+*You can use in your own projects
+*/
 #include "zfs.h"
 #include <string.h>
 #include <stdlib.h>

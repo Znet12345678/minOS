@@ -3,6 +3,12 @@
 *Not for actual use
 *(c)2015 Zachary James Schlotman
 *WIP
+*Work Ented as of December 24 2015
+*No more changes to be made
+*Works on very small drives,extreamly slow.
+*It's enough code to get an Idea of what it will do
+*If you wish to fix this up to use in a project of your own you may.
+*Public domain No credit needed as of December 24 2015
 */
 #include "zfs.h"
 #include <stdlib.h>

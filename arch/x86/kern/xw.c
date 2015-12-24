@@ -1,3 +1,8 @@
+/*
+*Basic inline asm
+*Public domain
+*Zachary Schlotman
+*/
 #include <stdint.h>
 #include <asm.h>
 static inline uint8_t inw(uint16_t port){

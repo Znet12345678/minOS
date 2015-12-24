@@ -1,3 +1,11 @@
+/*
+*MinFS File System Driver
+*Not Completed
+*(c) 2015 Zachary James Schlotman
+*For Use only in minOS
+*Linked into kernel
+*Not to be used as module
+*/
 #ifndef __KERNEL_BUILD
 #include <stdio.h>
 #include <stdlib.h>

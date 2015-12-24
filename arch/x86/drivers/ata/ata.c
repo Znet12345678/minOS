@@ -1,3 +1,8 @@
+/*
+*minOS ata reader
+*limited hardware support
+*(c) 2015 Zachary James Schlotman
+*/
 #include <stdint.h>
 static inline uint16_t inw(uint32_t s){
         uint16_t ret;

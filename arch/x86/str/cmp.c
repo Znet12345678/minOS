@@ -1,3 +1,9 @@
+/*
+*C library functions
+*Built into kernel
+*Public domain
+*Zachary James Schlotman
+*/
 #include <kernel/types.h>
 #include <string.h>
 int strcmp(const char *str1,const char *str2){

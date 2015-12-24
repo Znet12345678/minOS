@@ -1,5 +1,7 @@
 /*
 *Not needed a bunch of minimal function implementations for newlib
+*public domain
+*Zachary Schlotman
 */
 #include <stdint.h>
 # define __iomem        __attribute__((noderef, address_space(2)))

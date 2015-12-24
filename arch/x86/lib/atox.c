@@ -1,3 +1,9 @@
+/*
+*atoi function
+*combi function
+*Public Domain
+*Zachary James Schlotman
+*/
 #include <string.h>
 int combi(int *p,unsigned long size){
 	int inc = 0;

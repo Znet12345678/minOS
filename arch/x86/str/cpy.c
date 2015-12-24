@@ -1,3 +1,7 @@
+/*
+*Some c library functions for math and strings
+*(c) 2015 Zachary James Schlotman
+*/
 #include <kernel/types.h>
 #include <string.h>
 void kstrcpy(char *dest,const char *src){
