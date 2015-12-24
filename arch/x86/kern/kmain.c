@@ -277,7 +277,7 @@ int verbose_kmain(char *arg){
 			io = 0x170;
 			i = 0;
 			while(i < 4){
-				inb(io + 0x07);
+				inb(io + 0x0C);
 				i++;
 			}
 			i = 0;
@@ -307,7 +307,30 @@ int verbose_kmain(char *arg){
 					debug("DSKSCAN","ERR");
 		//			kprintf(" [ERR]No usable drives found!\n");
 					debug("KERNEL","PANIC");
-					__panic("No usable drive");
+					b:io = 0x3F0;
+					i = 0;
+					while(i < 4){
+						inb(io + 0x0C);
+						i++;
+					}
+					i = 0;
+					while(i < 4){
+						uint8_t status = inb(io + 0x07);
+						if(!(status & 0x80))
+							break;
+						i++;
+					}
+					if(i == 4)
+						panic();
+					i = 0;
+					while(i < 4){
+						uint8_t status = inb(io + 0x07);
+						if(status & 0x01)
+							__panic("I/O ERROR");
+						i++;
+					}
+
+
 				}
 				else{
 		//			kprintf("Secondary drive is working!\n");
@@ -327,12 +350,12 @@ int verbose_kmain(char *arg){
 		int i = 0;
 		io = 0x170;
 		while(i < 4){
-			inb(io + 7);
+			inb(io + 0x0C);
 			i++;
 		}
 		i = 0;
 		while(i < 4){
-			uint8_t status = inb(io + 7);
+			uint8_t status = inb(io + 0x07);
 			if(!(status & 0x80))
 				break;
 		//	kprintf("     [WRN]Attempt failed for secondary drive\n");
@@ -340,7 +363,7 @@ int verbose_kmain(char *arg){
 		}
 		i = 0;
 		while(i < 4){
-			uint8_t status = inb(io + 7);
+			uint8_t status = inb(io + 0x07);
 			if(status & 0x01){
 				debug("DSKSCAN","ERR");
 		//		kprintf("     [ERR] I/O Error on secondary drive\n");
@@ -357,12 +380,12 @@ int verbose_kmain(char *arg){
 			io = 0x3F6;
 			i = 0;
 			while(i < 4){
-				inb(io + 7);;
+				inb(io + 0x07);
 				i++;
 			}
 			i = 0;
 			while(i < 4){
-				uint8_t status = inb(io + 7);
+				uint8_t status = inb(io + 0x07);
 				if(!(status & 0x80))
 					break;
 				kprintf(" [WRN] IDE FAILED TEST\n");
@@ -373,12 +396,12 @@ int verbose_kmain(char *arg){
 				io = 0x376;
 				i = 0;
 				while(i < 4){
-					inb(io + 7);
+					inb(io + 0x0C);
 					i++;
 				}
 				i  =0;
 				while(i < 4){
-					uint8_t stat = inb(io + 7);
+					uint8_t stat = inb(io + 0x07);
 					if(!(stat & 0x80))
 						break;
 					kprintf(" [WRN] IDE FAILED TEST\n");
@@ -392,7 +415,7 @@ int verbose_kmain(char *arg){
 				}
 				i = 0;
 				while(i < 4){
-					int stat = inb(io + 7);
+					int stat = inb(io + 0x07);
 					if(stat & 0x01){
 						kprintf("DSKSCAN","ERR");
 						kprintf(" [ERR] I/O Error\n");
@@ -408,7 +431,7 @@ int verbose_kmain(char *arg){
 				i = 0;
 				int err = 0;
 				while(i < 4){
-					uint8_t stat = inb(io + 7);
+					uint8_t stat = inb(io + 0x07);
 					if(stat & 0x01){
 						kprintf(" [WRN] I/O Error\n");
 						err = 1;
@@ -422,12 +445,12 @@ int verbose_kmain(char *arg){
 					io = 0x376;
 					i = 0;
 					while(i < 4){
-						inb(io + 7);
+						inb(io + 0x0C);
 						i++;
 					}
 					i = 0;
 					while(i < 4){
-						uint8_t stat = inb(io + 7);
+						uint8_t stat = inb(io + 0x07);
 						if(!(stat & 0x80))
 							break;
 						kprintf(" [WRN] I/O Not ready!\n");
@@ -437,7 +460,7 @@ int verbose_kmain(char *arg){
 						__panic("No drives found\n");
 					i = 0;
 					while(i < 4){
-						uint8_t stat = inb(io + 7);
+						uint8_t stat = inb(io + 0x7);
 						if(stat & 0x01){
 							kprintf(" [ERR] I/O Error\n");
 							debug("KERNEL","I/O ERROR");
