@@ -1,6 +1,6 @@
 all:
 	@echo "CC panic.o"
-	@$(CC) -c panic.c -o panic.o -nostdlib -DDEV -g
+	@$(CC) -c panic.c -o panic.o -nostdlib -DDEV -g -DNOPANIC
 	@echo "CC sleep.o"
 	@$(CC) -c sleep.c -o sleep.o -nostdlib -ffreestanding -g -std=gnu99
 	@echo "CC atox.o"

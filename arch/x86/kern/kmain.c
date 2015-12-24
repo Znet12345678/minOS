@@ -204,7 +204,7 @@ void dump_args(char *reason){
 	//int offset = zfs_scan(drive);
 	kprintf("File System:\n");
 	kprintf("Not yet defined\n");
-	kprintf("Memmory allocator:Built-In\n");
+	kprintf("Memory allocator:Built-In\n");
 	kprintf("Modules: \n");
 	kprintf("Not Defined\n");
 	kprintf("minOS kernel is in alpha\n");
