@@ -340,8 +340,10 @@ int verbose_kmain(char *arg){
 			else{
 				debug("DSKSCAN","ERR");
 		//		kprintf(" [ERR] No usable drives found!\n");
-				debug("KERNEL","PANIC");
-				__panic("No Usable Drives");
+				//debug("KERNEL","PANIC");
+				goto b;
+				//__panic("No Usable Drives");
+
 			}
 		}
 	}
@@ -410,8 +412,9 @@ int verbose_kmain(char *arg){
 				if(i == 4){
 					debug("DSKSCAN","ERR");
 					kprintf(" [ERR]No usable drives found!\n");
-					debug("KERNEL","PANIC");
-					__panic("No Usable Drives\n");
+					goto b;
+					//debug("KERNEL","PANIC");
+					//__panic("No Usable Drives\n");
 				}
 				i = 0;
 				while(i < 4){
@@ -419,8 +422,9 @@ int verbose_kmain(char *arg){
 					if(stat & 0x01){
 						kprintf("DSKSCAN","ERR");
 						kprintf(" [ERR] I/O Error\n");
-						debug("KERNEL","I/O Error");
-						__panic("Fatal I/O Error");
+						//debug("KERNEL","I/O Error");
+						//__panic("Fatal I/O Error");
+						goto b;
 					}
 					i++;
 				}
@@ -457,14 +461,16 @@ int verbose_kmain(char *arg){
 						i++;
 					}
 					if(i == 4)
-						__panic("No drives found\n");
+						goto b;
+						//__panic("No drives found\n");
 					i = 0;
 					while(i < 4){
 						uint8_t stat = inb(io + 0x7);
 						if(stat & 0x01){
 							kprintf(" [ERR] I/O Error\n");
-							debug("KERNEL","I/O ERROR");
-							__panic("I/O Error");
+							goto b;
+						//	debug("KERNEL","I/O ERROR");
+						//	__panic("I/O Error");
 						}
 						i++;
 					}
