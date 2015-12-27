@@ -16,10 +16,24 @@ struct block{
 	char *sig;
 	char *cont;
 	char *strip;
+	char type;
 	int isdir;
 	int isfile;
+	int isinfo;
+	int isallocated;
 	int foff;
 	int doff;
+	int endingblock;
+	int infoblock;
+	//Info blocks only
+	int is_long;
+	int lba_len;
+	int blocks;
+	char *containing_dir;
+	int starting_lba;
+	//only applicable for directories
+	char *files;
+
 };
 struct dir{
 	char *dirname;
@@ -29,4 +43,5 @@ struct file{
 	char *filename;
 	char *contents;
 };
+void mount_p1(char *buf,int drive,struct minfs_superblock *superblk);
 #endif

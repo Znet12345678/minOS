@@ -29,7 +29,7 @@ all:
 	@echo "CC panic.o"
 	@$(CC) -c panic.c -o panic.o -nostdlib -g  -I../include -ffreestanding
 	@echo "AS bootl.o"
-	@$(NASM) bootl.asm -o bootl.o -g
+	@$(NASM) -f elf bootl.asm -o bootl.o -g
 	@echo "CC shell.o"
 	@$(CC) -c shell.c -o shell.o -nostdlib -g  -ffreestanding -I../include
 	@echo "CC mod.o"
