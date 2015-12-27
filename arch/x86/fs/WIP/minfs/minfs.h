@@ -23,7 +23,7 @@ struct block{
 	int isallocated;
 	int foff;
 	int doff;
-	int endingblock;
+	int ending_block;
 	int infoblock;
 	//Info blocks only
 	int is_long;
@@ -43,5 +43,5 @@ struct file{
 	char *filename;
 	char *contents;
 };
-void mount_p1(char *buf,int drive,struct minfs_superblock *superblk);
+int mount_p1(char *buf,int drive,struct minfs_superblock *superblk);
 #endif

@@ -113,7 +113,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 		ret.isallocated = 1;
 		int _infoblock = 0;
 		ret.infoblock = _infoblock;
-		ret.endingblock = 1;
+		ret.ending_block = 1;
 		ret.is_long = buf[3];
 		if(ret.is_long == 1){
 			char _lba_len[] = {buf[4],buf[5],buf[6]};
