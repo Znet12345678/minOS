@@ -18,7 +18,10 @@ void panic(){
 	//_panic();
 }
 void __panic(char *reason){
+	kprintf("A fatal error has been encountered in the kernel.__panic(reason)\n");
 	kprintf("Panic Reason:%s\n",reason);
 	dump_args(reason);
-	panic();
+	debug("KERNEL","Hang");
+	while(1){ };
+	//panic();
 }

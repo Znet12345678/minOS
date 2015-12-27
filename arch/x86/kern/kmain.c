@@ -533,16 +533,22 @@ int verbose_kmain(char *arg){
 		panic();
 	char *buffer = malloc(1024);
 	DFS_ReadFile(fileinfo,NULL,buffer,sec,5);*/
-	kprintf("[START] Mounting FileSystems\n");
+	//kprintf("[START] Mounting FileSystems\n");
+	debug("KERNEL","Parsing Superblock");
 	kprintf("	*Parsing Superblock\n");
-	struct minfs_superblock *superblk;
-	superblk = parse_superblk(0);
-	kprintf("	*Reading Initial inode\n");
-	struct inode *_inode;
-	_inode = read_inode(0,superblk->starting_inode,superblk);
-	kprintf("	*Reading Initial Block\n");
-	struct block *_block;
-	_block = read_blk(0,superblk->starting_block,_inode,superblk);
+	struct minfs_superblock *superblk = parse_superblk(0);
+	debug("KERNEL","mount_p1");
+	char *buffer = malloc(102400);
+	mount_p1(buffer,0,superblk);
+	//struct minfs_superblock *superblk = parse_superblk(0);
+	//if(superblk->blocksize != 512)
+	//	panic();
+	//kprintf("	*Reading Initial inode\n");
+	//struct inode *_inode;
+	//_inode = read_inode(0,superblk->starting_inode,superblk);
+	//kprintf("	*Reading Initial Block\n");
+	//struct block *_block;
+	//_block = read_blk(0,superblk->starting_block,_inode,superblk);
 	//kprintf("[FINALIZING] Mounting FileSystems\n");
 	//kprintf("[KERNEL] Initializing modules\n");
 	mod_init(modules);
@@ -554,6 +560,12 @@ int verbose_kmain(char *arg){
 	call_module("test",modules);
 	kprintf("Done\n");
 	kprintf("Nothing to do\n");
+	debug("KERNEL","Mounting File Systems");
+//	if(superblk->blocksize != 512)
+//		panic();
+	//	kprintf("Aw\n");
+	char *buf = malloc(102400);
+//	mount_p1(buf,0x00,superblk);
 	while(1){ }
 	//__panic("Nothing to do");
 	//panic("Nothing to do");

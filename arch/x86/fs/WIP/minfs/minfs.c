@@ -23,6 +23,9 @@
 int todec(char *buf){
 	return ((uint32_t)buf[2] << 16 | buf[1] << 8 | buf[0]);
 }
+int _todec(char *buf){
+	return ((uint32_t)buf[0] << 16| buf[1] << 8 );
+}
 #ifndef __KERNEL_BUILD
 int attach(char *in_name,char *out_name){
 	//...
@@ -47,17 +50,33 @@ struct block *read_block(char *in,int n,struct inode *inode,struct minfs_superbl
 #else
 struct minfs_superblock *parse_superblk(int drivenum){
 	struct minfs_superblock ret;
-	char *buf = malloc(1024);
+	char buf[1024];
 	ata_read_master(buf,2,0);
+	int i = 0;
 	char _buf[] = {buf[0],buf[1]};
-	ret.blocksize = todec(_buf);
-	char __buf[] = {buf[2],buf[3],buf[4]};
-	ret.starting_block = todec(__buf);
-	char ___buf[] = {buf[5],buf[6],buf[7]};
-	ret.starting_inode = todec(___buf);
+	//if(buf[1] != 2)
+	//	while(1) { };
+	//while(i < 512){
+	//	kprintf("%c",buf[i]);
+	//	i++;
+	//}
+	//kprintf("%s\n",_buf);
+//	while(1){ };
+
+	ret.blocksize = _todec(_buf);
+	//if(ret.blocksize != 512)
+	//	while(1) { };
+	//char __buf[] = {buf[2],buf[3],buf[4]};
+	//ret.starting_block = todec(__buf);
+	//char ___buf[] = {buf[5],buf[6],buf[7]};
+	//ret.starting_inode = todec(___buf);
+	ret.starting_block = buf[2];
+//	if(buf[2] != 4)
+		//panic();
+	ret.starting_inode = buf[3];
 	return &ret;
 }
-struct inode *read_inode(int drive,int n,struct minfs_superblock *sblk){
+struct inode *read_inode(int drive,int n,struct minfs_superblock sblk){
 	/*Reads from drive number*/
 	struct inode ret;
 	char *buf = malloc(1024);
@@ -86,12 +105,21 @@ int minfs_mount(int drivenum,int partnum,char *path){
 }
 struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 	struct block ret;
+	char *bufs[1024] = {malloc(1024)};
+	ata_read_master(bufs[0],3,0);
 	char _buf[] = {buf[0],buf[1]};
 	ret.sig = _buf;
-	if(_buf[0] != 42 || _buf[1] != 69){
+	if(buf[0] != 0x42 || bufs[1] != 0x69){
 		debug("PARSE_BUFFER_BLOCK","Failed to parse buffer:Invalid signature!");
+		//debug("PARSE_BUFFER_BLOCK","dumping raw buffer");
+		int i = 0;
+		//while(i < 512){
+		//	kprintf("%c",buf[i]);
+		//	i++;
+		//}
+		kprintf("\n");
 		debug("KERNEL","panic");
-		panic();
+		__panic("Invalid Signature");
 	}
 	ret.cont = buf;
 	char *strip = malloc(512);
@@ -144,7 +172,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 		}
 		else{
 			debug("PARSE_BUFFER_BLOCK","Failed to parse buffer:Invalid long byte");
-			panic();
+			__panic("Invalid long byte");
 		}
 	}
 	else if(ret.type == 2){
@@ -201,18 +229,26 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 	}
 	else{
 		debug("PARSE_BUFFER_BLOCK","Failed to parse buffer:Invalid type\n");
-		panic();
+		__panic("Invalid type");
 	}
 	return &ret;
 }
 int mount_p1(char *buf,int drivenum,struct minfs_superblock *superblk){
 	debug("MINFS_MOUNT","start");
-	char *block1 = malloc(512);
+	char *block1 = malloc(1024);
+//	char block1[1024]
+	//kprintf("%s\n",block1);
 	debug("MINFS_MOUNT","Allocating memory(About 524288 bytes) for buffers...\n");
 	char *buffers[512] = {malloc(1024)};
 	int i = 0;
+	while(i < 512){
+		block1[i] = 0;
+		i++;
+	}
 	debug("MINFS_MOUNT","Reading Starting Block");
-	ata_read_master(block1,superblk->starting_block,drivenum);
+	ata_read_master(block1,superblk->starting_block - 1,drivenum);
+	//kprintf("%s\n",block1);
 	debug("MINFS_MOUNT","Parsing starting Block");
+	parse_buffer_block(block1,superblk);
 }
 #endif
