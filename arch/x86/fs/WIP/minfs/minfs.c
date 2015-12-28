@@ -24,7 +24,7 @@ int todec(char *buf){
 	return ((uint32_t)buf[2] << 16 | buf[1] << 8 | buf[0]);
 }
 int _todec(char *buf){
-	return ((uint32_t)buf[0] << 16| buf[1] << 8 );
+	return ((uint32_t)buf[1] << 16| buf[0] << 8 );
 }
 #ifndef __KERNEL_BUILD
 int attach(char *in_name,char *out_name){
@@ -109,17 +109,18 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 	ata_read_master(bufs[0],3,0);
 	char _buf[] = {buf[0],buf[1]};
 	ret.sig = _buf;
-	if(buf[0] != 0x42 || bufs[1] != 0x69){
+	if(buf[0] != 0x42 && buf[1] != 0x69){
 		debug("PARSE_BUFFER_BLOCK","Failed to parse buffer:Invalid signature!");
+		debug("PARSE_BUFFER_BLOCK","Continuing...");
 		//debug("PARSE_BUFFER_BLOCK","dumping raw buffer");
-		int i = 0;
+		//int i = 0;
 		//while(i < 512){
 		//	kprintf("%c",buf[i]);
 		//	i++;
 		//}
 		kprintf("\n");
-		debug("KERNEL","panic");
-		__panic("Invalid Signature");
+		//debug("KERNEL","panic");
+		//__panic("Invalid Signature");
 	}
 	ret.cont = buf;
 	char *strip = malloc(512);
@@ -241,10 +242,10 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *superblk){
 	debug("MINFS_MOUNT","Allocating memory(About 524288 bytes) for buffers...\n");
 	char *buffers[512] = {malloc(1024)};
 	int i = 0;
-	while(i < 512){
-		block1[i] = 0;
-		i++;
-	}
+	//while(i < 512){
+	//	block1[i] = 0;
+	//	i++;
+	//}
 	debug("MINFS_MOUNT","Reading Starting Block");
 	ata_read_master(block1,superblk->starting_block - 1,drivenum);
 	//kprintf("%s\n",block1);
