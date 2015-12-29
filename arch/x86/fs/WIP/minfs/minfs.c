@@ -103,15 +103,15 @@ int minfs_mount(int drivenum,int partnum,char *path){
 	//...
 	return 0;
 }
-struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
+struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk,int i){
 	struct block ret;
 	char *bufs[1024] = {malloc(1024)};
 	ata_read_master(bufs[0],3,0);
 	char _buf[] = {buf[0],buf[1]};
 	ret.sig = _buf;
-	if(buf[0] != 0x42 && buf[1] != 0x69){
+	if(buf[0] != 0x42 && buf[1] != 0x69 && i != 0){
 		debug("PARSE_BUFFER_BLOCK","Failed to parse buffer:Invalid signature!");
-		debug("PARSE_BUFFER_BLOCK","Continuing...");
+		//debug("PARSE_BUFFER_BLOCK","Continuing...");
 		//debug("PARSE_BUFFER_BLOCK","dumping raw buffer");
 		//int i = 0;
 		//while(i < 512){
@@ -128,6 +128,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 	ret.type = buf[2];
 	if(ret.type == 0){
 		//Type is not allocated	
+		debug("PARSE_BUFFER_BLOCK","Found unallocated block");
 		ret.isfile = 0;
 		ret.isdir = 0;
 		ret.isinfo = 0;
@@ -135,6 +136,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 		return &ret;
 	}
 	else if(ret.type == 1){
+		debug("PARSE_BUFFER_BLOCK","Found Info block");
 		//Type is info
 		ret.isfile = 0;
 		ret.isdir = 0;
@@ -177,7 +179,9 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 		}
 	}
 	else if(ret.type == 2){
+
 		//Type is file
+		debug("PARSE_BUFFER_BLOCK","Found file block");
 		ret.isfile = 1;
 		ret.isdir = 0;
 		ret.isinfo = 0;
@@ -204,6 +208,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 		
 	}
 	else if(ret.type == 3){
+		debug("PARSE_BUFFER_BLOCK","Found dir block");
 		//Type is directory
 		ret.isfile = 0;
 		ret.isdir = 1;
@@ -221,6 +226,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk){
 		
 	}
 	else if(ret.type == 4){
+		debug("PARSE_BUFFER_BLOCK","Found rootfs block");
 		//Root file system
 		ret.isfile = 0;
 		ret.isdir = 1;
@@ -250,6 +256,27 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *superblk){
 	ata_read_master(block1,superblk->starting_block - 1,drivenum);
 	//kprintf("%s\n",block1);
 	debug("MINFS_MOUNT","Parsing starting Block");
-	parse_buffer_block(block1,superblk);
+	struct block *inblock = parse_buffer_block(block1,superblk,1);
+	debug("MINFS_MOUNT","Finished parsing block");
+	debug("MINFS_MOUNT","Tracking and parsing info block");
+	if(inblock->type == 0){
+		debug("MINFS_MOUNT","Starting block null");
+		debug("MINFS_MOUNT","Nothing to do");
+		return 0;
+	}
+	else if(inblock->infoblock == 0){
+		debug("MINFS_MOUNT","Info block is null hanging until it isn't(Probaly never)");
+		while(inblock->infoblock == 0)
+			inblock = parse_buffer_block(block1,superblk,1);
+	}
+	else{
+		debug("MINFS_MOUNT","Succesfully read address of block,Jumping to it");
+		ata_read_master(buffers[0],inblock->infoblock-1,drivenum);
+		debug("MINFS_MOUNT","Parsing info block\n");
+		struct block *infoblk = parse_buffer_block(buffers[0],superblk,0); 
+		debug("MINFS_MOUNT","Successfuly parsed block");
+		
+	}
+	return 1;
 }
 #endif
