@@ -1,9 +1,9 @@
 #ifndef ___MINFS_H
 #define ___MINFS_H
 struct minfs_superblock{
-	unsigned long blocksize;
-	char starting_block;
-	char starting_inode;
+	int blocksize;
+	int starting_block;
+	int starting_inode;
 };
 struct inode{
 	char *sig;

@@ -91,7 +91,7 @@ int mkfs_minfs(struct minfs_superblock *sblk,struct inode *inode,char *output){
 	fseek(f,2048,SEEK_SET);
 	fputc(0x42,f);
 	fputc(0x69,f);
-	
+	fputc(0x04,f);	
 	fclose(f);
 }
 int main(int argc,char *argv[]){

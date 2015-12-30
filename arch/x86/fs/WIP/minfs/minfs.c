@@ -48,7 +48,7 @@ struct block *read_block(char *in,int n,struct inode *inode,struct minfs_superbl
 	return blk;
 }
 #else
-int parse_superblk(int drivenum,struct minfs_superblock blk){
+struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk){
 	struct minfs_superblock ret;
 	char *buf = malloc(1024);
 	int i = 0;
@@ -88,6 +88,7 @@ int parse_superblk(int drivenum,struct minfs_superblock blk){
 	ret.starting_inode = buf[3];
 	//return &ret;*/
 	blk = ret;
+	return &ret;
 }
 struct inode *read_inode(int drive,int n,struct minfs_superblock *sblk){
 	/*Reads from drive number*/
@@ -116,7 +117,7 @@ int minfs_mount(int drivenum,int partnum,char *path){
 	//...
 	return 0;
 }
-struct block *parse_buffer_block(char *buf,struct minfs_superblock sblk,int i){
+struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk,int i){
 	struct block ret;
 	char *bufs[1024] = {malloc(1024)};
 	ata_read_master(bufs[0],3,0);
@@ -258,13 +259,14 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock sblk,int i){
 }
 int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	t_init();
-	struct minfs_superblock superblk;
-	parse_superblk(0,superblk);
-	if(superblk.starting_block <= 0)
+	struct minfs_superblock garbage;
+	struct minfs_superblock *superblk;
+	superblk = parse_superblk(0,garbage);
+	if(superblk->starting_block <= 0)
 		__panic("Null starting block");
-	//else if(superblk.starting_block == 4)
+	//else if(superblk->starting_block == 4)
 	//	panic();
-	//else if(superblk.starting_block == 4)
+	//else if(superblk->starting_block == 4)
 	//	kprintf("!\n");
 	debug("MINFS_MOUNT","start");
 	char *block1 = malloc(1024);
@@ -278,13 +280,13 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	//	i++;
 	//}
 	debug("MINFS_MOUNT","Reading Starting Block");
-	//if(superblk.starting_block != 4)
+	//if(superblk->starting_block != 4)
 	//	panic()
-	//while(i < superblk.starting_block){
+	//while(i < superblk->starting_block){
 	///	kprintf(".");
 	//	i++;
 	//}
-	ata_read_master(block1,superblk.starting_block - 1,0x00);
+	ata_read_master(block1,superblk->starting_block,0x00);
 	//kprintf("%s\n",block1);
 	debug("MINFS_MOUNT","Parsing starting Block");
 	struct block *inblock = parse_buffer_block(block1,superblk,1);
