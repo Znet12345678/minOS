@@ -2,8 +2,8 @@
 #define ___MINFS_H
 struct minfs_superblock{
 	unsigned long blocksize;
-	unsigned long starting_block;
-	unsigned long starting_inode;
+	char starting_block;
+	char starting_inode;
 };
 struct inode{
 	char *sig;

@@ -230,9 +230,9 @@ int verbose_kmain(char *arg){
 	//ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
 	debug("KERNEL",arg);
 	kprintf("minOS libzOS kernel\n");
-	debug("DRIVERS","init");
-	kprintf("[WRN]:Not implemented\n");
-	kprintf("Searching for usable disks\n");
+	//debug("DRIVERS","init");
+	//kprintf("[WRN]:Not implemented\n");
+	//kprintf("Searching for usable disks\n");
 	debug("DSKSCAN","*Scanning Primary");
 	int i = 0;
 	while(i < 4){
@@ -486,8 +486,11 @@ int verbose_kmain(char *arg){
 			io = 0x170;
 		}
 	}
-	
-	kprintf("Loading disk partitions\n");
+	//debug("Sleeping...");
+	//for(int i = 0; i < 400000;i++){
+
+	//}	
+	//kprintf("Loading disk partitions\n");
 	//panic();
 	int offset = 0;
 	//int offset = zfs_scan(0);
@@ -536,7 +539,7 @@ int verbose_kmain(char *arg){
 	//kprintf("[START] Mounting FileSystems\n");
 	debug("KERNEL","Parsing Superblock");
 	kprintf("	*Parsing Superblock\n");
-	struct minfs_superblock *superblk = parse_superblk(0);
+	struct minfs_superblock *superblk = parse_superblk(0,NULL);
 	debug("KERNEL","mount_p1");
 	char *buffer = malloc(102400);
 	mount_p1(buffer,0,superblk);
@@ -551,13 +554,13 @@ int verbose_kmain(char *arg){
 	//_block = read_blk(0,superblk->starting_block,_inode,superblk);
 	//kprintf("[FINALIZING] Mounting FileSystems\n");
 	//kprintf("[KERNEL] Initializing modules\n");
-	mod_init(modules);
+	//mod_init(modules);
 	//kprintf("[KERNEL] Done initializing modules\n");
 	//kprintf("[KERNEL] regerstring test module\n");
 	int pos = 0;
-	register_module("test",pos);
+	//register_module("test",pos);
 	//kprintf("[FATAL ERROR]UNDEFINED!Nothing to do.\nDropping into panic shell\n");
-	call_module("test",modules);
+	//call_module("test",modules);
 	kprintf("Done\n");
 	kprintf("Nothing to do\n");
 	debug("KERNEL","Mounting File Systems");
