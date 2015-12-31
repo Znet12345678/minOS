@@ -58,10 +58,18 @@ struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk
 	}
 	i = 0;
 	ata_read_master(buf,2,0);
+	//while(i < 512){
+	//	t_putc(buf[i]);
+	//	i++;	
+	//}//
+	//while(1) { };
+	i = 0;
 	char _buf[] = {buf[0],buf[1]};
 	ret.blocksize = _todec(_buf);
-	ret.starting_block = buf[2];
-	ret.starting_inode = buf[3];
+	int sb = buf[2];
+	int si = buf[3];
+	ret.starting_block = sb;
+	ret.starting_inode = si;
 /*	//kprintf("%s\n",buf);
 	//int i = 0;
 	char _buf[] = {buf[0],buf[1]};
@@ -81,11 +89,11 @@ struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk
 	//ret.starting_block = todec(__buf);
 	//char ___buf[] = {buf[5],buf[6],buf[7]};
 	//ret.starting_inode = todec(___buf);
-	ret.starting_block = buf[2];
+	ret.starting_block = (int)buf[2];
 //	kprintf("%c\n%c\n",buf[2],0x04);
 	//if(buf[2] != 4)
 	//	panic();
-	ret.starting_inode = buf[3];
+	ret.starting_inode =(int) buf[3];
 	//return &ret;*/
 	blk = ret;
 	return &ret;
@@ -119,23 +127,24 @@ int minfs_mount(int drivenum,int partnum,char *path){
 }
 struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk,int i){
 	struct block ret;
-	char *bufs[1024] = {malloc(1024)};
-	ata_read_master(bufs[0],3,0);
-	char _buf[] = {buf[0],buf[1]};
-	ret.sig = _buf;
-	if(buf[0] != 0x42 && buf[1] != 0x69 && i != 0){
+	//char *bufs[1024] = {malloc(1024)};
+	//ata_read_master(bufs[0],4,0);
+	//char _buf[] = {buf[0],buf[1]};
+	//ret.sig = _buf;
+	//kprintf("%c\n%c\n%c\n%c\n",buf[0],0x42,0x69,bufs[0][0]);
+	if(buf[0] != 0x42 || buf[1] != 0x69){
 		debug("PARSE_BUFFER_BLOCK","Failed to parse buffer:Invalid signature!");
-		//debug("PARSE_BUFFER_BLOCK","Continuing...");
-		//debug("PARSE_BUFFER_BLOCK","dumping raw buffer");
-		//int i = 0;
-		//while(i < 512){
-		//	kprintf("%c",buf[i]);
-		//	i++;
-		//}
-		kprintf("\n");
-		debug("KERNEL","panic");
-		__panic("Invalid signature");
+		//kprintf("\n");
+		//debug("KERNEL","panic");
+		//__panic("Invalid signature");
 		//__panic("Invalid Signature");
+		#ifdef RELEASE
+			debug("KERNEL","panic()");
+			panic();
+		#else
+			debug("PARSE_BUFFER_BLOCK","__panic(char *reason)");
+			__panic("Invalid signature");
+		#endif
 	}
 	ret.cont = buf;
 	char *strip = malloc(512);
@@ -260,7 +269,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk,int i){
 int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	t_init();
 	struct minfs_superblock garbage;
-	struct minfs_superblock *superblk;
+	struct minfs_superblock *superblk = malloc(sizeof(struct minfs_superblock *));
 	superblk = parse_superblk(0,garbage);
 	if(superblk->starting_block <= 0)
 		__panic("Null starting block");
@@ -272,35 +281,36 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	char *block1 = malloc(1024);
 //	char block1[1024]
 	//kprintf("%s\n",block1);
-	debug("MINFS_MOUNT","Allocating memory(About 524288 bytes) for buffers...\n");
+	debug("MINFS_MOUNT","Allocating memory(About 524288 bytes) for buffers...");
 	char *buffers[512] = {malloc(1024)};
+	debug("MINFS_MOUNT","Allocating memory for File Table");
+	char *file_table[102400] = {malloc(1024)};
+	debug("MINFS_MOUNT","Allocating memory for Descriptor Table");
+	char *desc_table[102400] = {malloc(1024)};
 	int i = 0;
 	//while(i < 512){
 	//	block1[i] = 0;
 	//	i++;
 	//}
 	debug("MINFS_MOUNT","Reading Starting Block");
-	//if(superblk->starting_block != 4)
-	//	panic()
-	//while(i < superblk->starting_block){
-	///	kprintf(".");
-	//	i++;
-	//}
 	ata_read_master(block1,superblk->starting_block,0x00);
-	//kprintf("%s\n",block1);
+	//kprintf("%c\n",block1[0]);
+	i = 0;
 	debug("MINFS_MOUNT","Parsing starting Block");
 	struct block *inblock = parse_buffer_block(block1,superblk,1);
 	debug("MINFS_MOUNT","Finished parsing block");
 	debug("MINFS_MOUNT","Tracking and parsing info block");
+
 	if(inblock->type == 0){
 		debug("MINFS_MOUNT","Starting block null");
 		debug("MINFS_MOUNT","Nothing to do");
 		return 0;
 	}
 	else if(inblock->infoblock == 0){
-		debug("MINFS_MOUNT","Info block is null hanging until it isn't(Probaly never)");
-		while(inblock->infoblock == 0)
-			inblock = parse_buffer_block(block1,superblk,1);
+		debug("MINFS_MOUNT","Info block is null.panic()");
+		panic();
+		//while(inblock->infoblock == 0)
+			//inblock = parse_buffer_block(block1,superblk,1);
 	}
 	else{
 		debug("MINFS_MOUNT","Succesfully read address of block,Jumping to it");

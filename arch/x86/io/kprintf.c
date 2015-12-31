@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <kernel/tty.h>
+#include <stdlib.h>
 #include <kernel/vga.h>
 #include <stdarg.h>
 #include <stdbool.h>
@@ -70,6 +71,39 @@ void kprintf(const char *format,...){
 			format++;
 			int buf = (int)va_arg(args,int);
 			char *ret = malloc(1024);
+			int i = 0;
+			while(buf > 0){
+				int buf1 = (buf%10);
+				if(buf1 == 0)
+					ret[intlen(buf) - (i + 1)] = '0';
+				else if(buf1 == 1)
+					ret[intlen(buf) - (i + 1)] = '1';
+				else if(buf1 == 2)
+					ret[intlen(buf) - (i + 1)] = '2';
+				else if(buf1 == 3)
+                                        ret[intlen(buf) - (i + 1)] = '3';
+				else if(buf1 == 4)
+                                        ret[intlen(buf) - (i + 1)] = '4';
+				else if(buf1 == 5)
+                                        ret[intlen(buf) - (i + 1)] = '5';
+				else if(buf1 == 6)
+                                        ret[intlen(buf) - (i + 1)] = '6';
+				else if(buf1 == 7)
+                                        ret[intlen(buf) - (i + 1)] = '7';
+				else if(buf1 == 8)
+                                        ret[intlen(buf) - (i + 1)] = '8';
+				else if(buf1 == 9)
+                                        ret[intlen(buf) - (i + 1)] = '9';
+				else
+					ret[intlen(buf) - (i + 1)] = 'E';
+				buf/=10;
+				i++;
+			}
+			i = 0;
+			while(i < intlen(buf)){
+				t_putc(ret[i]);
+			}
+			/*char *ret = malloc(1024);
 			//ret[1] = '\0';
 			int i = 0;
 			int n = 1;
@@ -106,7 +140,8 @@ void kprintf(const char *format,...){
 			while(i < strlen(ret)){
 				t_putc(ret[i]);
 				i++;
-			}
+			}*/
+			
 		}
 		else
 			goto badconv;
