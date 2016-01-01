@@ -125,7 +125,9 @@ int minfs_mount(int drivenum,int partnum,char *path){
 	//...
 	return 0;
 }
-struct block *parse_buffer_block(const char *buf,struct minfs_superblock *sblk,int i){
+struct block *parse_buffer_block(int lba,struct minfs_superblock *sblk,int i){
+	char *buf = malloc(1024);
+	ata_read_master(buf,lba,0x00);
 	struct block ret;
 	//char *bufs[1024] = {malloc(1024)};
 	//ata_read_master(bufs[0],4,0);
@@ -298,9 +300,10 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 //	kprintf("%c\n",block1[2]);
 	i = 0;
 	debug("MINFS_MOUNT","Parsing starting Block");
-	struct block *inblock = parse_buffer_block(block1,superblk,1);
+	struct block *inblock = parse_buffer_block(superblk->starting_block,superblk,1);
 	debug("MINFS_MOUNT","Finished parsing block");
 	debug("MINFS_MOUNT","Tracking and parsing info block");
+	//while(1){ };
 	//kprintf("%c",block1[2]);
 	if(inblock->type == 0){
 		debug("MINFS_MOUNT","Starting block null");
@@ -317,7 +320,7 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 		debug("MINFS_MOUNT","Succesfully read address of block,Jumping to it");
 		ata_read_master(buffers[0],inblock->infoblock,drivenum);
 		debug("MINFS_MOUNT","Parsing info block\n");
-		struct block *infoblk = parse_buffer_block(buffers[0],superblk,0); 
+		struct block *infoblk = parse_buffer_block(inblock->infoblock,superblk,0); 
 		debug("MINFS_MOUNT","Successfuly parsed block");
 		
 	}

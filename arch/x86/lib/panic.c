@@ -5,7 +5,7 @@
 */
 #include "panic.h"
 void panic(){
-	t_init();
+	//t_init();
 	kprintf("A fatal error has been encountered in the kernel. Panic has been called.\n");
 	kprintf("Continuing is not possible or is dangerous\n");
 	kprintf("minOS kernel\n");
@@ -21,6 +21,9 @@ void panic(){
 }
 void panic_shell(){
 	debug("panic_shell","Init");
+	debug("KERNEL","Failsafe kernel");
+	//kernel_main_old(0);
+	kernel_main_safe();
 	char *buf = malloc(1024);
 	while(1){
 		kprintf("\n>");
@@ -38,6 +41,9 @@ void panic_shell(){
 		else if(strcmp(buf,"hlt") == 0){
 			while(1){asm volatile("hlt"); };
 		}
+		else if(strcmp(buf,"old") == 0){
+			kernel_main_old(0);
+		}
 		buf = malloc(1024);
 	}
 }
@@ -45,7 +51,9 @@ void __panic(char *reason){
 	kprintf("A fatal error has been encountered in the kernel.__panic(reason)\n");
 	kprintf("Panic Reason:%s\n",reason);
 	dump_args(reason);
+	//debug("KERNEL","(c) 2015 Zachary James Schlotman");
+	debug("KERNEL","A fatal error has been encountered.");
 	debug("KERNEL","Hang");
-	//while(1){ };
-	panic();
+	while(1){ };
+	//panic();
 }

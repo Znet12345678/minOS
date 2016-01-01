@@ -221,6 +221,12 @@ int _verbose_kmain(char *arg){
 	debug("KERNEL","verbose_panic()");
 	verbose_panic(arg,"KERNEL","_verbose_kmain");
 }
+void kernel_main_safe(){
+	debug("KERNEL","Version 0.2-Alpha");
+	kprintf("**************SAFE BOOT**************\n");
+	debug("KERNEL","Hang");
+	while(1){};
+}
 int verbose_kmain(char *arg){
 	//t_init();
 	debug("KERNEL","Version 0.2-Alpha");
