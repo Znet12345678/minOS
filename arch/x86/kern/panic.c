@@ -3,6 +3,14 @@
 *panic functions
 */
 #include <stdio.h>
+void verbose_panic(char *args,char *process,char *subprocess){
+	kprintf("Verbose panic has been called\n");
+	kprintf("Kernel args:%s\n",args);
+	kprintf("Process responsable:%s\n",process);
+	kprintf("SubProcess responsable:%s\n",subprocess);
+	debug("KERNEL","Hang");
+	while(1) { };
+}
 void _panic(){
 	kprintf("Secondary Kernel panic{_panic();} has been called. It is recommended to reboot. If this is a development build please submit the issue to the developer.\n\n\n\n");
 	kprintf("Press any key to try again\n");
@@ -31,7 +39,7 @@ char *__kgets(){
 	}
 	return buf;
 }
-void panic_shell(){
+void _panic_shell(){
 	//char *buf;
 	kprintf("A semi-fatal panic has been encountered.\nYou will be dropped into a minimalistic shell\n");
 	while(1){

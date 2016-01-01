@@ -210,8 +210,19 @@ void dump_args(char *reason){
 	kprintf("minOS kernel is in alpha\n");
 	kprintf("Reason for panic: %s\n",reason);
 }
+int _verbose_kmain(char *arg){
+	debug("KERNEL","Version 0.2-Alpha");
+	debug("KERNEL","Verbose mode");
+	//debug("KERNEL","Testing hard drive");
+	int io = 0x1F0;
+	debug("KERNEL",arg);
+	debug("KERNEL","(c) 2016 Zachary James Schlotman");
+	debug("KERNEL","Please reboot with no boot arguments");
+	debug("KERNEL","verbose_panic()");
+	verbose_panic(arg,"KERNEL","_verbose_kmain");
+}
 int verbose_kmain(char *arg){
-	t_init();
+	//t_init();
 	debug("KERNEL","Version 0.2-Alpha");
 	kprintf("(c) 2015 Zachary James Schlotman\n");
 	//int i = atoi("4");

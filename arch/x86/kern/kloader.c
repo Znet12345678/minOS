@@ -106,14 +106,15 @@ void kernel_loader_main(){
 	kprintf("___________________________________________________________________________\n%)");
 	char *s = malloc(1024);
 	//kstrcpy(s,kgets());
-	kprintf("Defaulting arguments!\n");
 	verbose_kmain(NULL);
-	if(strcmp(s,"-v") == 0)
-		verbose_kmain(s);
-	else if(strncmp(s,"-g",2) == 0)
-		graphical_kmain(s);
-	else
-		verbose_kmain(s);
+	//kprintf("Defaulting arguments!\n");
+	//verbose_kmain(NULL);
+	//if(strcmp(s,"-v") == 0)
+	//	_verbose_kmain(s);
+	//if(strncmp(s,"-g",2) == 0)
+	//	graphical_kmain(s);
+	//else
+	//	verbose_kmain(s);
 	//int hd = (int)0x00000475;
 	/*if(strcmp(s,"s") == 0)
 		zsh();

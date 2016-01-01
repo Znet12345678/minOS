@@ -125,7 +125,7 @@ int minfs_mount(int drivenum,int partnum,char *path){
 	//...
 	return 0;
 }
-struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk,int i){
+struct block *parse_buffer_block(const char *buf,struct minfs_superblock *sblk,int i){
 	struct block ret;
 	//char *bufs[1024] = {malloc(1024)};
 	//ata_read_master(bufs[0],4,0);
@@ -147,7 +147,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk,int i){
 		#endif
 	}
 	ret.cont = buf;
-	char *strip = malloc(512);
+	char *strip = malloc(513);
 	ret.strip = strip;
 	ret.type = buf[2];
 	if(ret.type == 0x00){
@@ -262,6 +262,7 @@ struct block *parse_buffer_block(char *buf,struct minfs_superblock *sblk,int i){
 	}
 	else{
 		debug("PARSE_BUFFER_BLOCK","Failed to parse buffer:Invalid type\n");
+		//kprintf("%c",ret.type);
 		__panic("Invalid type");
 	}
 	return &ret;
@@ -294,13 +295,13 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	//}
 	debug("MINFS_MOUNT","Reading Starting Block");
 	ata_read_master(block1,superblk->starting_block,0x00);
-	//kprintf("%c\n",block1[0]);
+//	kprintf("%c\n",block1[2]);
 	i = 0;
 	debug("MINFS_MOUNT","Parsing starting Block");
 	struct block *inblock = parse_buffer_block(block1,superblk,1);
 	debug("MINFS_MOUNT","Finished parsing block");
 	debug("MINFS_MOUNT","Tracking and parsing info block");
-
+	//kprintf("%c",block1[2]);
 	if(inblock->type == 0){
 		debug("MINFS_MOUNT","Starting block null");
 		debug("MINFS_MOUNT","Nothing to do");
