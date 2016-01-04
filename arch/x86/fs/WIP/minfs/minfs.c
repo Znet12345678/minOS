@@ -269,8 +269,9 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 		//kprintf("%c",ret.type);
 		__panic("Invalid type");
 	}
-	_blk = ret;
-	return &_blk;
+	//_blk = ret;
+	//return &_blk;
+	
 }
 int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	t_init();
@@ -283,7 +284,8 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	//	panic();
 	//else if(superblk->starting_block == 4)
 	//	kprintf("!\n");
-	debug("MINFS_MOUNT","start");
+	debug("MINFS_MOUNT","init");
+	debug("MINFS_MOUNT","...");
 	char *block1 = malloc(1024);
 //	char block1[1024]
 	//kprintf("%s\n",block1);
@@ -317,7 +319,7 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	}*/
 	if(inblock.type != 0x04){
 		debug("MINFS_MOUNT","Couldn't find rootfs");
-		debug("KERNEL","hang");
+		debug("MINFS_MOUNT","hang");
 		while(1){ };
 	}
 	else if(inblock.infoblock < superblk->starting_block){
