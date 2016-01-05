@@ -46,6 +46,20 @@ void putent(char c,uint8_t colour,ksize_t x,ksize_t y){
 	const ksize_t index = y * VW + x;
 	tbuff[index] = mkent(c,colour);
 }
+void putcolour(uint8_t colour1){
+	//putent(' ',colour,tc,tr);
+	const ksize_t index = tr * VW + tc;
+	uint8_t colour = mkcolour(colour1,colour1);
+	tbuff[index] = mkent(' ',colour);
+	if(++tc == 80){
+		tc = 0;
+		if(++tr == 25){
+			tc = 0;
+			tr = 0;
+			//t_init();
+		}
+	}
+}
 void place_cursor(){
 	putent(' ',mkcolour(COLOUR_WHITE,COLOUR_WHITE),(tc + 1),tr);
 }

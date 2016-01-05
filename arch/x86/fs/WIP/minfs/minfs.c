@@ -274,7 +274,9 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 	
 }
 int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
+	#ifdef DEBUG
 	t_init();
+	#endif
 	struct minfs_superblock garbage;
 	struct minfs_superblock *superblk = malloc(sizeof(struct minfs_superblock *));
 	superblk = parse_superblk(0,garbage);

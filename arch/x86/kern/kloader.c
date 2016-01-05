@@ -105,8 +105,16 @@ void kernel_loader_main(){
 	kprintf("[-v] [-m] offset=#ofblocks\n");
 	kprintf("___________________________________________________________________________\n%)");
 	char *s = malloc(1024);
-	//kstrcpy(s,kgets());
+	#ifdef RELEASE
+	release_kmain();
+	#endif
+	#ifdef DEBUG
 	verbose_kmain(NULL);
+	#endif
+	#ifdef DEVELOPER
+	dev_kmain();
+	#endif
+//	verbose_kmain(NULL);
 	//kprintf("Defaulting arguments!\n");
 	//verbose_kmain(NULL);
 	//if(strcmp(s,"-v") == 0)

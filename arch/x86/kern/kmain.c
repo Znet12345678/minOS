@@ -9,6 +9,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <kernel/tty.h>
+#include <kernel/vga.h>
 #include "../lib/panic.h"
 
 //#include "../fs/broken/zfs/zfs.h"
@@ -21,6 +22,10 @@ unsigned long __strlen(const char *s1){
 	while(s1[len] != 0)
 		len++;
 	return len;
+}
+void dev_kmain(){
+	debug("KERNEL","hang");
+	while(1) { };
 }
 void test_init(){
 	kprintf("{[TESTM-INIT] Module Successfully loaded}\n");
@@ -227,8 +232,95 @@ void kernel_main_safe(){
 	debug("KERNEL","Hang");
 	while(1){};
 }
+int release_kmain(){
+	t_init();
+	debug("KERNEL","Version 0.2-Alpha");
+	kprintf("******************************RELEASE BUILD******************************\n");
+	debug("KERNEL","Early kernel,setting things up");
+	char *bufs[1024] = {malloc(1024)};
+	char *buf = malloc(1024);
+	int a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z;
+	debug("KERNEL","Using primary I/O port\n");
+	int io = 0x1F0;
+	debug("KERNEL","Setting up file systems");
+	struct minfs_superblock *superblk = parse_superblk(0,NULL);
+	mount_p1(bufs[0],superblk,0x00);
+	debug("KERNEL","Done");
+	
+}
 int verbose_kmain(char *arg){
 	//t_init();
+	int sel = 0;
+	t_init();
+	/*for(int i = 0; i < 240;i++){
+		putcolour(COLOUR_BLUE);
+	}
+	for(int i = 0;i < 20;i++){
+		putcolour(COLOUR_BLUE);
+		//kprintf("->Boot")
+	}
+	kprintf("->Boot");
+	for(int i = 0; i < 74;i++){
+		putcolour(COLOUR_BLUE);
+	}
+	kprintf(" hang");
+	for(int i = 0;i < 54;i++)
+		putcolour(COLOUR_BLUE);
+	for(int i = 0;i < (80*6);i++)
+		putcolour(COLOUR_BLUE);
+	char c = inportb(0x64);
+	while(1){
+	a1:while(inportb(0x64) == c) { };
+	c = inportb(0x60);
+	if(c == 0x1C)
+		break;
+	if(c != 0x48 && c != 0x50 && c != 0x1C)
+		goto a1;
+
+	a2:if(c != 0x1C){
+		t_init();
+		if(sel == 0)
+			sel = 1;
+		else
+			sel = 0;
+		if(sel == 1){
+			for(int i = 0; i < 260;i++){
+				putcolour(COLOUR_BLUE);
+			}
+			kprintf("  Boot");
+			for(int i = 0; i < 74;i++)
+				putcolour(COLOUR_BLUE);
+			kprintf("->hang");
+			for(int i = 0; i < (54 + (80 * 6));i++){
+				putcolour(COLOUR_BLUE);
+			}
+		}
+		else{
+			t_init();
+                	if(sel == 0)
+                	        sel = 1;
+                	else
+                      	 	 sel = 0;
+                	if(sel == 1){
+                        	for(int i = 0; i < 260;i++){
+                        	        putcolour(COLOUR_BLUE);
+                	        }
+                	        kprintf("->Boot");
+            	            for(int i = 0; i < 74;i++)
+                	                putcolour(COLOUR_BLUE);
+        	                kprintf("  hang");
+	                        for(int i = 0; i < (54 + (80 * 6));i++){
+                	                putcolour(COLOUR_BLUE);
+	                        }
+        	        }
+		
+		}
+	}
+	}
+	if(sel == 1){
+		kprintf("Hanging\n");
+		while(1) { };
+	}*/
 	debug("KERNEL","Version 0.2-Alpha");
 	kprintf("(c) 2015 Zachary James Schlotman\n");
 	//int i = atoi("4");

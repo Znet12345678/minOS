@@ -3,9 +3,9 @@ NASM=nasm -f elf
 
 all:
 	@echo "CC kmain.o"
-	@$(CC) -c kmain.c -o kmain.o -nostdlib -I../include -ffreestanding -std=gnu99 -I../fs/zfs -g
+	@$(CC) -c kmain.c -o kmain.o -nostdlib -I../include -ffreestanding -std=gnu99 -I../fs/zfs -g $(KMAIN_CFLAGS)
 	@echo "CC kloader.o"
-	@$(CC) -c kloader.c -o kloader.o -nostdlib -I../include -ffreestanding -std=gnu99 -g
+	@$(CC) -c kloader.c -o kloader.o -nostdlib -I../include -ffreestanding -std=gnu99 -g $(KMAIN_CFLAGS);
 	@echo "AS bootloader.o"
 	@$(NASM) -f elf bootloader.asm -o bootloader.o -g
 	@echo "CC kernel.o"
