@@ -190,6 +190,7 @@ int nstrcmp(const char *s1,const char *s2){
 	return 0;
 }
 void dump_args(char *reason){	
+	#ifdef DEBUG
 	kprintf("Drive Selection:");
 	int drive = -1;
 	if(drive == 0x00)
@@ -214,7 +215,9 @@ void dump_args(char *reason){
 	kprintf("Not Defined\n");
 	kprintf("minOS kernel is in alpha\n");
 	kprintf("Reason for panic: %s\n",reason);
+	#endif
 }
+
 int _verbose_kmain(char *arg){
 	debug("KERNEL","Version 0.2-Alpha");
 	debug("KERNEL","Verbose mode");

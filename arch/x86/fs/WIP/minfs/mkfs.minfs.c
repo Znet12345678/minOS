@@ -42,6 +42,9 @@ int mkfs_minfs(struct minfs_superblock *sblk,struct inode *inode,char *output){
 	//fputc(blksz1,f);
 	fputc(sblk->starting_block,f);
 	fputc(sblk->starting_inode,f);
+//	fputc(0,f);
+//	fputc(0,f);
+//	fputc(5,f);
 	/*fputc(blksz[0],f);
 	fputc(blksz[1],f);
 	if(sblk->starting_block < 10){
@@ -92,6 +95,9 @@ int mkfs_minfs(struct minfs_superblock *sblk,struct inode *inode,char *output){
 	fputc(0x42,f);
 	fputc(0x69,f);
 	fputc(0x04,f);	
+	fputc(0x00,f);
+	fputc(0x00,f);
+	fputc(5,f);
 	fclose(f);
 }
 int main(int argc,char *argv[]){

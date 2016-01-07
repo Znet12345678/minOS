@@ -50,7 +50,7 @@ void panic_shell(){
 void __panic(char *reason){
 	kprintf("A fatal error has been encountered in the kernel.__panic(reason)\n");
 	kprintf("Panic Reason:%s\n",reason);
-	dump_args(reason);
+	//dump_args(reason);
 	//debug("KERNEL","(c) 2015 Zachary James Schlotman");
 	debug("KERNEL","A fatal error has been encountered.");
 	debug("KERNEL","Hang");
