@@ -11,19 +11,19 @@ void panic(){
 	kprintf("minOS kernel\n");
 	kprintf("If you are getting a panic it is most likely that your hardware is not supported.\nThis works best in QEMU\n");
 	kprintf("This build will NOT continue after a panic.");
-	dump_args("NULL");
-	debug("KERNEL","panic_shell()");
-	panic_shell();
+	//dump_args("NULL");
+	//debug("KERNEL","panic_shell()");
+	//panic_shell();
 	//#ifndef NOPANIC
 	while(1){ }
 	//#endif
 	//_panic();
 }
 void panic_shell(){
-	debug("panic_shell","Init");
-	debug("KERNEL","Failsafe kernel");
+	//debug("panic_shell","Init");
+	//debug("KERNEL","Failsafe kernel");
 	//kernel_main_old(0);
-	kernel_main_safe();
+	//kernel_main_safe();
 	char *buf = malloc(1024);
 	while(1){
 		kprintf("\n>");

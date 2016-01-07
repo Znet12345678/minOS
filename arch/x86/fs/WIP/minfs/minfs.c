@@ -271,7 +271,7 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 	}
 	//_blk = ret;
 	//return &_blk;
-	
+	return &ret;	
 }
 int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	#ifdef DEBUG
@@ -308,7 +308,7 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	i = 0;
 	debug("MINFS_MOUNT","Parsing starting Block");
 	struct block inblock;
-	parse_buffer_block(inblock,superblk->starting_block,superblk,1);
+	struct block *_inblock = parse_buffer_block(inblock,superblk->starting_block,superblk,1);
 	debug("MINFS_MOUNT","Finished parsing block");
 	debug("MINFS_MOUNT","Tracking and parsing info block");
 	//while(1){ };
@@ -319,12 +319,12 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 		debug("MINFS_MOUNT","Nothing to do");
 		return 0;
 	}*/
-	if(inblock.type != 0x04){
+	if(_inblock->type != 0x04){
 		debug("MINFS_MOUNT","Couldn't find rootfs");
 		debug("MINFS_MOUNT","hang");
 		while(1){ };
 	}
-	else if(inblock.infoblock < superblk->starting_block){
+	else if(_inblock->infoblock < superblk->starting_block){
 		debug("MINFS_MOUNT","Info block is at an invalid position. panic()");
 		panic();
 		//while(inblock.infoblock == 0)
