@@ -177,7 +177,7 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 		ret.is_long = buf[3];
 		if(ret.is_long == 1){
 			char _lba_len[] = {buf[4],buf[5],buf[6]};
-			ret.lba_len = todec(_lba_len);
+			ret.lba_len = (buf[4] << 16 | buf[5] << 8 | buf[6]);
 			ret.blocks = ret.lba_len;
 			char _containing_dir[80];
 			int i = 7;
@@ -215,8 +215,8 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 		ret.isdir = 0;
 		ret.isinfo = 0;
 		ret.isallocated = 1;
-		char _infoblock[] = {buf[3],buf[4],buf[5]};
-		ret.infoblock = todec(_infoblock);
+		//char _infoblock[] = {buf[3],buf[4],buf[5]};
+		ret.infoblock = (buf[3] << 16 | buf[4] << 8 | buf[5]);
 		//ret.endingblock = ret.infoblock;
 		int i = 6;
 		int i1 = 0;
@@ -244,7 +244,7 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 		ret.isinfo = 0;
 		ret.isallocated = 1;
 		char _infoblock[] = {buf[3],buf[4],buf[5]};
-		ret.infoblock = todec(_infoblock);
+		ret.infoblock = (buf[3] << 16 | buf[4] << 8 | buf[5]);
 		char _files[512];
 		int i = 6;
 		while(i < 512){
@@ -262,7 +262,7 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 		ret.isinfo = 0;
 		ret.isallocated = 1;
 		char _infoblock[] = {buf[3],buf[4],buf[5]};
-		ret.infoblock = todec(_infoblock);
+		ret.infoblock = (buf[3] << 16 | buf[4] << 8 | buf[5]);
 	}
 	else{
 		debug("PARSE_BUFFER_BLOCK","Failed to parse buffer:Invalid type\n");
@@ -332,7 +332,15 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	}
 	else{
 		debug("MINFS_MOUNT","Succesfully read address of block,Jumping to it");
-		char *inbuf = malloc(513);
+		char *inbuf = malloc(1024);
+		int i = 0;
+		//if(_inblock->infoblock == 1280 || _inblock->infoblock == 327680){
+		//	kprintf("!");
+		//}
+		//while(i < _inblock->infoblock){
+			//kprintf(".");
+			//i++;
+		//}
 		ata_read_master(inbuf,_inblock->infoblock,0x00);
 		debug("MINFS_MOUNT","Parsing info block\n");
 		struct block infoblk;
