@@ -15,7 +15,9 @@ void panic(){
 	//debug("KERNEL","panic_shell()");
 	//panic_shell();
 	//#ifndef NOPANIC
-	while(1){ }
+	while(1){ 
+		t_displayl();
+	}
 	//#endif
 	//_panic();
 }

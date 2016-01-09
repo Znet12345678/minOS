@@ -41,7 +41,6 @@ void t_clear(){
 void t_setcolour(uint8_t colour){
 	tcolour = colour;
 }
-
 void putent(char c,uint8_t colour,ksize_t x,ksize_t y){
 	const ksize_t index = y * VW + x;
 	tbuff[index] = mkent(c,colour);
@@ -59,6 +58,16 @@ void putcolour(uint8_t colour1){
 			//t_init();
 		}
 	}
+}
+void t_displayl(){
+	//while(1){
+		putent('\\',tcolour,tc,tr);
+		for(int i = 0; i < 1000000; i++) {inb(0x1FC); }
+		putent('|',tcolour,tc,tr);
+		for(int i = 0; i < 1000000;i++) {inb(0x1FC); }
+		putent('/',tcolour,tc,tr);
+		for(int i = 0; i < 1000000;i++) {inb(0x1FC); }
+	//}
 }
 void place_cursor(){
 	putent(' ',mkcolour(COLOUR_WHITE,COLOUR_WHITE),(tc + 1),tr);
