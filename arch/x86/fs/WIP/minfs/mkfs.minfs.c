@@ -98,6 +98,14 @@ int mkfs_minfs(struct minfs_superblock *sblk,struct inode *inode,char *output){
 	fputc(0x00,f);
 	fputc(0x00,f);
 	fputc(5,f);
+	fseek(f,2560,SEEK_SET);
+	fputc(0x42,f);
+	fputc(0x69,f);
+	fputc(0x01,f);
+	fputc(0x00,f);
+	fputc(0x01,f);
+	fputc('/',f);
+	fputc(0x00,f);
 	fclose(f);
 }
 int main(int argc,char *argv[]){
