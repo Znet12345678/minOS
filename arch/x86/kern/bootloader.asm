@@ -4,7 +4,9 @@ int 0xAA
 section .text
 global _start
 extern Start
+extern realmode
 _start:
+	;call realmode
 	mov edx,len
 	mov ecx,msg
 	mov ebx,1

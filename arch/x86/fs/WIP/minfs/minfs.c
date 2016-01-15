@@ -1,3 +1,4 @@
+
 /*
 *MinFS File System Driver
 *Not Completed
@@ -52,12 +53,18 @@ struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk
 	struct minfs_superblock ret;
 	char *buf = malloc(1024);
 	int i = 0;
-	while(i < 512){
-		buf[i] = 0;
-		i++;
-	}
+	//while(i < 512){
+	//	buf[i] = 0;
+	//	i++;
+	//}
 	i = 0;
 	ata_read_master(buf,2,0);
+	//while(i < 512){
+	//	kprintf("%c",buf[i]);
+	//	i++;
+	//}
+	i = 0;
+	//kprintf("%s\n",buf);
 	//while(i < 512){
 	//	t_putc(buf[i]);
 	//	i++;	
@@ -66,10 +73,22 @@ struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk
 	i = 0;
 	char _buf[] = {buf[0],buf[1]};
 	ret.blocksize = _todec(_buf);
+	//if(buf[2] != 0x04)
+	//	panic();
 	int sb = buf[2];
+	//if(sb != 4)
+	//	panic();
 	int si = buf[3];
 	ret.starting_block = sb;
 	ret.starting_inode = si;
+	/*ret.numoffiles = buf[4];
+	ret.numofdirs = buf[5];
+	ret.fpntrs = malloc(1024);
+	char *fn[1024] = {malloc(1024)};
+	ret.filenames = fn;
+	ret.dpntrs = buf[5];
+	char *dirnames[1024] ={malloc(1024)};
+	ret.dirnames = dirnames;*/
 /*	//kprintf("%s\n",buf);
 	//int i = 0;
 	char _buf[] = {buf[0],buf[1]};
@@ -81,7 +100,6 @@ struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk
 	//}
 	//kprintf("%s\n",_buf);
 //	while(1){ };
-
 	ret.blocksize = _todec(_buf);
 	//if(ret.blocksize != 512)
 	//	while(1) { };
@@ -95,8 +113,105 @@ struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk
 	//	panic();
 	ret.starting_inode =(int) buf[3];
 	//return &ret;*/
+	//while(1) { };
 	blk = ret;
 	return &ret;
+}
+struct miscblk *parse_miscblk(struct miscblk garbage){
+	//while(1){};
+	char *buf = malloc(1024);
+	ata_read_master(buf,10,0);
+	garbage.numofallocdblocks = buf[0] << 16 | buf[1] << 8 | buf[2];
+	garbage.numoffiles = buf[3] << 16 | buf[4] << 8 | buf[5];
+	int i = 6;
+	//kprintf("1");
+	int lba = 10;
+	garbage.fpnt = malloc(1024);
+	garbage.dpnt = malloc(1024);
+	int i1 = 0;
+	while(buf[i] != 0){
+		if(i >= 512){
+			i = 0;
+			buf = malloc(1024);
+			ata_read_master(buf,++lba,0);
+		}
+		garbage.fpnt[i1] = buf[i];
+		i1++;
+		i++;
+	}
+	garbage.i = i;
+	i++;
+	i1 = 0;
+	while(buf[i] != 0){
+		if(i >= 512){
+			i = 0;
+			buf = malloc(1024);
+			ata_read_master(buf,++lba,0);
+		}
+		garbage.dpnt[i1] = buf[i];
+		i1++;
+		i++;
+	}
+	garbage._i = i;
+	i++;
+	int i2 = 0;
+	while(1){
+		t_displayl();
+		if(i >= 512){
+			i = 0;
+			buf = malloc(1024);
+			ata_read_master(buf,++lba,0);
+		}
+		garbage.names[i2] = malloc(1024);
+		i1 = 0;
+		char *tmpbuf = malloc(80);
+		while(buf[i] != 0x20){
+			if(i >= 512){
+				i = 0;
+                        	buf = malloc(1024);
+                        	ata_read_master(buf,++lba,0);
+               	 	}
+
+			kstrcat(tmpbuf,&buf[i]);
+			i++;
+		}
+		garbage.names[i2] = tmpbuf;
+		if(buf[i] == 0xFF)
+			break;
+		//kprintf(".");
+		i2++;
+		i++;
+	}
+	i++;
+	i2 = 0;
+	while(1){
+		t_displayl();
+		if(i >= 512){
+			i = 0;
+                        buf = malloc(1024);
+                        ata_read_master(buf,++lba,0);
+		}
+		garbage.names[i2] = malloc(1024);
+		i1 = 0;
+		char *tmpbuf = malloc(80);
+		while(buf[i] != 0x20){
+			if(i >=512){
+				i = 0;
+                        	buf = malloc(1024);
+                	        ata_read_master(buf,++lba,0);
+        	        }
+			kstrcat(tmpbuf,&buf[i]);
+			i++;
+			//garbage.names[i2
+		}
+		garbage.names[i2] = tmpbuf;
+		if(buf[i] == 0xFF)
+			break;
+		i2++;
+		i++;
+	}
+	debug("PARSE_MISCBLOCK","done");
+	return &garbage;
 }
 struct inode *read_inode(int drive,int n,struct minfs_superblock *sblk){
 	/*Reads from drive number*/
@@ -152,6 +267,7 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 	char *strip = malloc(513);
 	ret.strip = strip;
 	ret.type = buf[2];
+	//while(1){ };
 	if(ret.type == 0x00){
 		//Type is not allocated	
 		debug("PARSE_BUFFER_BLOCK","Found unallocated block");
@@ -275,13 +391,15 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 }
 int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	//#ifdef DEBUG
+	//while(1) { };
 	t_init();
 	//#endif
 	struct minfs_superblock garbage;
-	struct minfs_superblock *superblk = malloc(sizeof(struct minfs_superblock *));
+	struct minfs_superblock *superblk;//= malloc(sizeof(struct minfs_superblock *));
 	superblk = parse_superblk(0,garbage);
 	if(superblk->starting_block <= 0)
 		__panic("Null starting block");
+	//while(1){ };
 	//else if(superblk->starting_block == 4)
 	//	panic();
 	//else if(superblk->starting_block == 4)
@@ -346,7 +464,10 @@ int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 		struct block infoblk;
 		struct block *_infoblk = parse_buffer_block(infoblk,_inblock->infoblock,superblk,0); 
 		debug("MINFS_MOUNT","Successfuly parsed block");
-		
+		debug("MINFS_MOUNT","Reading and Parsing miscblock");
+		//while(1) { };
+		struct miscblk mg;
+		struct miscblk *mb = parse_miscblk(mg);
 	}
 	return 1;
 }

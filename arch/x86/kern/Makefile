@@ -34,5 +34,8 @@ all:
 	@$(CC) -c shell.c -o shell.o -nostdlib -g  -ffreestanding -I../include
 	@echo "CC mod.o"
 	@$(CC) -c add_module.c -o mod.o -nostdlib -ffreestanding -I../include
+	@echo "AS rm.o"
+	@$(NASM) -f elf rm.asm -o rm.o
+#	@$(AS) rm.S -o rm.o
 clean:
 	rm *.o

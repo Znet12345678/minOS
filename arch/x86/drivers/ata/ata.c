@@ -141,7 +141,7 @@ int ata_read_master(uint8_t *buf,uint32_t _lba,uint16_t drive){
 	//ide_wait_for_read();
 	//ide_wait_for_read(io);
 	if(ide_wait_for_read(io) < 0)
-		return -1;
+		panic();
 		//_panic();
 		//return -1;
 	//kprintf("@");

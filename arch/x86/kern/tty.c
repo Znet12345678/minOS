@@ -76,11 +76,11 @@ void clear_cursor(){
 	putent(' ',tcolour,(tc + 1),tr);
 }
 void t_putc(char c){
-	unsigned short pos = (tr *80) + tc + 1;
+	/*unsigned short pos = (tr *80) + tc + 1;
 	outb(0x3D4,0x0F);
 	outb(0x3D5,(unsigned char) (pos&0xFF));
 	outb(0x3D4,0x0E);
-	outb(0x3D5,(unsigned char) ((pos >> 8)&0xFF));
+	outb(0x3D5,(unsigned char) ((pos >> 8)&0xFF));*/
 	if(c != '\n')
 		putent(c,tcolour,tc,tr);
 	if(c == '	')
@@ -93,6 +93,11 @@ void t_putc(char c){
 			t_init();
 		}
 	}
+	unsigned short pos = (tr *80) + tc + 1;
+        outb(0x3D4,0x0F);
+        outb(0x3D5,(unsigned char) (pos&0xFF));
+        outb(0x3D4,0x0E);
+        outb(0x3D5,(unsigned char) ((pos >> 8)&0xFF));
 }
 void t_cputc(char c,uint8_t colour){
 	if(c != '\n')

@@ -54,8 +54,8 @@ void __panic(char *reason){
 	kprintf("Panic Reason:%s\n",reason);
 	//dump_args(reason);
 	//debug("KERNEL","(c) 2015 Zachary James Schlotman");
-	debug("KERNEL","A fatal error has been encountered.");
-	debug("KERNEL","Hang");
+	//debug("KERNEL","A fatal error has been encountered.");
+	//debug("KERNEL","Hang");
 	while(1){ };
 	//panic();
 }
