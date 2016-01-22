@@ -6,8 +6,8 @@ all:
 	@$(CC) -c kmain.c -o kmain.o -nostdlib -I../include -ffreestanding -std=gnu99 -I../fs/zfs -g $(KMAIN_CFLAGS)
 	@echo "CC kloader.o"
 	@$(CC) -c kloader.c -o kloader.o -nostdlib -I../include -ffreestanding -std=gnu99 -g $(KMAIN_CFLAGS);
-	@echo "AS bootloader.o"
-	@$(NASM) -f elf bootloader.asm -o bootloader.o -g
+	@echo "BINAS bootloader.bin"
+	@$(NASM) -f bin bootloader.asm -o bootloader.bin -g
 	@echo "CC kernel.o"
 	@$(CC) -c kernel.c -o kernel.o -nostdlib -I../include -ffreestanding -std=gnu99 -g
 	@echo "CC tty.o"
@@ -36,6 +36,10 @@ all:
 	@$(CC) -c add_module.c -o mod.o -nostdlib -ffreestanding -I../include
 	@echo "AS rm.o"
 	@$(NASM) -f elf rm.asm -o rm.o
+	@echo "CC reboot.c"
+	@$(CC) -c reboot.c -o reboot.o -ffreestanding -nostdlib
+	@echo "BINAS zero.bin"
+	@$(NASM) -f bin zero.asm -o zero.bin
 #	@$(AS) rm.S -o rm.o
 clean:
 	rm *.o

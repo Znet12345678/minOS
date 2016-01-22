@@ -5,6 +5,7 @@
 //or al,1
 //mov cr0, eax
 //JMP 08h:_start
+.org 0x8c00
 .set ALIGN,    1<<0
 .set MEMINFO,  1<<1
 .set FLAGS,    ALIGN | MEMINFO
@@ -20,10 +21,10 @@ stack_bottom:
 .skip 16384 
 stack_top:
 .section .text
-.global Start
+.global _start
 //.type Start, @function
 BOOTSEG = 0x07c0
-Start:
+_start:
 	//. = _start + 510
 	//.byte 0x55
 	//.byte 0xaa
@@ -38,6 +39,6 @@ Start:
 .Lhang:
 	hlt
 	jmp .Lhang
-.size Start, . - Start
+.size _start, . - _start
 //.fill (510-(.-_start)),1,0
 //BootMagic: .int 0xAA55

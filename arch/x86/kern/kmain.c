@@ -11,6 +11,7 @@
 #include <kernel/tty.h>
 #include <kernel/vga.h>
 #include "../lib/panic.h"
+#include "../fs/WIP/fat/fat32.h"
 
 //#include "../fs/broken/zfs/zfs.h"
 #include "../fs/broken/zfs/zfs.h"
@@ -246,10 +247,38 @@ int release_kmain(){
 	debug("KERNEL","Using primary I/O port\n");
 	int io = 0x1F0;
 	debug("KERNEL","Setting up file systems");
-	struct minfs_superblock *superblk = parse_superblk(0,NULL);
-	mount_p1(bufs[0],superblk,0x00);
+	ata_read_master(buf,0,0);
+	//struct minfs_superblock *superblk = parse_superblk(0,);
+	//mount("/",0x00);
+	//debug("KERNEL","Done");
+	struct bpb boots;
+	boots.jmp = buf[0] << 16 | buf[1] << 8 | buf[2];
+	boots.bytespersector = buf[11] << 8 | buf[12];
+	boots.sectorspercluster = buf[13];
+	boots.reserved  = buf[14] << 8 | buf[15];
+	boots.numoffat = buf[16];
+	boots.numofdirent = buf[17] << 8 | buf[18];
+	boots.totsec = buf[19] << 8 | buf[20];
+	boots.mdt = buf[21];
+	boots.sectorspertrack = buf[24] << 8 | buf[25];
+	boots.heads = buf[26] << 8 | buf[27];
+	boots.hiddensectors = buf[28] << 32 | buf[29] << 16 | buf[30] << 8 | buf[31];
+	char *ehg = malloc(1024);
+	ata_read_master(ehg,boots.hiddensectors,0);
+	//while(1){ }
+	boots.largeammountofsectoronmedia = 0;
+	struct Fat32_ExtendedBootRecord ebr;
+	ebr.SectorsPerFat = buf[36] << 32 | buf[37] << 16 | buf[38] << 8 | buf[39];
+	ebr.flags =buf[40] << 8 | buf[41];
+	ebr.cluster_number = buf[44] << 32 | buf[45] << 16 | buf[46] << 8 | buf[47];
+	ebr.second_number = buf[48] << 8 | buf[49];
+	ebr.backup = buf[50] << 8 | buf[51];
+	ebr.DriveNum = buf[52];
+	ebr.Signature = buf[53];
+	char *fat = malloc(1024);
+	fat32_mount(boots,ebr,fat);
 	debug("KERNEL","Done");
-	
+	//panic();
 }
 int verbose_kmain(char *arg){
 	//t_init();
@@ -651,11 +680,11 @@ int verbose_kmain(char *arg){
 	//kprintf("[START] Mounting FileSystems\n");
 	debug("KERNEL","Parsing Superblock");
 	kprintf("	*Parsing Superblock\n");
-	struct minfs_superblock *superblk = parse_superblk(0,NULL);
+	//struct minfs_superblock *superblk = parse_superblk(0,NULL);
 	debug("KERNEL","mount_p1");
 	char *buffer = malloc(102400);
-	mount_p1(buffer,0,superblk);
-	//struct minfs_superblock *superblk = parse_superblk(0);
+//	mount_p1(buffer,0,superblk);
+//	//struct minfs_superblock *superblk = parse_superblk(0);
 	//if(superblk->blocksize != 512)
 	//	panic();
 	//kprintf("	*Reading Initial inode\n");

@@ -15,6 +15,7 @@ void panic(){
 	//debug("KERNEL","panic_shell()");
 	//panic_shell();
 	//#ifndef NOPANIC
+	//reboot();
 	while(1){ 
 		t_displayl();
 	}

@@ -142,10 +142,13 @@ int mkfs_minfs(struct minfs_superblock *sblk,struct inode *inode,char *output){
 	fputc(0,f);
 	fputc(0,f);
 	fputc(0,f);
+	fputc(0,f);
 	fputc(0x04,f);
 	fputc(0,f);
+	fputc(0x20,f);
 	fputc(0xFF,f);
 	fputc('/',f);
+	fputc(0x20,f);
 	fputc(0xFF,f);
 
 	fclose(f);

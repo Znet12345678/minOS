@@ -157,6 +157,8 @@ struct miscblk *parse_miscblk(struct miscblk garbage){
 	int i2 = 0;
 	while(1){
 		t_displayl();
+		if(buf[i] == 0xff)
+			break;
 		if(i >= 512){
 			i = 0;
 			buf = malloc(1024);
@@ -176,8 +178,6 @@ struct miscblk *parse_miscblk(struct miscblk garbage){
 			i++;
 		}
 		garbage.names[i2] = tmpbuf;
-		if(buf[i] == 0xFF)
-			break;
 		//kprintf(".");
 		i2++;
 		i++;
@@ -186,6 +186,8 @@ struct miscblk *parse_miscblk(struct miscblk garbage){
 	i2 = 0;
 	while(1){
 		t_displayl();
+		if(buf[i] == 0xff)
+			break;
 		if(i >= 512){
 			i = 0;
                         buf = malloc(1024);
@@ -205,8 +207,7 @@ struct miscblk *parse_miscblk(struct miscblk garbage){
 			//garbage.names[i2
 		}
 		garbage.names[i2] = tmpbuf;
-		if(buf[i] == 0xFF)
-			break;
+
 		i2++;
 		i++;
 	}

@@ -67,6 +67,7 @@ struct FILE{
 	int b_len;
 };
 int mount_p1(char *buf,int drive,struct minfs_superblock *superblk);
+struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk);
 #define F_READ 0x00
 #define F_WRITE 0x01
 #define F_APPEND 0x02
