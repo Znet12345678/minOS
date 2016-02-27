@@ -4,3 +4,4 @@ all:
 #	@make -C fat32
 	@make -C WIP/minfs
 	@make -C WIP/fat
+	@make -C WIP/fs

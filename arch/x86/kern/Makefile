@@ -40,6 +40,10 @@ all:
 	@$(CC) -c reboot.c -o reboot.o -ffreestanding -nostdlib
 	@echo "BINAS zero.bin"
 	@$(NASM) -f bin zero.asm -o zero.bin
+	@echo "NASM initgui.o"
+	@$(NASM) -f elf initgui.asm -o initgui.o
+	@echo "NASM int32.o"
+	@$(NASM) -f elf int32.asm -o int32.o
 #	@$(AS) rm.S -o rm.o
 clean:
 	rm *.o

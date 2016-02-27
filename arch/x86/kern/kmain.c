@@ -12,7 +12,10 @@
 #include <kernel/vga.h>
 #include "../lib/panic.h"
 #include "../fs/WIP/fat/fat32.h"
-
+typedef struct __attribute__ ((packed)) {
+    unsigned short di, si, bp, sp, bx, dx, cx, ax;
+    unsigned short gs, fs, es, ds, eflags;
+} regs16_t;
 //#include "../fs/broken/zfs/zfs.h"
 #include "../fs/broken/zfs/zfs.h"
 #include "../fs/broken/ext2/ext2.h"
@@ -247,11 +250,11 @@ int release_kmain(){
 	debug("KERNEL","Using primary I/O port\n");
 	int io = 0x1F0;
 	debug("KERNEL","Setting up file systems");
-	ata_read_master(buf,0,0);
+	//ata_read_master(buf,0,0);
 	//struct minfs_superblock *superblk = parse_superblk(0,);
 	//mount("/",0x00);
 	//debug("KERNEL","Done");
-	struct bpb boots;
+	/*struct bpb boots;
 	boots.jmp = buf[0] << 16 | buf[1] << 8 | buf[2];
 	boots.bytespersector = buf[11] << 8 | buf[12];
 	boots.sectorspercluster = buf[13];
@@ -276,7 +279,13 @@ int release_kmain(){
 	ebr.DriveNum = buf[52];
 	ebr.Signature = buf[53];
 	char *fat = malloc(1024);
-	fat32_mount(boots,ebr,fat);
+	fat32_mount(boots,ebr,fat);*/
+	//debug("KERNEL","INITIALIZING GUI BRASE YOURSELVES");
+	//initgui();
+	//regs16_t regs;
+	//regs.ax = 0x0013;
+	//int32(0x10,&regs);
+	//init_gui();
 	debug("KERNEL","Done");
 	//panic();
 }
