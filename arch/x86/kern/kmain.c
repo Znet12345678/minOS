@@ -287,6 +287,15 @@ int release_kmain(){
 	//int32(0x10,&regs);
 	//init_gui();
 	debug("KERNEL","Done");
+	while(1){
+		kprintf("\n");
+		kprintf("[nobody@minos_kernel]");
+		char *s = malloc(1024);
+		s = kgets();
+		//kprintf("\n%s.\n",s);
+		shell_process(s);
+		//kprintf("\n%s\n",s);
+	}
 	//panic();
 }
 int verbose_kmain(char *arg){

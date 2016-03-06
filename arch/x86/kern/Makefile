@@ -31,7 +31,7 @@ all:
 	@echo "AS bootl.o"
 	@$(NASM) -f elf bootl.asm -o bootl.o -g
 	@echo "CC shell.o"
-	@$(CC) -c shell.c -o shell.o -nostdlib -g  -ffreestanding -I../include
+	@$(CC) -c shell.c -o shell.o  -std=c99 -nostdlib -g  -ffreestanding -I../include
 	@echo "CC mod.o"
 	@$(CC) -c add_module.c -o mod.o -nostdlib -ffreestanding -I../include
 	@echo "AS rm.o"

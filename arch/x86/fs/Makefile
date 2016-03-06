@@ -5,3 +5,4 @@ all:
 	@make -C WIP/minfs
 	@make -C WIP/fat
 	@make -C WIP/fs
+	@make -C WIP/zfs

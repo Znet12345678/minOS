@@ -55,6 +55,7 @@ char *kgets(){
 		i++;
 		
 	}
+	args[i] = 0x00;
 	 i = 0;
 	return args;
 }

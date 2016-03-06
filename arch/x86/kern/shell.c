@@ -5,6 +5,65 @@
 */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#define MAX_COMMANDS 100
+int scmp(const char *str1,const char *str2,unsigned int n){
+	int i = n;
+	while(str1[i] != 0){
+		if(str1[i] != str2[i])
+			return ++i;
+		i++;
+	}
+	return 0;
+}
+void shell_process(const char *str){
+	char *arg1 = malloc(1024);
+	char *args = malloc(1024);
+	int i = 0;
+	while(str[i] != ' ' && str[i] != 0x00){
+		//kprintf(".");
+		arg1[i] = str[i];
+		i++;
+	}
+	arg1[i] = 0;
+	//kprintf("%s",arg1);
+	const char *commands[MAX_COMMANDS] = { 0 };
+	const char *response[MAX_COMMANDS] = { 0 };
+	commands[0] = "version";
+	commands[1] = "ls";
+	commands[2] = "help";
+	commands[3] = "commands";
+	commands[4] = "contact";
+	commands[5] = "copyright";
+	response[0] = "v0.3-alpha\n";
+	response[1] = "No File System completed\n";
+	char lc[3] = {0x0A,'l','c'};
+	response[2] = lc;
+	response[3] = lc;
+	response[4] = "Email:znet12345678@gmail.com Phone:972-800-8197\n";
+	response[5] = "(c) 2016 Zachary James Schlotman";
+	for(int i = 0; i < MAX_COMMANDS;i++){
+		if(strcmp(arg1,commands[i]) == 0){
+			if(response[i][0] == 0x0A){
+				if(scmp(response[i],"lc",1) == 0){
+					kprintf("Commands:\n");
+					for(int j = 0; j < MAX_COMMANDS; j++){
+						kprintf("%s",commands[j]);
+						if(commands[j][0] != 0)
+							kprintf(" ");
+					}
+				}
+			}
+			else
+				kprintf("\n%s",response[i]);
+			break;
+		}
+
+	}
+	if(i == MAX_COMMANDS - 1)
+		kprintf("Unkown command!\n");
+
+}
 void *_fmalloc(unsigned long s){
         char ret[s];
         return (void *)ret;
@@ -35,8 +94,8 @@ char *_kgets(){
 }
 void call(char *func,char *args){
 		//asm("push %esp, offset %P0" : : "m"(args));
-		asm("call %P0" : : "m"(func));
-		asm("pop %esp");
+	//	asm("call %P0" : : "m"(func));
+	//	asm("pop %esp");
 }
 void zsh(){
 	t_init();
