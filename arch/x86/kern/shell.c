@@ -69,7 +69,7 @@ void shell_process(const char *str){
 
 	}
 	if(i >= MAX_COMMANDS - 1)
-		kprintf("Unkown command!\n");
+		kprintf("\nUnkown command!\n");
 
 }
 void *_fmalloc(unsigned long s){

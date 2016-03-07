@@ -11,6 +11,9 @@ struct file_struct{
 	int offset;
 	int posx;
 	int posy;
+	int pos;
+	int endingpos;
+	int blockpos;
 	char *filename;
 	int opperation;
 };
