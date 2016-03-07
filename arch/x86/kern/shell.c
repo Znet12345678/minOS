@@ -8,10 +8,14 @@
 #include <stdlib.h>
 #define MAX_COMMANDS 100
 int scmp(const char *str1,const char *str2,unsigned int n){
-	int i = n;
-	while(str1[i] != 0){
-		if(str1[i] != str2[i])
+	unsigned int i = n;
+	int i1 = 0;
+	while(i1 < strlen(str2)){
+		//kprintf(".");
+		if(str1[i] != str2[i1])
 			return ++i;
+		i1++;
+		//kprintf(".");
 		i++;
 	}
 	return 0;
@@ -42,17 +46,21 @@ void shell_process(const char *str){
 	response[3] = lc;
 	response[4] = "Email:znet12345678@gmail.com Phone:972-800-8197\n";
 	response[5] = "(c) 2016 Zachary James Schlotman";
-	for(int i = 0; i < MAX_COMMANDS;i++){
+	//int i;
+	for(i = 0; i < MAX_COMMANDS;i++){
 		if(strcmp(arg1,commands[i]) == 0){
 			if(response[i][0] == 0x0A){
 				if(scmp(response[i],"lc",1) == 0){
-					kprintf("Commands:\n");
+					kprintf("\nCommands:\n");
 					for(int j = 0; j < MAX_COMMANDS; j++){
-						kprintf("%s",commands[j]);
+						if(commands[j] != 0)
+							kprintf("%s",commands[j]);
 						if(commands[j][0] != 0)
 							kprintf(" ");
 					}
 				}
+				//else
+				//	kprintf(".");
 			}
 			else
 				kprintf("\n%s",response[i]);
@@ -60,7 +68,7 @@ void shell_process(const char *str){
 		}
 
 	}
-	if(i == MAX_COMMANDS - 1)
+	if(i >= MAX_COMMANDS - 1)
 		kprintf("Unkown command!\n");
 
 }
