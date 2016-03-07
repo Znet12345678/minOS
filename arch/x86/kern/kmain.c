@@ -223,7 +223,7 @@ void dump_args(char *reason){
 }
 
 int _verbose_kmain(char *arg){
-	debug("KERNEL","Version 0.2-Alpha");
+	debug("KERNEL","Version 0.3-alpha");
 	debug("KERNEL","Verbose mode");
 	//debug("KERNEL","Testing hard drive");
 	int io = 0x1F0;
@@ -234,14 +234,14 @@ int _verbose_kmain(char *arg){
 	verbose_panic(arg,"KERNEL","_verbose_kmain");
 }
 void kernel_main_safe(){
-	debug("KERNEL","Version 0.2-Alpha");
+	debug("KERNEL","Version 0.3-alpha");
 	kprintf("**************SAFE BOOT**************\n");
 	debug("KERNEL","Hang");
 	while(1){};
 }
 int release_kmain(){
 	t_init();
-	debug("KERNEL","Version 0.2-Alpha");
+	debug("KERNEL","Version 0.3-alpha");
 	kprintf("******************************RELEASE BUILD******************************\n");
 	debug("KERNEL","Early kernel,setting things up");
 	char *bufs[1024] = {malloc(1024)};
@@ -371,7 +371,7 @@ int verbose_kmain(char *arg){
 		kprintf("Hanging\n");
 		while(1) { };
 	}*/
-	debug("KERNEL","Version 0.2-Alpha");
+	debug("KERNEL","Version 0.3-alpha");
 	kprintf("(c) 2015 Zachary James Schlotman\n");
 	//int i = atoi("4");
 	//if(i == 4)
