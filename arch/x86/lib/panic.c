@@ -22,6 +22,7 @@ void panic(){
 	//#endif
 	//_panic();
 }
+#ifndef __LIB_BUILD
 void panic_shell(){
 	//debug("panic_shell","Init");
 	//debug("KERNEL","Failsafe kernel");
@@ -50,6 +51,7 @@ void panic_shell(){
 		buf = malloc(1024);
 	}
 }
+#endif
 void __panic(char *reason){
 	kprintf("A fatal error has been encountered in the kernel.__panic(reason)\n");
 	kprintf("Panic Reason:%s\n",reason);

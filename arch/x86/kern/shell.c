@@ -1,5 +1,4 @@
 /*
-*broken
 *public domain
 *Zachary James Schlotman
 */
@@ -72,10 +71,17 @@ void shell_process(const char *str){
 		kprintf("\nUnkown command!\n");
 
 }
+#ifndef __LIB_BUILD
 void *_fmalloc(unsigned long s){
         char ret[s];
         return (void *)ret;
 }
+#else
+void *fmalloc(unsigned long s){
+	char ret[s];
+	return (void *)ret;
+}
+#endif
 char *_kgets(){
         char *args =fmalloc(80);
         char oldc = '\n';

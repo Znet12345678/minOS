@@ -44,6 +44,10 @@ all:
 	@$(NASM) -f elf initgui.asm -o initgui.o
 	@echo "NASM int32.o"
 	@$(NASM) -f elf int32.asm -o int32.o
+	@echo "AS yourboot.o"
+	@$(AS) yourboot.S -o yourboot.o
+	@echo "CC yourkernel.o"
+	@$(CC) -c yourkernel.c -o yourkernel.o -nostdlib -I../include
 #	@$(AS) rm.S -o rm.o
 clean:
 	rm *.o

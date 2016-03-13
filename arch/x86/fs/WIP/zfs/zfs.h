@@ -5,35 +5,41 @@
 #define TYPE_FILE 2
 #define OP_READ 0x00
 #define OP_WRITE 0x01
+#include <stdint.h>
 struct file_struct{
-	int startingblock;
-	int endingblock;
-	int offset;
-	int posx;
-	int posy;
-	int pos;
-	int endingpos;
-	int blockpos;
+	uint32_t startingblock;
+	uint32_t endingblock;
+	uint32_t offset;
+	uint32_t posx;
+	uint32_t posy;
+	uint32_t pos;
+	uint32_t endingpos;
+	uint32_t blockpos;
 	char *filename;
-	int opperation;
+	uint32_t opperation;
+	uint32_t tpos;
 };
 struct zfs_superblock{
-	unsigned int allocblk;
-	unsigned int unallocblk;
-	unsigned int tblk;
-	unsigned int dataresv;
-	unsigned int rootfsblk;
-	unsigned int numoff;
-	unsigned int numofd;
-	unsigned int fds;
+	uint32_t allocblk;
+	uint32_t unallocblk;
+	uint32_t tblk;
+	uint32_t dataresv;
+	uint32_t rootfsblk;
+	uint32_t numoff;
+	uint32_t numofd;
+	uint32_t fds;
 };
 struct data{
-	int islongname;
-	int namelen;
+	uint32_t alloc;
+	uint32_t islongname;
+	uint32_t namelen;
 	char *name;
-	int type;
-	int startingblock;
- 	int endingblock;
+	uint32_t type;
+	uint32_t offset;
+	uint32_t endingpos;
+	uint32_t blockpos;
+	uint32_t startingblock;
+ 	uint32_t endingblock;
 };
 #ifndef __KERNEL_BUILD
 void write_fs(struct zfs_superblock *sblk);

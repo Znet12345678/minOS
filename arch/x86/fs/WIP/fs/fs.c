@@ -3,7 +3,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "fs.h"
-struct superblk *parse_superblk(struct superblk *ret){
+struct superblk *nfs_parse_superblk(struct superblk *ret){
 	char *buf = malloc(1024);
 	ata_read_master(buf,2,0);
 	ret->sblksize = buf[0] << 8 | buf[1];

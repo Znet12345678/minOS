@@ -39,6 +39,7 @@ char *__kgets(){
 	}
 	return buf;
 }
+#ifndef __LIB_BUILD
 void _panic_shell(){
 	//char *buf;
 	kprintf("A semi-fatal panic has been encountered.\nYou will be dropped into a minimalistic shell\n");
@@ -63,3 +64,4 @@ void _panic_shell(){
 		kprintf("\n");
 	}
 }
+#endif
