@@ -292,7 +292,7 @@ int mkfszfs(char *filename){
 	putc(0,f);
 	putc(5,f);
 	putc(0,f);
-	putc(6,f);
+	putc(8,f);
 	//putc(0,f);
 	//putc(6,f);
 	putc(0,f);

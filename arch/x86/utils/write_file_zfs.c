@@ -5,12 +5,19 @@
 #include <zfs.h>
 int get_end(const char *fname){
 	FILE *f;
-	if(!(f = fopen(fname,"r"))){
+	if(!(f = fopen(fname,"rb"))){
 		printf("Couldn't open %s for reading",fname);
+		return -1;
 	}
 	fseek(f,0,SEEK_END);
 	int ret = ftell(f);
-	fclose(f);
+	fseek(f,0,SEEK_SET);
+	//fclose(f);
+	//if(fclose(f) < 0){
+	//	printf("Error closing file!\n");
+	//	return -1;
+	//}
+	//fseek(f,0,SEEK_SET);
 	return ret;
 }
 int zero_out(const char *fname){
@@ -33,20 +40,22 @@ int find_datablk(struct zfs_superblock *sblk,const char *fname){
 	}
 	fseek(f,fds * 512,SEEK_SET);
 	int i = 0;
-	int c = -1;
+	int c = 0;
 	int islong;
 	int namelen;
-	int isalloc = -1;
+	int isalloc = 0x0F;
 	int found = 0;
 	while(isalloc != EOF){
+		//printf(".");
 		isalloc = fgetc(f);
 		if(isalloc == 0){
 			found = 1;
+			//printf(".\n");
 			break;
 		}
 		islong = fgetc(f);
 		if(islong == 1){
-			namelen = fgetc(f);
+			namelen = getc(f);
 			i+=(namelen + 12);
 			fseek(f,fds * 512 + i,SEEK_SET);
 		}
@@ -59,15 +68,29 @@ int find_datablk(struct zfs_superblock *sblk,const char *fname){
 		printf("Couldn't find unallocated block!\n");
 		return -1;
 	}
-	fclose(f);
+	//if(fclose(f) < 0){
+	//	printf("Error closing file!\n");
+	//	return -1;
+	//}
+	//printf(".\n");
 	return i;
 }
 int write_datablk(struct zfs_superblock *sblk,struct data *d,const char *fname,int loc){
 	FILE *f;
-	if(!(f = fopen(fname,"wb"))){
+	//printf("Allocating memory\n");
+	/*printf("Allocating %d bytes\n",get_end(fname));
+	char *buf = malloc(get_end(fname) + 10);
+	printf("Reading buffer\n");
+	if(!(read_buf(buf,fname)))
+		return -1;
+	*/
+	if(!(f = fopen(fname,"r+b"))){
 		printf("Couldnt open:%s for writing\n",fname);
 		return -1;
 	}
+
+	//printf("Writing buffer\n");
+	//write_buf(buf,fname);
 	fseek(f,sblk->fds * 512 + loc,SEEK_SET);
 	fputc(1,f);
 	fputc(d->islongname,f);
@@ -86,13 +109,13 @@ int write_datablk(struct zfs_superblock *sblk,struct data *d,const char *fname,i
 	}
 	fputc(d->startingblock >> 16,f);
 	fputc(d->startingblock >> 8,f);
-	fputc(d->startingblock % 10,f);
+	fputc(d->startingblock,f);
 	fputc(d->endingblock >> 16,f);
 	fputc(d->endingblock >> 8,f);
-	fputc(d->endingblock % 10,f);
+	fputc(d->endingblock,f);
 	fputc(d->endingpos >> 8,f);
-	fputc(d->endingpos % 10,f);
-	fclose(f);
+	fputc(d->endingpos,f);
+	//fclose(f);
 	return 1;
 }
 int write_file(const char *buf,struct data *d,const char *fname){
@@ -133,7 +156,10 @@ int read_buf(char *buf,const char *name){
         buf[i + 4] = 0x0F;
         buf[i + 5] = 'F';
         buf[i + 6] = 0x0F;
-	fclose(f);
+	//if(fclose(f) < 0){
+	//	printf("Error closing file!\n");
+	//	return -1;
+	//}
 	return 1;
 }
 int write_buf(char *buf,const  char * name){
@@ -173,23 +199,25 @@ int read_file(char *buf,struct data *d,const char *fname){
 	fclose(f);
 	return 1;
 }
-int *find_unalloc_block(const char *filename,int numofblock){
+int *find_unalloc_block(const char *filename,int numofblock,int start_blk){
 	int i = 0;
 	FILE *f;
-	if(!(f = fopen(filename,"r"))){
+	if(!(f = fopen(filename,"rb"))){
 		printf("Couldnt open %s for reading", filename);
 		return -1;
 	}
-	int needed = numofblock * 512;
+	fseek(f,start_blk * 512,SEEK_SET);
+	int needed = numofblock;
 	int got = 0;
-	int c;
+	int c = 0xFF;
 	int start;
 	int end;
-	int *ret = malloc(1024);
+	int *ret = malloc(3);
 	ret[0] = -1;
 	ret[1] = -1;
-	int pos = 0;
-	while((c = getc(f)) != EOF){
+	int pos = start_blk * 512;
+	while((c = fgetc(f)) != EOF){
+		printf(".");
 		if(got == needed && c == 0){
 			end = pos;
 			ret[1] = end;
@@ -199,6 +227,7 @@ int *find_unalloc_block(const char *filename,int numofblock){
 			if(ret[0] == -1)
 				ret[0] = pos;
 			got++;
+			pos++;
 		}
 		else if(c == 0){
 			got++;
@@ -210,10 +239,13 @@ int *find_unalloc_block(const char *filename,int numofblock){
 		}
 	}
 	printf("Couldn't find enough freespace on drive!\n");
-	fclose(f);
+	if(fclose(f) < 0){
+		printf("Error closing file!\n");
+		return -1;
+	}
 	return -1;
 }
-struct data *parse_file(char *buf,const char *filename){
+struct data *parse_file(char *buf,const char *filename,char *_filename,struct zfs_superblock *sblk){
 	int end = 0;
 	while(1){
 		if(buf[end] == 0x0F && buf[end + 1] == 'E' && buf[end + 2] == 0x0F && buf[end + 3] == 'O' && buf[end + 4] == 0x0F && buf[end + 5] == 'F' && buf[end + 6] == 0x0F)
@@ -221,31 +253,34 @@ struct data *parse_file(char *buf,const char *filename){
 		end++;
 	}
 	end--;
+	printf("[end] %d\n",end);
 	struct data *ret = malloc(sizeof(struct data *));
 	int *se = malloc(80);
 	if((end % 512) == 0)
-		se = find_unalloc_block(filename,end/512);
-	else
-		se = find_unalloc_block(filename,end/512 + 1);
+		se = find_unalloc_block(filename,end,sblk->fds);
+//	else
+//		se = find_unalloc_block(filename,end ,sblk->fds);
 	if(!(se)){
 		printf("Error finding unallocated block!\n");
 		return -1;
 	}
+	printf("[se(0)] %d [se(1)] %d\n",se[0],se[1]);
 	ret->alloc = 1;
 	ret->startingblock = se[0];
 	ret->endingblock = se[1];
-	if(strlen(filename) > 10)
+	if(strlen(_filename) > 10)
 		ret->islongname = 1;
 	else
 		ret->islongname = 0;
 	if(ret->islongname)
 		ret->namelen = strlen(filename);
+	ret->name = _filename;
 	ret->type = TYPE_FILE;
 	ret->blockpos = ret->startingblock;
 	return ret;
 }
 struct zfs_superblock *parse_superblock(char *buf){
-	struct zfs_superblock *ret = malloc(1024);
+	struct zfs_superblock *ret = malloc(sizeof(struct zfs_superblock *));
 	ret->allocblk = buf[1024] << 24 | buf[1025] << 16 | buf[1026] << 8 | buf[1027];
 	ret->unallocblk = buf[1028] << 24 | buf[1029] << 16 | buf[1030] << 8 | buf[1031];
 	ret->tblk = ret->allocblk + ret->unallocblk;
@@ -253,7 +288,7 @@ struct zfs_superblock *parse_superblock(char *buf){
 	ret->rootfsblk = buf[1038] << 8 | buf[1039];
 	ret->numoff = buf[1040] << 24 | buf[1041] << 16 | buf[1042] << 8 | buf[1043];
 	ret->numofd = buf[1044] << 24 | buf[1045] << 16 | buf[1046] << 8 | buf[1047];
-	ret->fds = buf[1046] << 8 | buf[1047];
+	ret->fds = buf[1048] << 8 | buf[1049];
 	return ret;
 	/*ret->allocblk = (buf[1024] << 16) * 10000 | (buf[1025] << 8) * 10000 | buf[1026] * 10000 | buf[1027] << 16 | buf[1028] << 8 | buf[1029];
 	ret->unallocblk = (buf[1030] << 16) * 10000 | (buf[1031] << 8) * 10000 | buf[1032] * 10000 | buf[1033] << 16 | buf[1034] << 8 | buf[1035];
@@ -347,6 +382,15 @@ int main(int argc, char* argv[]){
 		usage(argv[0]);
 		return -1;
 	}
+	FILE *f;
+	if(!(f = fopen(argv[1],"r"))){
+		printf("Error opening file:%s\n",argv[1]);
+		return -1;
+	}
+	fclose(f);
+	if(!(f = fopen(argv[2],"r"))){
+		printf("Error opening file:%s\n",argv[2]);
+	}
 	char *buf = malloc(get_end(argv[1]));
 	printf("Reading file to buf\n");
 	if(!(read_buf(buf,argv[1]))){
@@ -361,7 +405,7 @@ int main(int argc, char* argv[]){
 	if(!(write_buf(buf,argv[1]))){
 		printf("Error restoring %s\n",argv[1]);
 	}
-	printf("Freeing memory\n");
+	printf("freeing memory\n");
 	free(buf);
 	printf("Reading buffer\n");
 	buf = malloc(get_end(argv[1]));
@@ -375,15 +419,20 @@ int main(int argc, char* argv[]){
 		printf("Error finding datablock!\n");
 		return -1;
 	}
-	printf("Freeing buffer\n");
-	free(buf);
+	printf("freeing buffer\n");
+	//free(buf);
+	printf("Allocating memory\n");
 	buf = malloc(get_end(argv[2]));
+	if(!(buf)){
+		printf("Error allocating %d bytes of memory!\n",get_end(argv[2]));
+	}
+	printf("Reading buffer\n");
 	if(!(read_buf(buf,argv[2]))){
 		printf("Error reading buffer!\n");
 		return -1;;
 	}
 	printf("Parsing file\n");
-	struct data *d = parse_file(buf,argv[2]);
+	struct data *d = parse_file(buf,argv[1],argv[2],sblk);
 	if(!(d)){
 		printf("Error parsing file!\n");
 		return -1;
@@ -391,7 +440,7 @@ int main(int argc, char* argv[]){
 	printf("Dumping: [alloc]           %d   [islongname]   %d   [namelen]   %d   [name]     %s\n         [type]            %d   [offset]       %d   [endingpos] %d   [blockpos] %d\n         [startingblock]   %d   [endingblock]  %d\n"
 	,d->alloc,d->islongname,d->namelen,d->name,d->type,d->offset,d->endingpos,d->blockpos,d->startingblock,d->endingblock);
 	printf("Writing datablock\n");
-	if(!(write_datablk(sblk,d,argv[2],db))){
+	if(!(write_datablk(sblk,d,argv[1],db))){
 		printf("Error writing datablock!\n");
 		return -1;
 	}
