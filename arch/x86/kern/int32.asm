@@ -57,8 +57,10 @@ endstruc
 %define DATA16                                 GDTENTRY(4)  ; 0x20
 %define STACK16                                (INT32_BASE - regs16_t_size)
  
- 
+global int32_reloc
+global _int32
 section .text
+    int32_reloc:call reloc
     int32: use32                               ; by Napalm
     _int32:
         cli                                    ; disable interrupts

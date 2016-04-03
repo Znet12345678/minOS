@@ -2,6 +2,12 @@
 NASM=nasm -f elf
 
 all:
+	@echo "AS chanload.o"
+	$(NASM) chainload.asm -o chainload.o
+	@echo "AS goreal.o"
+	@$(NASM) goreal.asm -o goreal.o
+	@echo "AS jmp.o"
+	@$(CC) -c jmp.S -o jmp.o -nostdlib
 	@echo "CC kmain.o"
 	@$(CC) -c kmain.c -o kmain.o -nostdlib -I../include -ffreestanding -std=gnu99 -I../fs/zfs -g $(KMAIN_CFLAGS)
 	@echo "CC kloader.o"

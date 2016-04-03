@@ -215,20 +215,20 @@ int *find_unalloc_block(const char *filename,int numofblock,struct zfs_superbloc
 	printf("Seeking\n");
 	fseek(f,start_blk * 512,SEEK_SET);
 	printf("Initialising variables\n");
-	int needed = numofblock;
+	int needed = numofblock * 512;
 	int got = 0;
 	int c = 0xFF;
 	int start;
 	int end;
-	int *ret = malloc(80);
-	ret[0] = -1;
-	ret[1] = -1;
+	int ret[2] = {-1,-1};
+//	ret[0] = -1;
+//	ret[1] = -1;
 	int orig = start_blk * 512;
 	int pos = start_blk * 512;
 	while((c = fgetc(f)) != EOF){
 		//printf(".");
 		if(got == needed && c == 0){
-			end = pos;
+			end = pos / 512;
 			ret[1] = end;
 			return ret;
 		}

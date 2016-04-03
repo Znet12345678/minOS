@@ -8,6 +8,8 @@
 #include <string.h>
 int strcmp(const char *str1,const char *str2){
 	int i = 0;
+	if(strlen(str1) != strlen(str2))
+		return -1;
 	while(i < strlen(str1)){
 		if(str1[i] != str2[i])
 			return (i + 1);

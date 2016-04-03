@@ -1,0 +1,21 @@
+[BITS 16]
+[ORG 0x7C00]
+mov ah,0x0e
+mov al,'I'
+int 0x10
+mov al,'t'
+int 0x10
+mov al,' '
+int 0x10
+mov al,'W'
+int 0x10
+mov al,'o'
+int 0x10
+mov al,'r'
+int 0x10
+mov al,'k'
+int 0x10
+mov al,'s'
+int 0x10
+mov al,'!'
+int 0x10

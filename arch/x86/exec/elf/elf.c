@@ -7,14 +7,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void write_memory(const char *addr,int value){
+void write_memory(unsigned int *addr,int value){
+	//memcpy(addr,value,1);
+	//*(int*)0x10000000 =value;
 	*addr = value;
 }
 void bin_error(){
 	kprintf("Couldn't execute binary file!\n");
 }
 struct elf_header *parse_header(struct file_struct *f){
-	struct elf_header *ret = malloc(sizeof(elf_header *));
+	struct elf_header *ret = malloc(sizeof(struct elf_header *));
 	char sig[4];
 	fs_read(sig,f,4);
 	ret->err = 0;
@@ -52,7 +54,7 @@ struct elf_header *parse_header(struct file_struct *f){
 	ret->type = type[0] << 8 | type[1];
 	char inst[2];
 	fs_read(inst,f,2);
-	ret->inst = inst[0] << 8 | inst[1];
+	ret->insset = inst[0] << 8 | inst[1];
 	if(inst != 0x3){
 		bin_error();
 		ret->err = 1;
@@ -75,7 +77,7 @@ struct elf_header *parse_header(struct file_struct *f){
 	ret->flags = flags[0] << 16 | flags[1] << 16 | flags[2] << 8 | flags[3];
 	char header_size[2];
 	fs_read(header_size,f,2);
-	ret->header_size = header_size[0] << 8 | hear_size[1];
+	ret->header_size = header_size[0] << 8 | header_size[1];
 	char size[2];
 	fs_read(size,f,2);
 	ret->entry_size = size[0] << 8 | size[1];
@@ -94,7 +96,7 @@ struct elf_header *parse_header(struct file_struct *f){
 	return ret;
 }
 struct program_header_32 * parse_ph(struct file_struct *f, struct elf_header *h){
-	struct program_header_32 *ret = malloc(sizeof(program_header_32 *));
+	struct program_header_32 *ret = malloc(sizeof(struct program_header_32 *));
 	if(h->arch != 1){
 		bin_error();
 		ret->err = 1;
@@ -103,9 +105,9 @@ struct program_header_32 * parse_ph(struct file_struct *f, struct elf_header *h)
 	char type[4];
 	seek(f,h->phtp);
 	read(type,f,4);
-	ret->typeofsegment = type[0] << 16 | type[1] << 16
+	ret->typeofsegment = type[0] << 16 | type[1] << 16;
 }
-void elf_exec(const char *text,unsigned char *data,struct elf_header *h,struct program_header_32 *ph32,unsigned char *mem){
+uint32_t elf_exec(unsigned char *text,unsigned char *data,struct elf_header *h,struct program_header_32 *ph32,unsigned char *mem){
 	
 }
 

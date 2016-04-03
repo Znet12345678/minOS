@@ -19,6 +19,7 @@ struct elf_header{
 	uint32_t phtp;/*Header table pos*/
 	uint32_t shtp;/*Section header table pos*/
 	uint32_t flags;
+	char *sig;
 	uint32_t header_size;
 	uint32_t entry_size;
 	uint32_t numberofentries;/*Program header table*/
@@ -40,7 +41,7 @@ struct program_header_32{
 };
 
 struct elf_header *parse_header(struct file_struct *f);/*Returns pouint32_ter to elf header struct*/
-void write_mem(unsigned char *pntr,unsigned uint32_t c);/*Writes c to memory pouint32_ter pntr*/
+void write_mem(unsigned char *pntr, uint32_t c);/*Writes c to memory pouint32_ter pntr*/
 struct program_header_32 * parse_ph(struct file_struct *f, struct elf_header *h);/*Returns pouint32_ter to program header*/
 uint32_t elf_exec(unsigned char *text,unsigned char *data,struct elf_header *h,struct program_header_32 *ph32,unsigned char *mem);
 

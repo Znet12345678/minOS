@@ -38,6 +38,8 @@ void shell_process(const char *str){
 	commands[3] = "commands";
 	commands[4] = "contact";
 	commands[5] = "copyright";
+	commands[6] = "boot";
+	commands[7] = "calc";
 	response[0] = "v0.3-alpha\n";
 	response[1] = "No File System completed\n";
 	char lc[3] = {0x0A,'l','c'};
@@ -45,6 +47,10 @@ void shell_process(const char *str){
 	response[3] = lc;
 	response[4] = "Email:znet12345678@gmail.com Phone:972-800-8197\n";
 	response[5] = "(c) 2016 Zachary James Schlotman";
+	char b[2] = {0x0A,'b'};
+	response[6] = b;
+	char c[2] = {0x0A,'c'}l
+	response[7] = c;
 	//int i;
 	for(i = 0; i < MAX_COMMANDS;i++){
 		if(strcmp(arg1,commands[i]) == 0){
@@ -57,6 +63,48 @@ void shell_process(const char *str){
 						if(commands[j][0] != 0)
 							kprintf(" ");
 					}
+				}
+				else if(scmp(response[i],"b",1) == 0){
+					kprintf("\nReading first sector of hd then jumping to it\n");
+					char *buf = malloc(1024);
+					ata_read_master(buf,0,0);
+					kprintf("Writing to memory:0x01000000\n");
+					char *mem =(char *)0x01000000;
+					for(int i = 0; i < 512;i++){
+						//kprintf(".");
+						//write_memory(mem,buf[i]);
+						*mem = buf[i];
+						//	kprintf("%c.%c",buf[i],*mem);
+						*mem++;
+					}
+					//kprintf("%c\n",(int)0x10000000);
+					//kprintf("%c\n",buf[0]);
+					//if((int)0x00100000 == buf[1])
+					//	kprintf("Y\n");
+					//else
+					//	kprintf("N\n");
+					//for(int i = 0; i < 100;i++){
+					//	kprintf("%c",buf[i]);
+					//}
+					//char *pntr = (char*)0x00100000;
+					//kprintf("\n");
+					//for(int i = 0; i < 100; i++){
+					//	kprintf("%c",*pntr);
+					//	*pntr++;
+					//}
+					//kprintf("%c.%c\n",0x00100001,buf[0]);
+					//jmp_boot();
+					//go_real();
+					//chainload();
+					//chainload();
+					kprintf("Jumping to memory location!\nThis won't work if the program requires real mode!\n");
+					__asm__ ("jmp 0x01000000");
+					panic();
+					//asm("JMP 0xA0000000");
+				}
+				else if(scmp(response[i],"c",1) == 0){
+					calculator_init();
+					calculator();
 				}
 				//else
 				//	kprintf(".");
@@ -108,8 +156,8 @@ char *_kgets(){
 }
 void call(char *func,char *args){
 		//asm("push %esp, offset %P0" : : "m"(args));
-	//	asm("call %P0" : : "m"(func));
-	//	asm("pop %esp");
+		//asm("call %P0" : : "m"(func));
+		//asm("pop %esp");
 }
 void zsh(){
 	t_init();
