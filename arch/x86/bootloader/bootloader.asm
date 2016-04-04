@@ -58,6 +58,7 @@ start:
 	int 0x10
 	JMP floppya_SUCC1
 floppya_SUCC1:
+	;mov 0x0FF,0x00
 	mov ah,0x0e
 	mov al,'F'
 	int 0x10
@@ -80,6 +81,7 @@ floppya_SUCC1:
 	int 0x13
 	cmp ah,0
 	JZ SUCC2
+	;mov 0x0FF,0x01
 	mov ah,0x0e
 	mov al,'F'
 	int 0x10
@@ -114,6 +116,7 @@ floppyb_SUCC1:	mov ah,0x0e
         int 0x13
 	cmp ah,0
         JZ SUCC2
+	;mov [0x0FF],0x80
 	mov al,'F'
 	mov ah,0x0e
 	int 0x10
@@ -148,6 +151,7 @@ hda_SUCC1:mov ah,0x0e
         int 0x13
 	cmp ah,0
         JZ SUCC2
+	;mov 0x0FF,0x81
 	mov ah,0x0e
 	mov al,'F'
 	int 0x10
@@ -195,6 +199,9 @@ hdb_SUCC1:mov ah,0x0e
 	int 0x10
 	JMP hang
 SUCC2:
+	;mov dl,0x0FF
+	;cmp dl,0x0FF
+	;JZ hang
 	mov ah,0x0e
 	mov al,'S'
 	int 0x10
