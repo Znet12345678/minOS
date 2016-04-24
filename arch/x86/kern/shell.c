@@ -39,7 +39,7 @@ void shell_process(const char *str){
 	commands[4] = "contact";
 	commands[5] = "copyright";
 	commands[6] = "boot";
-	commands[7] = "calc";
+	//commands[7] = "calc";
 	response[0] = "v0.3-alpha\n";
 	response[1] = "No File System completed\n";
 	char lc[3] = {0x0A,'l','c'};
@@ -49,8 +49,8 @@ void shell_process(const char *str){
 	response[5] = "(c) 2016 Zachary James Schlotman";
 	char b[2] = {0x0A,'b'};
 	response[6] = b;
-	char c[2] = {0x0A,'c'}l
-	response[7] = c;
+	//char c[2] = {0x0A,'c'};
+	//response[7] = c;
 	//int i;
 	for(i = 0; i < MAX_COMMANDS;i++){
 		if(strcmp(arg1,commands[i]) == 0){
@@ -102,10 +102,10 @@ void shell_process(const char *str){
 					panic();
 					//asm("JMP 0xA0000000");
 				}
-				else if(scmp(response[i],"c",1) == 0){
-					calculator_init();
-					calculator();
-				}
+				//else if(scmp(response[i],"c",1) == 0){
+				//	calculator_init();
+				//	calculator();
+				//}
 				//else
 				//	kprintf(".");
 			}

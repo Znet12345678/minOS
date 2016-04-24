@@ -4,9 +4,12 @@
 *(c) 2015 Zachary James Schlotman
 */
 #include <stdint.h>
+static inline void outsw(uint16_t port,uint8_t val){
+        __asm__ volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
+}
 static inline uint16_t inw(uint32_t s){
         uint16_t ret;
-        asm volatile("inw %%dx, %%ax": "=a"(ret):  "d"(s));
+        __asm__ volatile("inw %%dx, %%ax": "=a"(ret):  "d"(s));
         return ret;
 }
 ide_indent(){
@@ -172,10 +175,10 @@ int ata_write_master(uint8_t *buf,uint16_t _lba){
                 io = 0x170;
         else if(drive == 0x02)
                 io = 0x4138;
-        uint8_t cmd = 0xE0;
+        uint8_t cmd = 0x30;
         uint8_t slavebit = 0x00;
         //kprintf("Sending LBA and CMD\n");
-        outb(io + 0x06,(cmd | (uint8_t)((lba >> 24 & 0x0F))));
+        outb(io + 0x06,cmd);
         outb(io + 1,0x00);
         outb(io + 0x02,1);
         outb(io + 0x03,(uint8_t)lba);
@@ -184,13 +187,138 @@ int ata_write_master(uint8_t *buf,uint16_t _lba){
         outb(io + 0x07,0x30);
         //ide_wait_for_read();
         //ide_wait_for_read(io);
-        if(ide_wait_for_read(io) < 0)
-                return -1;
-	int i = 0;
+        ///if(ide_wait_for_read(io) < 0)
+   // kprintf(".");
+    uint32_t status = inportb(io + 0x07);
+    if(status & 0x01){
+        return -1;
+    }
+    int i = 0;
 	while(i < 512){
-		outb(*(uint16_t *)buf + i * 2);
+		//outsw(*(uint16_t *)buf + i * 2);
+       // outsw(0x1F0,0);
+        outb(*(uint16_t *)buf + i * 2);
 		i++;
 	}
+}
+int zero_drive(){
+    int i = 0;
+    while(1){
+        t_displaylq();
+        if(ata_write_master(0,i) < 0)
+            break;
+        i++;
+    }
+    return 0;
+}
+int zero_part(int partnum){
+    char *buf = malloc(513);
+    int start;
+    int end;
+    ata_read_master(buf,0,0x00);
+    if(partnum == 0)
+        return zero_drive();
+    if(partnum == 1){
+        start = buf[454] << 24 | buf[455] << 16 | buf[456] << 8 | buf[457];
+        end = start + (buf[458] << 24 | buf[459] << 16 | buf[460] << 8 | buf[461]);
+    }
+    else if(partnum == 2){
+        start = buf[470] << 24 | buf[471] << 16 | buf[472] << 8 | buf[473];
+        end = start + (buf[474] << 24 | buf[475] << 16 | buf[476] << 8 | buf[477]);
+    }
+    else if(partnum == 3){
+        start = buf[486] << 24 | buf[487] << 16 | buf[488] << 8 | buf[489];
+        end = start + (buf[490] << 24 | buf[491] << 16 | buf[492] << 8 | buf[493]);
+    }
+    else if(partnum == 4){
+        start = buf[502] << 24  | buf[503] << 16 | buf[504] << 8 | buf[505];
+        end = start + (buf[506] << 24 | buf[507] << 16 | buf[508] << 8 | buf[509]);
+    }
+
+    int io = 0x1F0;
+    for(int i = 0; i < (end - start);i++){
+        uint8_t cmd = 0x30;
+        uint8_t slavebit = 0x00;
+        outb(0x1F6,0x30);
+        outb(io + 0x06,(cmd | (uint8_t)((i >> 24 & 0x0F))));
+        outb(io + 1,0x00);
+        outb(io + 0x02,1);
+        outb(io + 0x03,(uint8_t)i);
+        outb(io + 0x04,(uint8_t)((i) >> 8));
+        outb(io + 0x05,(uint8_t)((i) >> 16));
+        if(ide_wait_for_read(io) < 0)
+            return -1;
+        int i = 0;
+        while(i < 512){
+            outb(*(uint16_t *)0 + i * 2);
+        }
+    }
+}
+struct partition{
+    int boot;
+    int starting_head;
+    int starting_sector;
+    int starting_cylinder;
+    int id;
+    int ending_head;
+    int ending_sector;
+    int ending_cylinder;
+    uint32_t relative_sector;
+    uint32_t tsp;
+};
+int ata_read_part(uint8_t *rbuf,uint16_t lba,int partnum){
+    char *buf = malloc(513);
+    int start;
+    int end;
+    ata_read_master(buf,0,0x00);
+    if(partnum == 0)
+        return ata_read_master(rbuf,lba,0);
+    if(partnum == 1){
+        start = buf[454] << 24 | buf[455] << 16 | buf[456] << 8 | buf[457];
+        end = start + (buf[458] << 24 | buf[459] << 16 | buf[460] << 8 | buf[461]);
+    }
+    else if(partnum == 2){
+        start = buf[470] << 24 | buf[471] << 16 | buf[472] << 8 | buf[473];
+        end = start + (buf[474] << 24 | buf[475] << 16 | buf[476] << 8 | buf[477]);
+    }
+    else if(partnum == 3){
+        start = buf[486] << 24 | buf[487] << 16 | buf[488] << 8 | buf[489];
+        end = start + (buf[490] << 24 | buf[491] << 16 | buf[492] << 8 | buf[493]);
+    }
+    else if(partnum == 4){
+        start = buf[502] << 24  | buf[503] << 16 | buf[504] << 8 | buf[505];
+        end = start + (buf[506] << 24 | buf[507] << 16 | buf[508] << 8 | buf[509]);
+    }
+    if((start + lba) > end)
+        return -1;
+    return ata_read_master(rbuf,lba + start,0);
+}
+int ata_write_part(uint8_t *rbuf,uint16_t lba,int partnum){
+    char *buf = malloc(513);
+    int start;
+    int end;
+    ata_read_master(buf,0,0x00);
+    if(partnum == 0)
+        return ata_read_master(rbuf,lba,0);
+    if(partnum == 1){
+        start = buf[454] << 24 | buf[455] << 16 | buf[456] << 8 | buf[457];
+        end = start + (buf[458] << 24 | buf[459] << 16 | buf[460] << 8 | buf[461]);
+    }
+    else if(partnum == 2){
+        start = buf[470] << 24 | buf[471] << 16 | buf[472] << 8 | buf[473];
+        end = start + (buf[474] << 24 | buf[475] << 16 | buf[476] << 8 | buf[477]);
+    }
+    else if(partnum == 3){
+        start = buf[486] << 24 | buf[487] << 16 | buf[488] << 8 | buf[489];
+        end = start + (buf[490] << 24 | buf[491] << 16 | buf[492] << 8 | buf[493]);
+    }
+    else if(partnum == 4){
+        start = buf[502] << 24  | buf[503] << 16 | buf[504] << 8 | buf[505];
+        end = start + (buf[506] << 24 | buf[507] << 16 | buf[508] << 8 | buf[509]);
+    }
+    if((start + lba) > end)
+        return -1;
+    return ata_write_master(rbuf,lba + start);
 }
 int ata_read_cnt(uint8_t *buf,uint32_t lba,int cnt, uint16_t drive){
 	int io;

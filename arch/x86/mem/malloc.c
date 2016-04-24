@@ -3,7 +3,6 @@
 * ZOS/minOS Memory allocator
 * ZOS/minOS Project
 * liballoc
-* Probaly broken will provide working i386 binary if it is.
 */
 struct page{
 	unsigned long size;
@@ -28,10 +27,17 @@ void malloc_init(){
 }
 struct page *findpage(struct page *pa,int esize){
 	int size = 0;
-	int startmem = 0xC0000000;
-	int maxmem = 0xFFFFFFFF;
+	int *_startmem =(int*)0x01000000;
+	int *endmem = 0x01000001;
+	int startmem = *_startmem;
+	int maxmem = *endmem;
+	if(startmem == 0 || maxmem == 0){
+		kprintf("[MALLOC][WRN]Using unsafe memory allocation!\n");
+		startmem = 0xC0000000;
+		maxmem = 0xFFFFFFFF;
+	}
 	int i = 0;
-	int currentmem = 0xC0000000;
+	int currentmem = *_startmem;
 	struct page *pg;
 	size = 0;
 	//kprintf("MALLOC:searching\n");

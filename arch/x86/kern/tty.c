@@ -16,6 +16,21 @@ ksize_t tc;
 uint8_t tcolour;
 uint16_t *tbuff;
 void t_init(){
+    tr = 0;
+    tc = 0;
+    tcolour = mkcolour(COLOUR_WHITE,COLOUR_BLACK);
+    tbuff = VMEM;
+    int *mem = 0x00000500;
+    for(int i = 0; i < (VH * VW);i++)
+        *mem = 0;
+    for(int y = 0; y < VH;y++){
+        for(int x = 0;x < VW;x++){
+            const ksize_t index = y * VW + x;
+            tbuff[index] = mkent(' ',tcolour);
+        }
+    }
+}
+void _t_init(){
 	tr = 0;
 	tc = 0;
 	tcolour = mkcolour(COLOUR_WHITE,COLOUR_BLACK);
@@ -69,18 +84,41 @@ void t_displayl(){
 		for(int i = 0; i < 1000000;i++) {inb(0x1FC); }
 	//}
 }
+void t_displaylq(){
+	putent('\\',tcolour,tc,tr);
+	putent('|',tcolour,tc,tr);
+	putent('/',tcolour,tc,tr);
+}
 void place_cursor(){
 	putent(' ',mkcolour(COLOUR_WHITE,COLOUR_WHITE),(tc + 1),tr);
 }
 void clear_cursor(){
 	putent(' ',tcolour,(tc + 1),tr);
 }
+void _t_putc(char c){
+    if(c != '\n')
+        putent(c,tcolour,tc,tr);
+    if(c == '	')
+        c = ' ';
+    if(++tc == 80 || c == '\n'){
+        tc = 0;
+        if(++tc == 80 || c == '\n'){
+            tc = 0;
+            if(++tr == 25){
+                tr = 0;
+                tc = 0;
+                t_init();
+            }
+        }
+    }
+}
 void t_putc(char c){
-	/*unsigned short pos = (tr *80) + tc + 1;
-	outb(0x3D4,0x0F);
-	outb(0x3D5,(unsigned char) (pos&0xFF));
-	outb(0x3D4,0x0E);
-	outb(0x3D5,(unsigned char) ((pos >> 8)&0xFF));*/
+    /*if(tr != 0){
+        int *mem = (int *)0x00000500;
+        while(*mem != 0)
+            *mem++;
+        *mem = c;
+    }*/
 	if(c != '\n')
 		putent(c,tcolour,tc,tr);
 	if(c == '	')
@@ -90,7 +128,18 @@ void t_putc(char c){
 		if(++tr == 25){
 			tr = 0;
 			tc = 0;
-			t_init();
+            t_init();
+			/*_t_init();
+            int *mem = (int*)0x00000500;
+            while(*mem != 0){
+                _t_putc(*mem);
+                *mem++;
+            }
+            mem = (int*)0x00000500;
+            while(*mem != 0){
+                *mem = 0;
+                *mem++;
+            }*/
 		}
 	}
 	unsigned short pos = (tr *80) + tc + 1;
@@ -99,6 +148,7 @@ void t_putc(char c){
         outb(0x3D4,0x0E);
         outb(0x3D5,(unsigned char) ((pos >> 8)&0xFF));
 }
+
 void t_cputc(char c,uint8_t colour){
 	if(c != '\n')
 		putent(c,colour,tc,tr);

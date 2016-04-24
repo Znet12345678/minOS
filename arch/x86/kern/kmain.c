@@ -10,6 +10,7 @@
 #include <string.h>
 #include <kernel/tty.h>
 #include <kernel/vga.h>
+#include "../mem/mm.h"
 #include "../lib/panic.h"
 #include "../fs/WIP/fat/fat32.h"
 typedef struct __attribute__ ((packed)) {
@@ -286,6 +287,16 @@ int release_kmain(){
 	//regs.ax = 0x0013;
 	//int32(0x10,&regs);
 	//init_gui();
+	kprintf("Initializing memory management\n");
+	kmem_init();
+	kprintf("Writing file to ramdisk\n");
+	const char *wbuf = "Welcome to minOS\n";
+	write_rd_file("Welcome",wbuf,strlen(wbuf),0x00100000);
+	struct rd_file *welcome_f = read_rd_file_full("Welcome",0x00100000);
+	kprintf("Welcome says %s\n",welcome_f->raw);
+	kprintf("Erasing drive");
+	zero_drive();
+	kprintf("\n");
 	debug("KERNEL","Done");
 	while(1){
 		kprintf("\n");

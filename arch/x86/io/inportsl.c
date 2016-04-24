@@ -13,7 +13,9 @@ void inportsl(unsigned short _port,unsigned long *_buff,unsigned _len){
 		i++;
 	}
 }
-
+static inline void outsw(uint16_t port,uint8_t val){
+	asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
+}
 void insl(unsigned short _port,unsigned long *_buff,unsigned _len){
         asm("cld; rep; insl" :: "D" (_buff), "d" (_port), "c" (_len));
 }
