@@ -13,6 +13,7 @@
 #include "../mem/mm.h"
 #include "../lib/panic.h"
 #include "../fs/WIP/fat/fat32.h"
+#include "../fs/WIP/inffs/inffs.h"
 typedef struct __attribute__ ((packed)) {
     unsigned short di, si, bp, sp, bx, dx, cx, ax;
     unsigned short gs, fs, es, ds, eflags;
@@ -245,12 +246,21 @@ int release_kmain(){
 	debug("KERNEL","Version 0.3-alpha");
 	kprintf("******************************RELEASE BUILD******************************\n");
 	debug("KERNEL","Early kernel,setting things up");
+	debug("KERNEL","Resetting Drives");
+ /*   outb(0x1F0,0);
+    outb(0x1F1,0);
+	outb(0x1F2,0);
+	outb(0x1F3,0);
+	outb(0x1F4,0);
+	outb(0x1F5,0);
+    outb(0x1F6,0);
+    outb(0x1F7,0);*/
 	char *bufs[1024] = {malloc(1024)};
 	char *buf = malloc(1024);
 	int a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z;
-	debug("KERNEL","Using primary I/O port\n");
+	//debug("KERNEL","Using primary I/O port\n");
 	int io = 0x1F0;
-	debug("KERNEL","Setting up file systems");
+	//debug("KERNEL","Setting up file systems");
 	//ata_read_master(buf,0,0);
 	//struct minfs_superblock *superblk = parse_superblk(0,);
 	//mount("/",0x00);
@@ -287,16 +297,26 @@ int release_kmain(){
 	//regs.ax = 0x0013;
 	//int32(0x10,&regs);
 	//init_gui();
-	kprintf("Initializing memory management\n");
+	//kprintf("Initializing memory management\n");
 	kmem_init();
-	kprintf("Writing file to ramdisk\n");
+	//kprintf("Writing file to ramdisk\n");
 	const char *wbuf = "Welcome to minOS\n";
 	write_rd_file("Welcome",wbuf,strlen(wbuf),0x00100000);
 	struct rd_file *welcome_f = read_rd_file_full("Welcome",0x00100000);
-	kprintf("Welcome says %s\n",welcome_f->raw);
-	kprintf("Erasing drive");
-	zero_drive();
-	kprintf("\n");
+	//kprintf("Welcome says %s\n",welcome_f->raw);
+	if(!(__IS_INFFS())){
+		kprintf("Formating drive");
+		__INFFS_MKFS_FULLDISK();
+		kprintf("\n");
+		kprintf("Press enter to restart\n");
+		kgets();
+		t_init();
+		release_kmain();
+	}
+	//debug("INFFS","Opening test file");
+	struct __INFFS_FILE *i_f = __INFFS_FULLDISK_FS_FOPEN("/test",__INFFS_FOPP_WRITE);
+	//debug("INFFS","Writing test file");
+	__INFFS_FULLDISK_FS_FWRITE(i_f,"Test",strlen("Test"));
 	debug("KERNEL","Done");
 	while(1){
 		kprintf("\n");

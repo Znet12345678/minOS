@@ -9,7 +9,7 @@ all:
 	@echo "AS jmp.o"
 	@$(CC) -c jmp.S -o jmp.o -nostdlib
 	@echo "CC kmain.o"
-	@$(CC) -c kmain.c -o kmain.o -nostdlib -I../include -ffreestanding -std=gnu99 -I../fs/zfs -g $(KMAIN_CFLAGS)
+	@$(CC) -c kmain.c -o kmain.o -nostdlib -I../include -ffreestanding -std=gnu99 -I../fs/zfs -g $(KMAIN_CFLAGS) -fmax-errors=1
 	@echo "CC kloader.o"
 	@$(CC) -c kloader.c -o kloader.o -nostdlib -I../include -ffreestanding -std=gnu99 -g $(KMAIN_CFLAGS);
 	@echo "BINAS bootloader.bin"

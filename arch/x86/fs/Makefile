@@ -6,3 +6,4 @@ all:
 	@make -C WIP/fat
 	@make -C WIP/fs
 	@make -C WIP/zfs
+	@make -C WIP/inffs

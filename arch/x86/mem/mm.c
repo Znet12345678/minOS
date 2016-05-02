@@ -408,8 +408,8 @@ void kmem_init(){
 	*mem++;
 	*mem = 0xC2000000;
 	kprintf("Zeroing kernel memory\n");
-	if(zero_memory(0xC0000000,0xC2000000) < 0)
-		panic();
+	//if(zero_memory(0xC0000000,0xC2000000) < 0)
+	//	panic();
 	kprintf("Creating 512KB ramdisk\n");
 	if(write_ramdisk(0x00100000,524288) < 0)
 		panic();

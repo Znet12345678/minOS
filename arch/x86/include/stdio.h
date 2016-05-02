@@ -3,4 +3,5 @@
 void kprintf(const char *format,...);
 void kputs(const char *str);
 void kputc(int ic);
+void debug(char *proccess,char *output);
 #endif

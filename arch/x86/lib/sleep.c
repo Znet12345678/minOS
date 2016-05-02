@@ -9,7 +9,7 @@ void msleep(unsigned long time){
 		;
 }
 void sleep(unsigned long time){
-	int stime = time * 100000000;
+	int stime = time * 10000;
 	for(int i = 0; i < time;i++)
-		;
+		inb(0x1FC);
 }
