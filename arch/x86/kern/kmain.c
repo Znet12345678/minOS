@@ -297,12 +297,12 @@ int release_kmain(){
 	//regs.ax = 0x0013;
 	//int32(0x10,&regs);
 	//init_gui();
-	//kprintf("Initializing memory management\n");
+	kprintf("Initializing memory management\n");
 	kmem_init();
 	//kprintf("Writing file to ramdisk\n");
-	const char *wbuf = "Welcome to minOS\n";
-	write_rd_file("Welcome",wbuf,strlen(wbuf),0x00100000);
-	struct rd_file *welcome_f = read_rd_file_full("Welcome",0x00100000);
+	//const char *wbuf = "Welcome to minOS\n";
+	//write_rd_file("Welcome",wbuf,strlen(wbuf),0x00100000);
+	//struct rd_file *welcome_f = read_rd_file_full("Welcome",0x00100000);
 	//kprintf("Welcome says %s\n",welcome_f->raw);
 	if(!(__IS_INFFS())){
 		kprintf("Formating drive");
@@ -313,9 +313,14 @@ int release_kmain(){
 		t_init();
 		release_kmain();
 	}
-	//debug("INFFS","Opening test file");
-	struct __INFFS_FILE *i_f = __INFFS_FULLDISK_FS_FOPEN("/test",__INFFS_FOPP_WRITE);
-	//debug("INFFS","Writing test file");
+	debug("INFFS","Opening test file");
+	struct __INFFS_FILE *i_f = malloc(sizeof(struct __INFFS_FILE *));
+	__INFFS_FULLDISK_FS_FOPEN("/test",__INFFS_FOPP_WRITE,i_f);
+	if(!(i_f)){
+		kprintf("Error opening file!\n");
+		panic();
+	}
+	debug("INFFS","Writing test file");
 	__INFFS_FULLDISK_FS_FWRITE(i_f,"Test",strlen("Test"));
 	debug("KERNEL","Done");
 	while(1){

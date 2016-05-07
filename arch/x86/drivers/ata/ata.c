@@ -215,8 +215,8 @@ int ata_read_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned in
 	outb(0x1F4,(uint8_t) (lba >> 8));
 	outb(0x1F5,(uint8_t) (lba >> 16));
 	outb(0x1F7,0x20);
-	if(ide_wait_for_read < 0)
-		return -1;
+	if(ide_wait_for_read(0x1F0) < 0)
+		panic();
 	int i = 0;
 	while(i < offset){
 		inb(0x1F0);
@@ -240,8 +240,8 @@ int ata_read_master_n(uint8_t *buf,uint16_t lba,unsigned int n){
         outb(0x1F4,(uint8_t) (lba >> 8));
         outb(0x1F5,(uint8_t) (lba >> 16));
         outb(0x1F7,0x20);
-        if(ide_wait_for_read < 0)
-                return -1;
+        if(ide_wait_for_read(0x1F0) < 0)
+                panic();
         int i = 0;
 	while(i < n){
 		uint16_t val = inb(0x1F0);
@@ -285,13 +285,11 @@ int ata_write_master_n(uint8_t *buf,uint16_t lba,unsigned int n){
     outb(0x1F4,(uint8_t)(lba >> 8));
     outb(0x1F5,(uint8_t)(lba >> 16));
     outb(0x1F7,0x30);
-    if(ide_wait_for_write < 0){
+    if(ide_wait_for_write() < 0){
 	kprintf("I/O Error!\n");
 	panic();
     }
     int j = 0;
-    char *tmp = malloc(1024);
-    ata_read_master(tmp,lba,0);
     outsw(0x1F0,buf,n);
     char _buf[513] = {[0 ... 512]0};
     outsw(0x1F0,_buf,512 - n);
@@ -310,8 +308,10 @@ int ata_write_master(uint8_t *buf,uint16_t _lba){
     outb(io + 0x04,(uint8_t)((lba) >> 8));
     outb(io + 0x05,(uint8_t)((lba) >> 16));
     outb(io + 0x07,0x30);
-    while(ide_wait_for_write() < 0)
-        ;
+    if(ide_wait_for_write() < 0){
+	kprintf("I/O Error!\n");
+	panic();
+    }
     int i = 0;
     outsw(0x1F0,buf,512);
 }

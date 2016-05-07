@@ -15,7 +15,7 @@
 struct __INFFS_SUPERBLK{
     char *sig;//10 bytes
     int ninfblk;//4 bytes
-    int inf_start_lba;//1 byte
+    char inf_start_lba;//1 byte
     int inf_end_lba;//4 bytes
     int fs_size;//4 bytes
 };
@@ -65,7 +65,7 @@ struct inffs_path{
 	char *dir;
 	char *name;
 };
-struct __INFFS_FILE *__INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation);
+struct __INFFS_FILE *__INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,struct __INFFS_FILE *ret);
 int __INFFS_MKFS_FULLDISK();
 int __INFFS_FULLDISK_FS_FREAD(struct __INFFS_FILE *file,int *buf,int n);
 int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *file,int *buf,int n);

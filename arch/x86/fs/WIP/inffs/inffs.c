@@ -94,7 +94,7 @@ int __MINOS_GET_DISK_SIZE(){
 int __INFFS_MKFS_FULLDISK(){
     t_init();
     kprintf("\nMaking full disk filesystem\n");
-    struct __INFFS_SUPERBLK *ret = malloc(1024);
+    struct __INFFS_SUPERBLK *ret = malloc(sizeof(struct __INFFS_SUPERBLK *));
     char sig[] = {'I',0x0f,'N',0x0f,'F',0x0f,'F',0x0f,'S',0x0f};
     ret->sig = sig;
     kprintf("Getting disk size\n");
@@ -125,8 +125,8 @@ int __IS_INFFS(){
 		return 1;
 	return 0;
 }
-struct __INFFS_SUPERBLK *__INFFS_PARSE_SUPERBLK(){
-   	struct __INFFS_SUPERBLK *ret = malloc(sizeof(struct __INFFS_SUPERBLK));
+struct __INFFS_SUPERBLK *__INFFS_PARSE_SUPERBLK(struct __INFFS_SUPERBLK *ret){
+   	//struct __INFFS_SUPERBLK *ret = malloc(sizeof(struct __INFFS_SUPERBLK*));
     	char *buf = malloc(1024);
  	ata_read_master(buf,5,0);
 	ret->sig[0] = __IS_INFFS();
@@ -176,9 +176,10 @@ struct __INFFS_INFOBLK *__INFFS_GET_INFBLK(struct inffs_path *pth,struct __INFFS
 		lba++;
 	}
 }
-struct __INFFS_FILE *__INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation) {
-	struct __INFFS_FILE *ret = malloc(sizeof(struct __INFFS_FILE *));
-	struct __INFFS_SUPERBLK *sblk = __INFFS_PARSE_SUPERBLK();
+struct __INFFS_FILE *__INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,struct __INFFS_FILE *ret) {
+	//struct __INFFS_FILE *ret = malloc(sizeof(struct __INFFS_FILE *));
+	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
+	__INFFS_PARSE_SUPERBLK(sblk);
 	//struct __INFFS_INFOBLK *infblk = __INFFS_GET_INFBLK(parse_path(path),sblk);
 	struct inffs_path *_path = parse_path(path);
 	if(opperation == __INFFS_FOPP_READ){
@@ -233,9 +234,10 @@ struct __INFFS_INFBLK_FREE{
 	int end_lba;
 	int end_offset;
 };
-struct __INFFS_INFBLK_FREE *find_freeinfblk(int n){
-	struct __INFFS_INFBLK_FREE *ret = malloc(sizeof(struct __INFFS_INFBLK_FREE *));
-	struct __INFFS_SUPERBLK *sblk = __INFFS_PARSE_SUPERBLK();
+struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *ret){
+	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFS_SUPERBLK *));
+	__INFFS_PARSE_SUPERBLK(sblk);
+	int meh = 0;
 	//while(1)
 	//	;
 	int lba = sblk->inf_start_lba;
@@ -247,7 +249,7 @@ struct __INFFS_INFBLK_FREE *find_freeinfblk(int n){
 	ret->end_offset = -1;
 	while(lba < sblk->inf_end_lba){
 		i = 0;
-
+		//kprintf(".");
 		char *buf = malloc(1024);
 		ata_read_master(buf,lba,0);
 		while(i < 512){
@@ -282,7 +284,8 @@ struct free{
 struct free *find_free(unsigned long size,struct free *ret){
 	//while(1)
 	//	;
-	struct __INFFS_SUPERBLK *sblk = __INFFS_PARSE_SUPERBLK();
+	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
+	__INFFS_PARSE_SUPERBLK(sblk);
 	//while(1)
 	//	;
 	if(!(sblk)){
@@ -343,12 +346,23 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	if(f->opperation != __INFFS_FOPP_WRITE)
 		return -1;
 	kprintf("Finding free info block\n");
-	struct __INFFS_INFBLK_FREE *free = find_freeinfblk(strlen(f->name) + 12);
+	struct __INFFS_INFBLK_FREE *free = malloc(sizeof(struct __INFFS_INFSBLK_FREE *));
+	find_freeinfblk(strlen(f->name) + 12,free);
+	if(!(free)){
+		kprintf("Failed to find free space for infoblock\n");
+		panic();
+	}
 	kprintf("Finding enough free space on drive\n");
 	//while(1)
 	//	;
 	struct free *f_file = malloc(sizeof(struct free *));
 	find_free(n,f_file);
+	//while(1)
+	//	;
+	if(!(f_file)){
+		kprintf("Failed to find free space for file\n");
+		panic();
+	}
 	char wbuf[] = {1,(strlen(f->name) + 12),f_file->lba_begin >> 24,f_file->lba_begin >> 16,f_file->lba_begin >> 8,f_file->lba_begin >> 0,(n/512) >> 24,(n/512) >> 16,(n/512) >> 8,(n/512) >> 0,strlen(f->name)};
 	char *fwbuf = malloc(1024);
 	for(int i = 0; i < (sizeof(wbuf)/sizeof(*wbuf));i++)
