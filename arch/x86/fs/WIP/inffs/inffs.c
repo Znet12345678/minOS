@@ -139,6 +139,7 @@ struct __INFFS_SUPERBLK *__INFFS_PARSE_SUPERBLK(struct __INFFS_SUPERBLK *ret){
 	ret->ninfblk = buf[10] << 24 | buf[11] << 16 | buf[12] << 8 | buf[13];
 	ret->inf_start_lba = buf[14];
 	ret->inf_end_lba = buf[15] << 24 | buf[16] << 16 | buf[17] << 8 | buf[18];
+	//kprintf("%d\n",ret->inf_end_lba);
 	ret->fs_size = buf[19] << 24 | buf[20] << 16 | buf[21] << 8 | buf[22];
 	return ret;
 }

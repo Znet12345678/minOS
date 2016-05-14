@@ -297,8 +297,7 @@ int release_kmain(){
 	//regs.ax = 0x0013;
 	//int32(0x10,&regs);
 	//init_gui();
-	kprintf("Initializing memory management\n");
-	kmem_init();
+	//kprintf("Initializing memory management\n");
 	//kprintf("Writing file to ramdisk\n");
 	//const char *wbuf = "Welcome to minOS\n";
 	//write_rd_file("Welcome",wbuf,strlen(wbuf),0x00100000);
