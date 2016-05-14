@@ -70,6 +70,8 @@ void kprintf(const char *format,...){
 		else if(*format == 'd'){
 			format++;
 			int j = (int)va_arg(args,int);
+			if(j == 0)
+				t_putc('0');
 			if(j < 0){
 				t_putc('-');
 				j*=-1;
