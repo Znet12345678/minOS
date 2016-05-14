@@ -314,14 +314,18 @@ int release_kmain(){
 		release_kmain();
 	}
 	debug("INFFS","Opening test file");
-	struct __INFFS_FILE *i_f = malloc(sizeof(struct __INFFS_FILE *));
-	__INFFS_FULLDISK_FS_FOPEN("/test",__INFFS_FOPP_WRITE,i_f);
-	if(!(i_f)){
-		kprintf("Error opening file!\n");
+	struct __INFFS_FILE tmp;
+	struct __INFFS_FILE *f_i = __INFFS_FULLDISK_FS_FOPEN("/test",__INFFS_FOPP_WRITE,&tmp);
+	if(!(f_i)){
+		kprintf("Error opening file for writing!\n");
 		panic();
 	}
+
 	debug("INFFS","Writing test file");
-	__INFFS_FULLDISK_FS_FWRITE(i_f,"Test",strlen("Test"));
+	if(__INFFS_FULLDISK_FS_FWRITE(&tmp,"Test",strlen("Test")) < 0){
+		kprintf("Error writing file!\n");
+		panic();
+	}
 	debug("KERNEL","Done");
 	while(1){
 		kprintf("\n");

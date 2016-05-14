@@ -23,51 +23,54 @@ int num_of_levels(const char *path){
 	}
 	return ret;
 }
-struct inffs_path *parse_path(const char *path){
-	int case1;
-	struct inffs_path *_path = malloc(sizeof(struct inffs_path *));
+struct inffs_path *parse_path(const char *path,struct inffs_path *_path){
+	int case1 = 0;
+	//struct inffs_path *_path = malloc(sizeof(struct inffs_path *));
 	if(path[strlen(path) - 1] == '/')
 		case1 = 1;
 	if(case1){
 		int i = 0;
-		_path->dir = malloc(1024);
 		int j = 0;
-		while(i < (num_of_levels(path) - 1)){
-			while(path[j] != '/'){
-				*(_path->dir) = path[j];
-				*(_path->dir)++;
+		while(i < (num_of_levels(path))){
+			int k = 0;
+			if(path[j] == '/')
 				j++;
-			}
-			*(_path->dir) = path[j];
+			else
+				while(path[j] != '/'){
+					_path->dir[k] = path[j];
+					k++;
+					j++;
+				}
 			i++;
 		}
-		_path->name = malloc(80);
+		int k = 0;
 		while(path[j] != '/'){
-			*(_path->name) = path[j];
-			*(_path->name)++;
+			_path->name[k] = path[j];
+			k++;
 			j++;
 		}
 		return _path;
 	}
 	else{
                 int i = 0;
-                _path->dir = malloc(1024);
-                int j = 0;
                 while(i < (num_of_levels(path))){
-                        while(path[j] != '/'){
-                                *(_path->dir) = path[j];
-                                *(_path->dir)++;
-                                j++;
-                        }
-                        *(_path->dir) = path[j];
-                        i++;
-                }
-                _path->name = malloc(80);
-                while(path[j] != 0){
-                        *(_path->name) = path[j];
-                        *(_path->name)++;
-                        j++;
-                }
+			int k = 0;
+			if(*path == '/')
+				*path++;
+			else
+				while(*path != '/'){
+					_path->dir[k] = *path;
+					k++;
+					*path++;
+				}
+			i++;
+		}
+		int k = 0;
+		while(*path != 0){
+			_path->name[k] = *path;
+			k++;
+			*path++;
+		}
                 return _path;
 
 	}
@@ -161,10 +164,8 @@ struct __INFFS_INFOBLK *__INFFS_GET_INFBLK(struct inffs_path *pth,struct __INFFS
 			ret->namelen = buf[i];
 			i++;
 			int j = 0;
-			ret->name = malloc(ret->namelen + 1);
 			while(j < ret->namelen){
-				*ret->name = buf[j];
-				*ret->name++;
+				ret->name[j] = buf[j];
 				j++;
 			}
 			ret->dent_pntr = buf[i] << 24 | buf[i + 1] << 16 | buf[i + 2] << 8 | buf[i + 3];
@@ -176,64 +177,13 @@ struct __INFFS_INFOBLK *__INFFS_GET_INFBLK(struct inffs_path *pth,struct __INFFS
 		lba++;
 	}
 }
-struct __INFFS_FILE *__INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,struct __INFFS_FILE *ret) {
-	//struct __INFFS_FILE *ret = malloc(sizeof(struct __INFFS_FILE *));
-	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
-	__INFFS_PARSE_SUPERBLK(sblk);
-	//struct __INFFS_INFOBLK *infblk = __INFFS_GET_INFBLK(parse_path(path),sblk);
-	struct inffs_path *_path = parse_path(path);
-	if(opperation == __INFFS_FOPP_READ){
-		struct __INFFS_INFOBLK *infblk = __INFFS_GET_INFBLK(parse_path(path),sblk);
-		ret->name = _path->name;
-		if(!(sblk)){
-			debug("INFFS","Failed to parse superblock");
-			return (struct __INFFS_FILE *)-1;
-		}
-		if(!(infblk)){
-			debug("INFFS","Invalid file\n");
-			return (struct __INFFS_FILE *)-1;
-		}
-		int lba = infblk->blk;
-		char *buf = malloc(1024);
-		ata_read_master(buf,lba,0);
-		ret->isalloc = buf[0];
-		if(!(ret->isalloc)){
-			debug("INFFS","Something is wrong with your file system!");
-			return (struct __INFFS_FILE *)-1;
-		}
-		ret->sig = buf[1];
-		if(ret->sig != 0x0F){
-			debug("INFFS","Something is wrong with your file system!");
-			return (struct __INFFS_FILE *)-1;
-		}
-		ret->fsize = buf[2] << 24 | buf[3] << 16 | buf[4] << 8 | buf[5];
-		ret->start_lba = lba;
-		ret->end_lba = (infblk->blk + infblk->sizeinblocks);
-		ret->endingval = buf[6] << 8 | buf[7];
-		ret->pos = 0;
-		ret->opperation = opperation;
-		ret->blkpos = 0;
-		ret->_blkpos = 0;
-		return ret;
-	}
-	else{
-		ret->name = _path->name;
-		ret->fsize = -1;
-		ret->start_lba = -1;
-		ret->endingval = -1;
-		ret->pos = -1;
-		ret->opperation = opperation;
-		ret->blkpos = 0;
-		ret->_blkpos = 0;
-		return ret;
-	}
-}
 struct __INFFS_INFBLK_FREE{
-	int start_lba;
-	int start_offset;
-	int end_lba;
-	int end_offset;
+        int start_lba;
+        int start_offset;
+        int end_lba;
+        int end_offset;
 };
+
 struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *ret){
 	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFS_SUPERBLK *));
 	__INFFS_PARSE_SUPERBLK(sblk);
@@ -273,6 +223,66 @@ struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *re
 			i++;
 		}
 		lba++;
+	}
+}
+struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,struct __INFFS_FILE *ret) {
+	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
+	__INFFS_PARSE_SUPERBLK(sblk);
+	//struct __INFFS_FILE *ret = malloc(sizeof(struct __INFFS_FILE *));
+	//struct __INFFS_INFOBLK *infblk = __INFFS_GET_INFBLK(parse_path(path),sblk);
+	struct inffs_path *_path = malloc(sizeof(struct inffs_path *));
+	parse_path(path,_path);
+	if(opperation == __INFFS_FOPP_READ){
+		struct __INFFS_INFOBLK *infblk = __INFFS_GET_INFBLK(_path,sblk);
+		kstrcpy(ret->name,_path->name);
+		//kprintf("%s\n",ret->name);
+		if(!(sblk)){
+			debug("INFFS","Failed to parse superblock");
+			return -1;
+		}
+		if(!(infblk)){
+			debug("INFFS","Invalid file\n");
+			return -1;
+		}
+		int lba = infblk->blk;
+		char *buf = malloc(1024);
+		ata_read_master(buf,lba,0);
+		ret->isalloc = buf[0];
+		if(!(ret->isalloc)){
+			debug("INFFS","Something is wrong with your file system!");
+			return -1;
+		}
+		ret->sig = buf[1];
+		if(ret->sig != 0x0F){
+			debug("INFFS","Something is wrong with your file system!");
+			return -1;
+		}
+		ret->fsize = buf[2] << 24 | buf[3] << 16 | buf[4] << 8 | buf[5];
+		ret->start_lba = lba;
+		ret->end_lba = (infblk->blk + infblk->sizeinblocks);
+		ret->endingval = buf[6] << 8 | buf[7];
+		ret->pos = 0;
+		ret->opperation = opperation;
+		ret->blkpos = 0;
+		ret->_blkpos = 0;
+		return ret;
+	}
+	else{
+		kstrcpy(ret->name,_path->name);
+		kprintf("%s\n",ret->name);
+		ret->fsize = 0;
+		struct __INFFS_INFBLK_FREE *infblk = malloc(sizeof(struct __INFFS_INFBLK_FREE *));
+		find_freeinfblk(strlen(_path->name) + 12,infblk);
+		ret->start_lba = infblk->start_lba;
+		//if(!(ret->start_lba)){
+		//	debug("__INFFS_FULLDISK_FS_FOPEN","Invalid infblk");
+		//}
+		ret->endingval = infblk->end_lba;
+		ret->pos = infblk->start_offset;
+		ret->opperation = opperation;
+		ret->blkpos = infblk->start_offset;
+		ret->_blkpos = 0;
+		return ret;
 	}
 }
 struct free{
@@ -345,6 +355,7 @@ struct free *find_free(unsigned long size,struct free *ret){
 int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	if(f->opperation != __INFFS_FOPP_WRITE)
 		return -1;
+	kprintf("Writing %s\n",f->name);
 	kprintf("Finding free info block\n");
 	struct __INFFS_INFBLK_FREE *free = malloc(sizeof(struct __INFFS_INFSBLK_FREE *));
 	find_freeinfblk(strlen(f->name) + 12,free);
