@@ -407,7 +407,7 @@ void kmem_init(){
 	*mem = 0xC0000000;
 	*mem++;
 	*mem = 0xC2000000;
-	kprintf("Zeroing kernel memory\n");
+	//kprintf("Zeroing kernel memory\n");
 	//if(zero_memory(0xC0000000,0xC2000000) < 0)
 	//	panic();
 	kprintf("Creating 512KB ramdisk\n");

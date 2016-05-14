@@ -69,10 +69,42 @@ void kprintf(const char *format,...){
 		}
 		else if(*format == 'd'){
 			format++;
-			int buf = (int)va_arg(args,int);
-			char *ret = malloc(1024);
-			int i = 0;
-			while(buf > 0){
+			int j = (int)va_arg(args,int);
+			char *buf = malloc(1024);
+			//char buf[1024] = {[0 ... 1023]0};
+			int i = intlen(j) - 1;
+			while(j > 0){
+				int _buf = (j%10);
+				if(_buf == 0)
+					buf[i] = '0';
+				else if(_buf == 1)
+					buf[i] =  '1';
+	                        else if(_buf == 2)
+                                        buf[i] = '2';
+                                else if(_buf == 3)
+                                        buf[i] = '3';
+                                else if(_buf == 4)
+                                        buf[i] = '4';
+                                else if(_buf == 5)
+                                        buf[i] = '5';
+                                else if(_buf == 6)
+                                        buf[i] = '6';
+                                else if(_buf == 7)
+                                        buf[i] = '7';
+                                else if(_buf == 8)
+                                        buf[i] = '8';
+                                else if(_buf == 9)
+                                        buf[i] = '9';
+
+				i--;
+				j/=10;
+			}
+			i = 0;
+			while(i < strlen(buf)){
+				t_putc(buf[i]);
+				i++;
+			}
+			/*while(buf > 0){
 				int buf1 = (buf%10);
 				if(buf1 == 0)
 					ret[intlen(buf) - (i + 1)] = '0';
@@ -102,6 +134,7 @@ void kprintf(const char *format,...){
 			i = 0;
 			while(i < intlen(buf)){
 				t_putc(ret[i]);
+				i++;
 			}
 			/*char *ret = malloc(1024);
 			//ret[1] = '\0';

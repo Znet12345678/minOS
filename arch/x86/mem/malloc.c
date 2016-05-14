@@ -126,6 +126,8 @@ void *malloc(int ssize){
 			int i = pg->pos;
 			while(start < pg->endmemory){
 				ret[i] = start;
+				int *pntr = (int*)start;
+				*pntr = 0;
 				start++;
 				i++;
 			}

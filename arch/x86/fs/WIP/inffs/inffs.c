@@ -103,13 +103,12 @@ int __INFFS_MKFS_FULLDISK(){
     kprintf("Getting disk size\n");
     int disk_size = __MINOS_GET_DISK_SIZE();
     kprintf("Done Getting disk size\n");
-    if(disk_size > 102400)
-        ret->ninfblk = disk_size / 1024;
-    else if(disk_size > 100)
-        ret->ninfblk = disk_size / 100;
-    else
-       return -1;
-
+    //if(disk_size > 102400)
+      //  ret->ninfblk = disk_size / 1024;
+    //else if(disk_size > 100)
+  //      ret->ninfblk = disk_size / 100;
+//    else
+    ret->ninfblk = 102400;
     ret->inf_start_lba = 5;
     ret->inf_end_lba = ret->inf_start_lba + ret->ninfblk;
     ret->fs_size = disk_size;
