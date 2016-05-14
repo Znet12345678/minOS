@@ -70,7 +70,11 @@ void kprintf(const char *format,...){
 		else if(*format == 'd'){
 			format++;
 			int j = (int)va_arg(args,int);
-			char *buf = malloc(1024);
+			if(j < 0){
+				t_putc('-');
+				j*=-1;
+			}
+			char buf[1024] = {[0 ... 1023]0};
 			//char buf[1024] = {[0 ... 1023]0};
 			int i = intlen(j) - 1;
 			while(j > 0){
