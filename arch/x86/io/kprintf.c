@@ -76,7 +76,8 @@ void kprintf(const char *format,...){
 				t_putc('-');
 				j*=-1;
 			}
-			char *buf = malloc(1024);
+			char buf[1024] = {[0 ... 1023]0};
+			//char *buf = malloc(intlen(buf));
 			//char buf[1024] = {[0 ... 1023]0};
 			//char buf[1024] = {[0 ... 1023]0};
 			int i = intlen(j) - 1;

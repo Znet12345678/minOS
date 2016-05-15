@@ -96,28 +96,38 @@ int __MINOS_GET_DISK_SIZE(){
 }
 int __INFFS_MKFS_FULLDISK(){
     t_init();
+    kprintf("%d\n",1024);
     kprintf("\nMaking full disk filesystem\n");
-    struct __INFFS_SUPERBLK *ret = malloc(sizeof(struct __INFFS_SUPERBLK *));
+    struct __INFFS_SUPERBLK ret;
     char sig[] = {'I',0x0f,'N',0x0f,'F',0x0f,'F',0x0f,'S',0x0f};
-    ret->sig = sig;
+    ret.sig = sig;
     kprintf("Getting disk size\n");
     int disk_size = __MINOS_GET_DISK_SIZE();
     kprintf("Done Getting disk size\n");
     //if(disk_size > 102400)
-      //  ret->ninfblk = disk_size / 1024;
+      //  ret.ninfblk = disk_size / 1024;
     //else if(disk_size > 100)
-  //      ret->ninfblk = disk_size / 100;
+  //      ret.ninfblk = disk_size / 100;
 //    else
-    ret->ninfblk = 102400;
-    ret->inf_start_lba = 5;
-    ret->inf_end_lba = ret->inf_start_lba + ret->ninfblk;
-    ret->fs_size = disk_size;
-    char sblk_raw[] = {'I',0x0f,'N',0x0f,'F',0x0f,'F',0x0f,'S',0x0f,ret->ninfblk >> 24,ret->ninfblk >> 16, ret->ninfblk >> 8,ret->ninfblk >> 0,ret->inf_start_lba,ret->inf_end_lba >> 24,ret->inf_end_lba >> 16,ret->inf_end_lba >> 8,ret->inf_end_lba >> 0,ret->fs_size >> 24,ret->fs_size >> 16,ret->fs_size >> 16,ret->fs_size >> 8,ret->fs_size >> 0};
+    ret.ninfblk = 102400;
+    ret.inf_start_lba = 5;
+ //   if(ret.inf_start_lba == 5)
+//	panic();
+    ret.inf_end_lba = 5 + ret.ninfblk;
+    ret.fs_size = disk_size;
+  //  kprintf("%d\n",ret.inf_start_lba);
+    kprintf("Writing:[disk_size]%d [ninfblk]%d [inf_start_lba]%d\n[inf_end_lba]%d [fs_size]%d\n",disk_size,ret.ninfblk,ret.inf_start_lba,ret.inf_end_lba,ret.inf_end_lba,ret.fs_size);
+    char sblk_raw[] = {'I',0x0f,'N',0x0f,'F',0x0f,'F',0x0f,'S',0x0f,ret.ninfblk >> 24,ret.ninfblk >> 16, ret.ninfblk >> 8,ret.ninfblk >> 0,ret.inf_start_lba,ret.inf_end_lba >> 24,ret.inf_end_lba >> 16,ret.inf_end_lba >> 8,ret.inf_end_lba >> 0,ret.fs_size >> 24,ret.fs_size >> 16,ret.fs_size >> 16,ret.fs_size >> 8,ret.fs_size >> 0};
+ //   if(ret.inf_start_lba == 5024)
+//	panic();
     kprintf("Writing data\n");
     if(ata_write_master_n(sblk_raw,5,sizeof(sblk_raw)/sizeof(sblk_raw[0])) < 0){
         kprintf("Error making file system!\n");
         return -1;
     }
+    char *buf = malloc(1024);
+    ata_read_master(buf,5,0);
+    kprintf("Read data:[ninfblk]%d [inf_start_lba]%d\n[inf_end_lba]%d [fs_size]%d\n",(buf[10] << 24 | buf[11] << 16 | buf [12] << 8 | buf[13] ),buf[14],(buf[15] << 24,buf[16] << 16 | buf[17] << 8 | buf[18]),(buf[19] << 24 | buf[20] << 16 | buf[21] << 8 | buf[22]));
     kprintf("Done\n");
 }
 int __IS_INFFS(){
@@ -139,7 +149,7 @@ struct __INFFS_SUPERBLK *__INFFS_PARSE_SUPERBLK(struct __INFFS_SUPERBLK *ret){
 	ret->ninfblk = buf[10] << 24 | buf[11] << 16 | buf[12] << 8 | buf[13];
 	ret->inf_start_lba = buf[14];
 	ret->inf_end_lba = buf[15] << 24 | buf[16] << 16 | buf[17] << 8 | buf[18];
-	//kprintf("%d\n",ret->inf_end_lba);
+	kprintf("%d\n",ret->inf_end_lba);
 	ret->fs_size = buf[19] << 24 | buf[20] << 16 | buf[21] << 8 | buf[22];
 	return ret;
 }

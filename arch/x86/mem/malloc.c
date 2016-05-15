@@ -33,7 +33,7 @@ struct page *findpage(struct page *pa,int esize){
 	int maxmem = *endmem;
 	if(startmem == 0 || maxmem == 0){
 		//kprintf("[MALLOC][WRN]Using unsafe memory allocation!\n");
-		startmem = 0xC0000000;
+		startmem = 0x01000000;
 		maxmem = 0xFFFFFFFF;
 	}
 	int i = 0;
@@ -126,7 +126,8 @@ void *malloc(int ssize){
 			int i = pg->pos;
 			while(start < pg->endmemory){
 				ret[i] = start;
-				ret[i] = 0;
+				unsigned char *pntr = (unsigned char *)start;
+				*pntr = 0;
 				start++;
 				i++;
 			}
@@ -141,7 +142,8 @@ void *malloc(int ssize){
 			while(startmem < pg->endmemory){
 				size = (size - 1);
 				ret[i] = startmem;
-				ret[i] = 0;
+				unsigned char *pntr = (unsigned char *)startmem;
+                                *pntr = 0;
 				tmppg.pos++;
 				i++;
 				startmem++;
