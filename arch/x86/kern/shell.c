@@ -40,6 +40,8 @@ void shell_process(const char *str){
 	commands[5] = "copyright";
 	commands[6] = "boot";
 	//commands[7] = "calc";
+	commands[7] = "reboot";
+	commands[8] = "format";
 	response[0] = "v0.3-alpha\n";
 	response[1] = "No File System completed\n";
 	char lc[3] = {0x0A,'l','c'};
@@ -49,6 +51,10 @@ void shell_process(const char *str){
 	response[5] = "(c) 2016 Zachary James Schlotman";
 	char b[2] = {0x0A,'b'};
 	response[6] = b;
+	char rb[2] = {0x0A,'r'};
+	response[7] = rb;
+	char f[2] = {0x0A,'f'};
+	response[8] = f;
 	//char c[2] = {0x0A,'c'};
 	//response[7] = c;
 	//int i;
@@ -63,6 +69,14 @@ void shell_process(const char *str){
 						if(commands[j][0] != 0)
 							kprintf(" ");
 					}
+				}
+				else if(scmp(response[i],"r",1) == 0){
+					kprintf("reboot()\n");
+					reboot();
+				}
+				else if(scmp(response[i],"f",1) == 0){
+					t_init();
+					__INFFS_MKFS_FULLDISK();
 				}
 				else if(scmp(response[i],"b",1) == 0){
 					kprintf("\nReading first sector of hd then jumping to it\n");

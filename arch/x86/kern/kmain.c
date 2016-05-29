@@ -313,8 +313,11 @@ int release_kmain(){
 		release_kmain();
 	}
 	debug("INFFS","Opening test file");
+
 	struct __INFFS_FILE tmp;
 	struct __INFFS_FILE *f_i = __INFFS_FULLDISK_FS_FOPEN("/test",__INFFS_FOPP_WRITE,&tmp);
+	//while(1)
+	//	;
 	if(!(f_i)){
 		kprintf("Error opening file for writing!\n");
 		panic();

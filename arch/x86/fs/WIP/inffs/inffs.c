@@ -79,7 +79,7 @@ int __MINOS_GET_DISK_SIZE(){
     int i = 1;
     int j = 0;
     int blk = 0;
-    uint32_t inc = 1000000000;
+    int inc = 1000000000;
     while(inc > 0){
         if(ata_check_lba(i * inc) == 0){
             //kprintf(".");
@@ -109,7 +109,7 @@ int __INFFS_MKFS_FULLDISK(){
     //else if(disk_size > 100)
   //      ret.ninfblk = disk_size / 100;
 //    else
-    ret.ninfblk = 102400;
+    ret.ninfblk = 1024;
     ret.inf_start_lba = 5;
  //   if(ret.inf_start_lba == 5)
 //	panic();
@@ -121,7 +121,7 @@ int __INFFS_MKFS_FULLDISK(){
  //   if(ret.inf_start_lba == 5024)
 //	panic();
     kprintf("Writing data\n");
-    if(ata_write_master_n(sblk_raw,5,sizeof(sblk_raw)/sizeof(sblk_raw[0])) < 0){
+    if(ata_write_master_n(sblk_raw,5,sizeof(sblk_raw)) < 0){
         kprintf("Error making file system!\n");
         return -1;
     }
@@ -195,7 +195,7 @@ struct __INFFS_INFBLK_FREE{
 };
 
 struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *ret){
-	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFS_SUPERBLK *));
+	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
 	__INFFS_PARSE_SUPERBLK(sblk);
 	int meh = 0;
 	//while(1)
@@ -238,6 +238,8 @@ struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *re
 struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,struct __INFFS_FILE *ret) {
 	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
 	__INFFS_PARSE_SUPERBLK(sblk);
+	///while(1)
+	//	;
 	//struct __INFFS_FILE *ret = malloc(sizeof(struct __INFFS_FILE *));
 	//struct __INFFS_INFOBLK *infblk = __INFFS_GET_INFBLK(parse_path(path),sblk);
 	struct inffs_path *_path = malloc(sizeof(struct inffs_path *));
@@ -304,7 +306,7 @@ struct free{
 struct free *find_free(unsigned long size,struct free *ret){
 	//while(1)
 	//	;
-	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
+	struct __INFFS_SUPERBLK *sblk =  malloc(sizeof(struct __INFFS_SUPERBLK *));
 	__INFFS_PARSE_SUPERBLK(sblk);
 	//while(1)
 	//	;

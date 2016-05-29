@@ -16,8 +16,13 @@ void panic(){
 	//panic_shell();
 	//#ifndef NOPANIC
 	//reboot();
-	while(1){ 
-		t_displayl();
+	kprintf("Dropping into shell\n");
+	while(1){
+		kprintf("[MINOS]#");
+		char *cmd = malloc(1024);
+		cmd = kgets();
+		//kstrcpy(cmd,kgets());
+		shell_process(cmd);
 	}
 	//#endif
 	//_panic();
