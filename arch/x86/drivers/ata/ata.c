@@ -196,6 +196,7 @@ int ata_read_master(uint8_t *buf,uint32_t _lba,uint16_t drive){
 		//kstrcat(buf,&cdata);
 		//buf[i] = (char)data;
 		//buf[i * 2] = data
+		//buf[i] = data;
 		*(uint16_t *)(buf + i * 2) = data;
 		//kprintf("%c",data);
 		///kprintf("%c",buf[i]);

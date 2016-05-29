@@ -105,15 +105,20 @@ void kernel_loader_main(){
 	kprintf("[ ] means optional * * means required\n");
 	kprintf("[-v] [-r] [-d] offset=#ofblocks\n");
 	kprintf("-v is verbose -r is release -d is development\n");
-	kprintf("___________________________________________________________________________\n%)");
-	char *s = malloc(1024);
-	s = kgets();
-	if(strcmp(s,"-v") == 0)
-		verbose_kmain();
-	else if(strcmp(s,"-r") == 0)
-		release_kmain();
-	else if(strcmp(s,"-d") == 0)
-		dev_kmain();
+	kprintf("___________________________________________________________________________\n");
+	while(1){
+		kprintf("%)");
+		char *s = malloc(1024);
+		s = kgets();
+		if(strcmp(s,"-v") == 0)
+			verbose_kmain();
+		else if(strcmp(s,"-r") == 0)
+			release_kmain();
+		else if(strcmp(s,"-d") == 0)
+			dev_kmain();
+		else
+			kprintf("invalid selection!\n");
+	}
 	/*#ifdef RELEASE
 	release_kmain();
 	#endif

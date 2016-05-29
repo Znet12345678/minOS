@@ -139,24 +139,24 @@ int __IS_INFFS(){
 }
 struct __INFFS_SUPERBLK *__INFFS_PARSE_SUPERBLK(struct __INFFS_SUPERBLK *ret){
    	//struct __INFFS_SUPERBLK *ret = malloc(sizeof(struct __INFFS_SUPERBLK*));
-    	char *buf = malloc(1024);
+    	char buf[1024];
  	ata_read_master(buf,5,0);
 	ret->sig[0] = __IS_INFFS();
 	//while(1)
 	//	;
 	if(!(ret->sig[0]))
 		return (struct __INFFS_SUPERBLK *)-1;
-	ret->ninfblk = buf[10] << 24 | buf[11] << 16 | buf[12] << 8 | buf[13];
+	ret->ninfblk = (buf[10] << 24 | buf[11] << 16 | buf[12] << 8 | buf[13]);
 	ret->inf_start_lba = buf[14];
-	ret->inf_end_lba = buf[15] << 24 | buf[16] << 16 | buf[17] << 8 | buf[18];
+	ret->inf_end_lba = (buf[15] << 24 | buf[16] << 16 | buf[17] << 8 | buf[18]);
 	kprintf("%d\n",ret->inf_end_lba);
-	ret->fs_size = buf[19] << 24 | buf[20] << 16 | buf[21] << 8 | buf[22];
+	ret->fs_size = (buf[19] << 24 | buf[20] << 16 | buf[21] << 8 | buf[22]);
 	return ret;
 }
-struct __INFFS_INFOBLK *__INFFS_GET_INFBLK(struct inffs_path *pth,struct __INFFS_SUPERBLK *sblk){
+struct __INFFS_INFOBLK *__INFFS_GET_INFBLK(struct inffs_path *pth,struct __INFFS_SUPERBLK sblk){
 	struct __INFFS_INFOBLK *ret = malloc(sizeof(struct __INFFS_INFOBLK*));
-	int lba = sblk->inf_start_lba;
-	while(lba < sblk->inf_end_lba){
+	int lba = sblk.inf_start_lba;
+	while(lba < sblk.inf_end_lba){
 		char *buf = malloc(1024);
 		ata_read_master(buf,lba,0);
 		int i = 0;
@@ -195,19 +195,21 @@ struct __INFFS_INFBLK_FREE{
 };
 
 struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *ret){
-	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
-	__INFFS_PARSE_SUPERBLK(sblk);
+	struct __INFFS_SUPERBLK *_sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
+	struct __INFFS_SUPERBLK sblk;
+	_sblk = __INFFS_PARSE_SUPERBLK(&sblk);
 	int meh = 0;
 	//while(1)
 	//	;
-	int lba = sblk->inf_start_lba;
+	int lba = sblk.inf_start_lba;
 	int i = 0;
 	int free = 0;
 	ret->start_lba = -1;
 	ret->start_offset = -1;
 	ret->end_lba = -1;
 	ret->end_offset = -1;
-	while(lba < sblk->inf_end_lba){
+	//kprintf("%d\n",sblk.inf_end_lba);
+	while(lba < sblk.inf_end_lba){
 		i = 0;
 		//kprintf(".");
 		char *buf = malloc(1024);
@@ -236,8 +238,9 @@ struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *re
 	}
 }
 struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,struct __INFFS_FILE *ret) {
-	struct __INFFS_SUPERBLK *sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
-	__INFFS_PARSE_SUPERBLK(sblk);
+	struct __INFFS_SUPERBLK *_sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
+	struct __INFFS_SUPERBLK sblk;
+	_sblk =	__INFFS_PARSE_SUPERBLK(&sblk);
 	///while(1)
 	//	;
 	//struct __INFFS_FILE *ret = malloc(sizeof(struct __INFFS_FILE *));
@@ -248,7 +251,7 @@ struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,
 		struct __INFFS_INFOBLK *infblk = __INFFS_GET_INFBLK(_path,sblk);
 		kstrcpy(ret->name,_path->name);
 		//kprintf("%s\n",ret->name);
-		if(!(sblk)){
+		if(!(_sblk)){
 			debug("INFFS","Failed to parse superblock");
 			return -1;
 		}
@@ -283,16 +286,16 @@ struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,
 		kstrcpy(ret->name,_path->name);
 		kprintf("%s\n",ret->name);
 		ret->fsize = 0;
-		struct __INFFS_INFBLK_FREE *infblk = malloc(sizeof(struct __INFFS_INFBLK_FREE *));
-		find_freeinfblk(strlen(_path->name) + 12,infblk);
-		ret->start_lba = infblk->start_lba;
+		struct __INFFS_INFBLK_FREE infblk;
+		find_freeinfblk(strlen(_path->name) + 12,&infblk);
+		ret->start_lba = infblk.start_lba;
 		//if(!(ret->start_lba)){
 		//	debug("__INFFS_FULLDISK_FS_FOPEN","Invalid infblk");
 		//}
-		ret->endingval = infblk->end_lba;
-		ret->pos = infblk->start_offset;
+		ret->endingval = infblk.end_lba;
+		ret->pos = infblk.start_offset;
 		ret->opperation = opperation;
-		ret->blkpos = infblk->start_offset;
+		ret->blkpos = infblk.start_offset;
 		ret->_blkpos = 0;
 		return ret;
 	}
@@ -306,15 +309,16 @@ struct free{
 struct free *find_free(unsigned long size,struct free *ret){
 	//while(1)
 	//	;
-	struct __INFFS_SUPERBLK *sblk =  malloc(sizeof(struct __INFFS_SUPERBLK *));
-	__INFFS_PARSE_SUPERBLK(sblk);
+	struct __INFFS_SUPERBLK *_sblk =  malloc(sizeof(struct __INFFS_SUPERBLK *));
+	struct __INFFS_SUPERBLK sblk;
+	_sblk = __INFFS_PARSE_SUPERBLK(&sblk);
 	//while(1)
 	//	;
-	if(!(sblk)){
+	if(!(_sblk)){
 		debug("INFFS","Failed to parse superblock");
 		panic();
 	}
-	int lba = sblk->inf_end_lba + 1;
+	int lba = sblk.inf_end_lba + 1;
 	char *buf = malloc(1024);
 	if(!(buf)){
 		debug("INFFS","Failed to allocate memory");
