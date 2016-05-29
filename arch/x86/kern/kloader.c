@@ -104,6 +104,7 @@ void kernel_loader_main(){
 	kprintf("Please set boot options in the following format:\n");
 	kprintf("[ ] means optional * * means required\n");
 	kprintf("[-v] [-r] [-d] offset=#ofblocks\n");
+	kprintf("-v is verbose -r is release -d is development\n");
 	kprintf("___________________________________________________________________________\n%)");
 	char *s = malloc(1024);
 	s = kgets();
