@@ -103,10 +103,17 @@ void kernel_loader_main(){
 	kprintf("MINOS libzOS kernel\n");
 	kprintf("Please set boot options in the following format:\n");
 	kprintf("[ ] means optional * * means required\n");
-	kprintf("[-v] [-m] offset=#ofblocks\n");
+	kprintf("[-v] [-r] [-d] offset=#ofblocks\n");
 	kprintf("___________________________________________________________________________\n%)");
 	char *s = malloc(1024);
-	#ifdef RELEASE
+	s = kgets();
+	if(strcmp(s,"-v") == 0)
+		verbose_kmain();
+	else if(strcmp(s,"-r") == 0)
+		release_kmain();
+	else if(strcmp(s,"-d") == 0)
+		dev_kmain();
+	/*#ifdef RELEASE
 	release_kmain();
 	#endif
 	#ifdef DEBUG
