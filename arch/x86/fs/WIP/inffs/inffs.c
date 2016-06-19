@@ -372,6 +372,7 @@ struct free *find_free(unsigned long size,struct free *ret){
 int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	if(f->opperation != __INFFS_FOPP_WRITE)
 		return -1;
+	t_init();
 	kprintf("Writing %s\n",f->name);
 	kprintf("Finding free info block\n");
 	struct __INFFS_INFBLK_FREE free;
@@ -393,10 +394,13 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 		panic();
 	}
 	char wbuf[] = {1,(strlen(f->name) + 12),f_file.lba_begin >> 24,f_file.lba_begin >> 16,f_file.lba_begin >> 8,f_file.lba_begin >> 0,(n/512) >> 24,(n/512) >> 16,(n/512) >> 8,(n/512) >> 0,strlen(f->name)};
-	char *fwbuf = malloc(1024);
+	char fwbuf[1024];
 	for(int i = 0; i < (sizeof(wbuf)/sizeof(*wbuf));i++)
 		fwbuf[i] = wbuf[i];
 	kstrcat(fwbuf,f->name);
+	for(int i = 0; i < 12 + strlen(f->name);i++)
+		kprintf("%c",fwbuf[i]);
+	//kprintf("%s\n",f->name);
 	char c = 0;
 	kstrcat(fwbuf,&c);
 	kprintf("Writing buf 1\n");
