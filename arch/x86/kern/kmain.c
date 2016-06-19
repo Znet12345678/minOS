@@ -303,6 +303,7 @@ int release_kmain(){
 	//write_rd_file("Welcome",wbuf,strlen(wbuf),0x00100000);
 	//struct rd_file *welcome_f = read_rd_file_full("Welcome",0x00100000);
 	//kprintf("Welcome says %s\n",welcome_f->raw);
+	//t_init();
 	if(!(__IS_INFFS())){
 		kprintf("Formating drive");
 		__INFFS_MKFS_FULLDISK();
@@ -324,7 +325,8 @@ int release_kmain(){
 	}
 
 	debug("INFFS","Writing test file");
-	if(__INFFS_FULLDISK_FS_FWRITE(&tmp,"Test",strlen("Test")) < 0){
+	char tbuf[1024] = {'T','e','s','t'};
+	if(__INFFS_FULLDISK_FS_FWRITE(&tmp,tbuf,strlen(tbuf)) < 0){
 		kprintf("Error writing file!\n");
 		panic();
 	}

@@ -31,6 +31,10 @@ void putpixel(unsigned char *screen,int x,int y,int color){
 		}		
 	}
 }*/
+void display_loading(){
+	int color = mkcolour(COLOUR_BLUE,COLOUR_BLUE);
+
+}
 void gt_putc(char c, int color,int x,int y){
 	/*if(c == 'a' || c == 'A' && pos == 0){
 		putpixel((unsigned char *)0xA0000,(pos * 4) + 1,color);

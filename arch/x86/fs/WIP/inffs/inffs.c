@@ -203,6 +203,7 @@ struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *re
 	//	;
 	int lba = sblk.inf_start_lba;
 	int i = 0;
+	//kprintf("[(lba)%d]\n",lba);
 	int free = 0;
 	ret->start_lba = -1;
 	ret->start_offset = -1;
@@ -212,7 +213,7 @@ struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *re
 	while(lba < sblk.inf_end_lba){
 		i = 0;
 		//kprintf(".");
-		char *buf = malloc(1024);
+		char  *buf = malloc(1024);
 		ata_read_master(buf,lba,0);
 		while(i < 512){
 			if(free == n){
@@ -225,7 +226,7 @@ struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *re
 				ret->start_offset = i;
 				free++;
 			}
-			else if(buf[i]= 0)
+			else if(buf[i] == 0)
 				free++;
 			else{
 				ret->start_lba = -1;
@@ -373,24 +374,25 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 		return -1;
 	kprintf("Writing %s\n",f->name);
 	kprintf("Finding free info block\n");
-	struct __INFFS_INFBLK_FREE *free = malloc(sizeof(struct __INFFS_INFSBLK_FREE *));
-	find_freeinfblk(strlen(f->name) + 12,free);
-	if(!(free)){
+	struct __INFFS_INFBLK_FREE free;
+	find_freeinfblk(strlen(f->name) + 12,&free);
+	if(!(&free)){
 		kprintf("Failed to find free space for infoblock\n");
 		panic();
 	}
 	kprintf("Finding enough free space on drive\n");
 	//while(1)
 	//	;
-	struct free *f_file = malloc(sizeof(struct free *));
-	find_free(n,f_file);
+	struct free *_f_file = malloc(sizeof(struct free *));
+	struct free f_file;
+	find_free(n,&f_file);
 	//while(1)
 	//	;
-	if(!(f_file)){
+	if(!(_f_file)){
 		kprintf("Failed to find free space for file\n");
 		panic();
 	}
-	char wbuf[] = {1,(strlen(f->name) + 12),f_file->lba_begin >> 24,f_file->lba_begin >> 16,f_file->lba_begin >> 8,f_file->lba_begin >> 0,(n/512) >> 24,(n/512) >> 16,(n/512) >> 8,(n/512) >> 0,strlen(f->name)};
+	char wbuf[] = {1,(strlen(f->name) + 12),f_file.lba_begin >> 24,f_file.lba_begin >> 16,f_file.lba_begin >> 8,f_file.lba_begin >> 0,(n/512) >> 24,(n/512) >> 16,(n/512) >> 8,(n/512) >> 0,strlen(f->name)};
 	char *fwbuf = malloc(1024);
 	for(int i = 0; i < (sizeof(wbuf)/sizeof(*wbuf));i++)
 		fwbuf[i] = wbuf[i];
@@ -398,13 +400,17 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	char c = 0;
 	kstrcat(fwbuf,&c);
 	kprintf("Writing buf 1\n");
-	ata_write_master_no_no_ow(fwbuf,free->start_lba,free->start_offset,strlen(f->name) + 12);
-	int i = f_file->offset_begin;
-	int lba = f_file->lba_begin;
+	kprintf("%d %d\n",free.start_lba,free.start_offset);
+	kprintf("LBA:%d\n",free.start_lba);
+	ata_write_master_no_no_ow(fwbuf,free.start_lba,free.start_offset,strlen(f->name) + 12);
+	kprintf("Done writing buf 1\n");
+	int i = f_file.offset_begin;
+	int lba = f_file.lba_begin;
 	char *tmpbuf = malloc(1024);
 	int j = 0;
 	kprintf("Writing buf 2\n");
-	ata_write_master_no_no_ow((uint8_t*)buf,lba,i,n);
+	kprintf("LBA:%d\n",lba);
+	ata_write_master_no_no_ow(buf,lba,i,n);
 	j++;
 	lba++;
 }

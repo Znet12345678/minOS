@@ -303,7 +303,7 @@ int ata_write_master(uint8_t *buf,uint16_t _lba){
     io = 0x1F0;
     uint8_t cmd = 0x30;
     uint8_t slavebit = 0x00;
-    outb(io + 0x06,(cmd | (uint8_t)((lba >> 24 & 0x0F))));
+    outb(io + 0x06,(0xE0 | (uint8_t)((lba >> 24 & 0x0F))));
     outb(io + 0x02,1);
     outb(io + 0x03,(uint8_t)lba);
     outb(io + 0x04,(uint8_t)((lba) >> 8));
@@ -317,12 +317,13 @@ int ata_write_master(uint8_t *buf,uint16_t _lba){
     outsw(0x1F0,buf,512);
 }
 int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,unsigned int n){
-	    uint16_t io;
+/*	    uint16_t io;
     uint32_t lba = _lba;
     io = 0x1F0;
     uint8_t cmd = 0x30;
     uint8_t slavebit = 0x00;
-    outb(io + 0x06,(cmd | (uint8_t)((lba >> 24 & 0x0F))));
+    outb(io + 0x06,(0xE0 | (uint8_t)((lba >> 24 & 0x0F))));
+    outb(io + 0x01,0);
     outb(io + 0x02,1);
     outb(io + 0x03,(uint8_t)lba);
     outb(io + 0x04,(uint8_t)((lba) >> 8));
@@ -331,12 +332,35 @@ int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,uns
     if(ide_wait_for_write() < 0){
 	kprintf("I/O Error\n");
 	panic();
-    }
+    }*/
+   // for(int j = 0; j < n;j++)
+//	kprintf("%c",buf[j]);
     int i = 0;
+    uint16_t io = 0x1F0;
+    uint8_t cmd = 0x30;
+    uint8_t slavebit = 0;
+    outb(0x1F6,(0xE0 | (uint8_t)((_lba >> 24 & 0x0F))));
+    outb(0x1F1,0);
+    outb(0x1F2,1);
+    outb(0x1F3,(uint8_t)_lba);
+    outb(0x1F4,(uint8_t)(_lba >> 8));
+    outb(0x1F5,(uint8_t)(_lba >> 16));
+    outb(0x1F7,0x30);
+    if(ide_wait_for_write() < 0){
+        kprintf("I/O Error!\n");
+        panic();
+    }
+    //kprintf("%d\n",n);
+    i = 0;
     char *_buf = malloc(1024);
+ //   kprintf("Reading...\n");
     ata_read_master(_buf,_lba,0);
+    //kprintf("LBA:%d\n",_lba);
+    kprintf("Offset:%d\n",offset);
     outsw(0x1F0,_buf,offset);
     outsw(0x1F0,buf,n);
+    //for(int i = 0; i < n;i++)
+//	kprintf("%c",buf[i]);
     return 0;
 }
 int ata_check_lba(uint32_t lba){
