@@ -110,7 +110,7 @@ int __INFFS_MKFS_FULLDISK(){
   //      ret.ninfblk = disk_size / 100;
 //    else
     ret.ninfblk = 1024;
-    ret.inf_start_lba = 5;
+    ret.inf_start_lba = 6;
  //   if(ret.inf_start_lba == 5)
 //	panic();
     ret.inf_end_lba = 5 + ret.ninfblk;

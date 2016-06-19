@@ -356,9 +356,11 @@ int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,uns
  //   kprintf("Reading...\n");
     ata_read_master(_buf,_lba,0);
     //kprintf("LBA:%d\n",_lba);
-    kprintf("Offset:%d\n",offset);
+    kprintf("Offset:%d Number of bytes %d\n",offset,n);
     outsw(0x1F0,_buf,offset);
-    outsw(0x1F0,buf,n);
+
+    for(int i = 0; i < (n/512) + 1;i++)
+	outsw(0x1F0,buf,512);
     //for(int i = 0; i < n;i++)
 //	kprintf("%c",buf[i]);
     return 0;
