@@ -373,15 +373,15 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	if(f->opperation != __INFFS_FOPP_WRITE)
 		return -1;
 	t_init();
-	kprintf("Writing %s\n",f->name);
-	kprintf("Finding free info block\n");
+	//kprintf("Writing %s\n",f->name);
+	//kprintf("Finding free info block\n");
 	struct __INFFS_INFBLK_FREE free;
 	find_freeinfblk(strlen(f->name) + 12,&free);
 	if(!(&free)){
 		kprintf("Failed to find free space for infoblock\n");
 		panic();
 	}
-	kprintf("Finding enough free space on drive\n");
+	//kprintf("Finding enough free space on drive\n");
 	//while(1)
 	//	;
 	struct free *_f_file = malloc(sizeof(struct free *));
@@ -398,8 +398,8 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	for(int i = 0; i < (sizeof(wbuf)/sizeof(*wbuf));i++)
 		fwbuf[i] = wbuf[i];
 	kstrcat(fwbuf,f->name);
-	for(int i = 0; i < 12 + strlen(f->name);i++)
-		kprintf("%c",fwbuf[i]);
+	//for(int i = 0; i < 12 + strlen(f->name);i++)
+	//	kprintf("%c",fwbuf[i]);
 	//kprintf("%s\n",f->name);
 	char c = 0;
 	kstrcat(fwbuf,&c);

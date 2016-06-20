@@ -190,6 +190,7 @@ int ata_read_master(uint8_t *buf,uint32_t _lba,uint16_t drive){
 	int i = 0;
 	while(i < 512){
 		uint16_t data = inw(io);
+		//kprintf("%c",data);
 		//kstrcat(buf,&(data));
 		//buf[i] = 0x00;
 		//char cdata = (char)data;
@@ -205,7 +206,7 @@ int ata_read_master(uint8_t *buf,uint32_t _lba,uint16_t drive){
 	}
 	return 1;
 }
-int ata_read_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned int n){
+int ata_read_master_no(uint8_t *buf,uint32_t lba,unsigned int offset,unsigned int n){
 	outb(0x1F6,(0xE0 | (uint8_t)((lba >> 24 & 0x0F))));
 	outb(0x1F1,0);
 	if(n < 512)
@@ -224,14 +225,14 @@ int ata_read_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned in
 		i++;
 	}
 	while(i < n){
-		uint16_t val = inb(0x1F0);
+		uint16_t val = inw(0x1F0);
 		*(uint16_t*)(buf + i*2) = val;
 		i++;
 	}
 	return 0;
 }
-int ata_read_master_n(uint8_t *buf,uint16_t lba,unsigned int n){
-        outb(0x1F6,(0xE0 | (uint8_t)((lba >> 24 & 0x0F))));
+int ata_read_master_n(uint8_t *buf,uint32_t lba,unsigned int n){
+        /*outb(0x1F6,(0xE0 | (uint8_t)((lba >> 24 & 0x0F))));
         outb(0x1F1,0);
         if(n < 512)
                 outb(0x1F2,1);
@@ -240,15 +241,34 @@ int ata_read_master_n(uint8_t *buf,uint16_t lba,unsigned int n){
         outb(0x1F3,(uint8_t) lba);
         outb(0x1F4,(uint8_t) (lba >> 8));
         outb(0x1F5,(uint8_t) (lba >> 16));
-        outb(0x1F7,0x20);
+        outb(0x1F7,0x20);*/
+	int io = 0x1F0;
+        outb(io + 0x06,(0xE0 | (uint8_t)((lba >> 24 & 0x0F))));
+        outb(io + 1,0x00);
+	if(n < 512)
+	        outb(io + 0x02,1);
+	else
+		outb(io + 0x02,n/512);
+        outb(io + 0x03,(uint8_t)lba);
+        outb(io + 0x04,(uint8_t)((lba) >> 8));
+        outb(io + 0x05,(uint8_t)((lba) >> 16));
+        outb(io + 0x07,0x20);
+
         if(ide_wait_for_read(0x1F0) < 0)
                 panic();
         int i = 0;
 	while(i < n){
-		uint16_t val = inb(0x1F0);
+		uint16_t val = inw(0x1F0);
+		//kprintf("%c",val);
 		*(uint16_t *)(buf + i * 2) = val;
+		//kprintf("%d",val);
 		i++;
 	}
+	if(n < 512)
+		while(i < (512 - n)){
+			inw(0x1F0);
+			i++;
+		}
 	return 0;
 }
 int ata_write_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned int n){
@@ -352,13 +372,23 @@ int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,uns
     }
     //kprintf("%d\n",n);
     i = 0;
-    char *_buf = malloc(1024);
+    char *_buf = malloc(offset);
  //   kprintf("Reading...\n");
-    ata_read_master(_buf,_lba,0);
+    //kprintf("LBA:%d\n",_lb1a);
+    //uint16_t __buf[1024];
+  //  ata_read_master(__buf,_lba,0);
+ //  for(int i = 0; i < 512;i++)
+//	kprintf("%d",__buf[i]);
+    ata_read_master_n(_buf,_lba,offset);
+ //   for(int i = 0; i < offset;i++)
+//	kprintf("%d",_buf[i]);
+  //  kprintf("\n");
+  //  for(int i = offset; i < 512;i++)
+//	_buf[i] = 0;
     //kprintf("LBA:%d\n",_lba);
     kprintf("Offset:%d Number of bytes %d\n",offset,n);
     outsw(0x1F0,_buf,offset);
-
+    //outsw(0x1F0,buf,n);
     for(int i = 0; i < (n/512) + 1;i++)
 	outsw(0x1F0,buf,512);
     //for(int i = 0; i < n;i++)

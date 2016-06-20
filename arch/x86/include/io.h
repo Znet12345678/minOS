@@ -33,8 +33,8 @@ static inline uint16_t inw(uint32_t s){
         return ret;
 }
 int ata_check_lba(uint32_t lba);
-int ata_read_master_n(uint8_t *buf,uint16_t lba,unsigned int n);
-int ata_read_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned int n);
+int ata_read_master_n(uint8_t *buf,uint32_t lba,unsigned int n);
+int ata_read_master_no(uint8_t *buf,uint32_t lba,unsigned int offset,unsigned int n);
 int ata_read_master(uint8_t *buf,uint32_t _lba,uint16_t drive);
 int ata_write_master_n(uint8_t *buf,uint16_t lba,unsigned int n);
 int ata_write_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned int n);
