@@ -372,7 +372,7 @@ struct free *find_free(unsigned long size,struct free *ret){
 int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	if(f->opperation != __INFFS_FOPP_WRITE)
 		return -1;
-	t_init();
+	//t_init();
 	//kprintf("Writing %s\n",f->name);
 	//kprintf("Finding free info block\n");
 	struct __INFFS_INFBLK_FREE free;
@@ -403,17 +403,19 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	//kprintf("%s\n",f->name);
 	char c = 0;
 	kstrcat(fwbuf,&c);
-	kprintf("Writing buf 1\n");
-	kprintf("%d %d\n",free.start_lba,free.start_offset);
+	//kprintf("Writing buf 1\n");
+	//kprintf("%d %d\n",free.start_lba,free.start_offset);
+	//int flba = free.start_lba;
 	kprintf("LBA:%d\n",free.start_lba);
 	ata_write_master_no_no_ow(fwbuf,free.start_lba,free.start_offset,strlen(f->name) + 12);
-	kprintf("Done writing buf 1\n");
+	//kprintf("Done writing buf 1\n");
 	int i = f_file.offset_begin;
 	int lba = f_file.lba_begin;
 	char *tmpbuf = malloc(1024);
 	int j = 0;
-	kprintf("Writing buf 2\n");
+	//kprintf("Writing buf 2\n");
 	kprintf("LBA:%d\n",lba);
+	//kprintf("%d %d\n",lba,i);
 	ata_write_master_no_no_ow(buf,lba,i,n);
 	j++;
 	lba++;

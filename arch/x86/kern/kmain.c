@@ -340,6 +340,16 @@ int release_kmain(){
 		shell_process(s);
 		//kprintf("\n%s\n",s);
 	}
+	//struct __INFFS_FILE _tmp;
+        //struct __INFFS_FILE *_f_i = __INFFS_FULLDISK_FS_FOPEN("/test1",__INFFS_FOPP_WRITE,&tmp);
+	//if(!(f_i))
+	//	panic();
+	//char _tbuf[1024] = {'T','e','s','T'};
+        //if(__INFFS_FULLDISK_FS_FWRITE(&_tmp,_tbuf,strlen(_tbuf)) < 0){
+          //      kprintf("Error writing file!\n");
+            //    panic();
+        //}
+
 	//panic();
 }
 int verbose_kmain(char *arg){

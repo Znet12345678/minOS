@@ -246,10 +246,7 @@ int ata_read_master_n(uint8_t *buf,uint32_t lba,unsigned int n){
 	int io = 0x1F0;
         outb(io + 0x06,(0xE0 | (uint8_t)((lba >> 24 & 0x0F))));
         outb(io + 1,0x00);
-	if(n < 512)
-	        outb(io + 0x02,1);
-	else
-		outb(io + 0x02,n/512);
+	outb(io + 2,1);
         outb(io + 0x03,(uint8_t)lba);
         outb(io + 0x04,(uint8_t)((lba) >> 8));
         outb(io + 0x05,(uint8_t)((lba) >> 16));
@@ -265,11 +262,6 @@ int ata_read_master_n(uint8_t *buf,uint32_t lba,unsigned int n){
 		//kprintf("%d",val);
 		i++;
 	}
-	if(n < 512)
-		while(i < (512 - n)){
-			inw(0x1F0);
-			i++;
-		}
 	return 0;
 }
 int ata_write_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned int n){
@@ -338,8 +330,13 @@ int ata_write_master(uint8_t *buf,uint16_t _lba){
     outsw(0x1F0,buf,512);
 }
 int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,unsigned int n){
-    char _buf[offset];
-    ata_read_master_n(_buf,_lba,offset);
+    kprintf("[b]LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
+
+    char _buf[1024];
+    int lba = _lba;
+    ata_read_master(_buf,lba,0);
+    kprintf("[a]LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
+
 /*	    uint16_t io;
     uint32_t lba = _lba;
     io = 0x1F0;
@@ -381,7 +378,7 @@ int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,uns
 	//kprintf("%d",c);
 //    }
 	//uint16_t io = 0x1F0;
-        uint8_t _cmd = 0xE0;
+    //    uint8_t _cmd = 0xE0;
         //kprintf("Sending LBA and CM
  //   kprintf("Reading...\n");
     //kprintf("LBA:%d\n",_lb1a);
@@ -396,7 +393,7 @@ int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,uns
   //  for(int i = offset; i < 512;i++)
 //	_buf[i] = 0;
     //kprintf("LBA:%d\n",_lba);
-    kprintf("Offset:%d Number of bytes %d\n",offset,n);
+ //   kprintf("LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
     outsw(0x1F0,_buf,offset);
     //outsw(0x1F0,buf,n);
     for(int i = 0; i < (n/512) + 1;i++)
