@@ -330,12 +330,15 @@ int ata_write_master(uint8_t *buf,uint16_t _lba){
     outsw(0x1F0,buf,512);
 }
 int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,unsigned int n){
-    kprintf("[b]LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
-
-    char _buf[1024];
+    //kprintf("[b]LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
+    uint8_t _buf[1024];
+   // char *_buf = malloc(1024);
     int lba = _lba;
+    uint8_t __buf[1024];
     ata_read_master(_buf,lba,0);
-    kprintf("[a]LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
+    ata_read_master_no(__buf,lba,(offset + n),(512 - (offset + n)));
+    //kprintf("%s\n",_buf);
+    //kprintf("[a]LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
 
 /*	    uint16_t io;
     uint32_t lba = _lba;
@@ -370,34 +373,19 @@ int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,uns
         kprintf("I/O Error!\n");
         panic();
     }
-    //kprintf("%d\n",n);
     i = 0;
-  //  for(int i = 0;i < offset;i++){
-    	//int c;
-	//ata_read_master_no(&c,_lba,i,1);
-	//kprintf("%d",c);
-//    }
-	//uint16_t io = 0x1F0;
-    //    uint8_t _cmd = 0xE0;
-        //kprintf("Sending LBA and CM
- //   kprintf("Reading...\n");
-    //kprintf("LBA:%d\n",_lb1a);
-    //uint16_t __buf[1024];
-  //  ata_read_master(__buf,_lba,0);
- //  for(int i = 0; i < 512;i++)
-//	kprintf("%d",__buf[i]);
-    //ata_read_master(_buf,_lba,0);
-//    for(int i = 0; i < offset;i++)
-	//kprintf("%d",_buf[i]);
-  //  kprintf("\n");
-  //  for(int i = offset; i < 512;i++)
-//	_buf[i] = 0;
-    //kprintf("LBA:%d\n",_lba);
- //   kprintf("LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
-    outsw(0x1F0,_buf,offset);
-    //outsw(0x1F0,buf,n);
-    for(int i = 0; i < (n/512) + 1;i++)
-	outsw(0x1F0,buf,512);
+    kprintf("LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
+    outsw(0x1F0,_buf,offset / 2);
+    //kprintf("Writing %s\n",buf);
+  //  for(int j = 0; j < n;j++){
+//	kprintf("%d",buf[j]);
+    //}
+    outsw(0x1F0,buf,n/2);
+    outsw(0x1F0,__buf,512 - (n/2 + offset));
+    //for(int i = 0; i < n;i++)
+//	    outsw(0x1F0,buf,1);
+//    for(int i = 0; i < (n/512) + 1;i++)
+//	outsw(0x1F0,buf,512);
     //for(int i = 0; i < n;i++)
 //	kprintf("%c",buf[i]);
     return 0;

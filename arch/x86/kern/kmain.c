@@ -325,7 +325,8 @@ int release_kmain(){
 	}
 
 	debug("INFFS","Writing test file");
-	char tbuf[1024] = {'T','e','s','t'};
+	//const char *tbuf = "Test";
+	uint8_t tbuf[1024] = {'T','e','s','t'};
 	if(__INFFS_FULLDISK_FS_FWRITE(&tmp,tbuf,strlen(tbuf)) < 0){
 		kprintf("Error writing file!\n");
 		panic();

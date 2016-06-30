@@ -369,7 +369,7 @@ struct free *find_free(unsigned long size,struct free *ret){
 	}
 	return ret;
 }
-int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
+int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,uint8_t *buf,int n){
 	if(f->opperation != __INFFS_FOPP_WRITE)
 		return -1;
 	//t_init();
@@ -394,9 +394,11 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 		panic();
 	}
 	char wbuf[] = {1,(strlen(f->name) + 12),f_file.lba_begin >> 24,f_file.lba_begin >> 16,f_file.lba_begin >> 8,f_file.lba_begin >> 0,(n/512) >> 24,(n/512) >> 16,(n/512) >> 8,(n/512) >> 0,strlen(f->name)};
-	char fwbuf[1024];
+	uint8_t fwbuf[1024];
 	for(int i = 0; i < (sizeof(wbuf)/sizeof(*wbuf));i++)
 		fwbuf[i] = wbuf[i];
+	//for(int i = (sizeof(wbuf)/sizeof(*wbuf)); i < (strlen(name) + (sizeof(wbuf);i++)
+	//	fwbuf
 	kstrcat(fwbuf,f->name);
 	//for(int i = 0; i < 12 + strlen(f->name);i++)
 	//	kprintf("%c",fwbuf[i]);
@@ -417,6 +419,7 @@ int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *f,int *buf,int n){
 	kprintf("LBA:%d\n",lba);
 	//kprintf("%d %d\n",lba,i);
 	ata_write_master_no_no_ow(buf,lba,i,n);
+//	kprintf("%d%d%d%d\n",buf[0],buf[1],buf[2],buf[3]);
 	j++;
 	lba++;
 }
