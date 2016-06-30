@@ -281,10 +281,10 @@ int ata_write_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned i
 	}
 	char *__buf = malloc(1024);
 	ata_read_master(__buf,lba,0);
-	outsw(0x1F0,__buf,offset);
-	outsw(0x1F0,buf,n);
+	outsw(0x1F0,__buf,offset/2);
+	outsw(0x1F0,buf,n/2);
 	char _buf[513] = {[0 ... 512]0};
-	outsw(0x1F0,_buf,512 - n);
+	outsw(0x1F0,_buf,512 - n/2);
 	return 0;
 }
 int ata_write_master_n(uint8_t *buf,uint16_t lba,unsigned int n){
@@ -304,9 +304,9 @@ int ata_write_master_n(uint8_t *buf,uint16_t lba,unsigned int n){
 	panic();
     }
     int j = 0;
-    outsw(0x1F0,buf,n);
+    outsw(0x1F0,buf,n/2);
     char _buf[513] = {[0 ... 512]0};
-    outsw(0x1F0,_buf,512 - n);
+    outsw(0x1F0,_buf,512 - n/2);
     return 0;
 
 }
