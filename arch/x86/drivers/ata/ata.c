@@ -281,10 +281,20 @@ int ata_write_master_no(uint8_t *buf,uint16_t lba,unsigned int offset,unsigned i
 	}
 	char *__buf = malloc(1024);
 	ata_read_master(__buf,lba,0);
-	outsw(0x1F0,__buf,offset/2);
-	outsw(0x1F0,buf,n/2);
-	char _buf[513] = {[0 ... 512]0};
-	outsw(0x1F0,_buf,512 - n/2);
+	if((offset % 2) == 0)
+		outsw(0x1F0,__buf,offset/2);
+	else
+		outsw(0x1F0,__buf,offset/2 + 1);
+	if((n%2) == 0){
+		outsw(0x1F0,buf,n/2);
+		char _buf[513] = {[0 ... 512]0};
+		outsw(0x1F0,_buf,512 - n/2);
+        }
+	else{
+		outsw(0x1F0,buf,n/2+1);
+                char _buf[513] = {[0 ... 512]0};
+                outsw(0x1F0,_buf,512 - n/2+1);
+	}
 	return 0;
 }
 int ata_write_master_n(uint8_t *buf,uint16_t lba,unsigned int n){
@@ -304,9 +314,16 @@ int ata_write_master_n(uint8_t *buf,uint16_t lba,unsigned int n){
 	panic();
     }
     int j = 0;
-    outsw(0x1F0,buf,n/2);
-    char _buf[513] = {[0 ... 512]0};
-    outsw(0x1F0,_buf,512 - n/2);
+    if((n % 2) == 0){
+    	outsw(0x1F0,buf,n/2);
+    	char _buf[513] = {[0 ... 512]0};
+    	outsw(0x1F0,_buf,512 - n/2);
+    }else{
+	outsw(0x1F0,buf,n/2 + 1);
+        char _buf[513] = {[0 ... 512]0};
+        outsw(0x1F0,_buf,512 - n/2 + 1);
+
+    }
     return 0;
 
 }
@@ -375,13 +392,22 @@ int ata_write_master_no_no_ow(uint8_t *buf,uint16_t _lba,unsigned int offset,uns
     }
     i = 0;
     kprintf("LBA %d Offset:%d Number of bytes %d\n",_lba,offset,n);
-    outsw(0x1F0,_buf,offset / 2);
+    if((offset % 2) == 0)
+    	outsw(0x1F0,_buf,offset/2);
+    else
+	outsw(0x1F0,_buf,offset/2+1);
     //kprintf("Writing %s\n",buf);
   //  for(int j = 0; j < n;j++){
 //	kprintf("%d",buf[j]);
     //}
-    outsw(0x1F0,buf,n/2);
-    outsw(0x1F0,__buf,512 - (n/2 + offset));
+    if((n % 2) == 0){
+   	 outsw(0x1F0,buf,n/2);
+   	 outsw(0x1F0,__buf,(512 - (n/2 + offset)));
+    }
+    else{
+	outsw(0x1F0,buf,n/2+1);
+	outsw(0x1F0,__buf,(512 - (n/2 + offset) + 1));
+    }
     //for(int i = 0; i < n;i++)
 //	    outsw(0x1F0,buf,1);
 //    for(int i = 0; i < (n/512) + 1;i++)
