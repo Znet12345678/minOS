@@ -101,9 +101,9 @@ int __INFFS_MKFS_FULLDISK(){
     struct __INFFS_SUPERBLK ret;
     char sig[] = {'I',0x0f,'N',0x0f,'F',0x0f,'F',0x0f,'S',0x0f};
     ret.sig = sig;
-    kprintf("Getting disk size\n");
-    int disk_size = __MINOS_GET_DISK_SIZE();
-    kprintf("Done Getting disk size\n");
+    //kprintf("Getting disk size\n");
+    int disk_size = 0;
+   /// kprintf("Done Getting disk size\n");
     //if(disk_size > 102400)
       //  ret.ninfblk = disk_size / 1024;
     //else if(disk_size > 100)
@@ -238,7 +238,52 @@ struct __INFFS_INFBLK_FREE *find_freeinfblk(int n,struct __INFFS_INFBLK_FREE *re
 		lba++;
 	}
 }
+int file_exists(const char *rname){
+	struct __INFFS_SUPERBLK sblk;
+	if(!(__INFFS_PARSE_SUPERBLK(&sblk)))
+		return -1;
+	int lba = sblk.inf_start_lba;
+	int end_lba = sblk.inf_end_lba;
+	char buf[1024];
+	int offset = 0;
+	while(lba < end_lba){
+		ata_read_master(buf,lba,0);
+		int i = offset;
+		while(i < 512){
+			if((i + 12) > 512){
+				char tmpbuf[1024];
+				ata_read_master(tmpbuf,lba + 1,0);
+				for(int j = 0; j < ((i + 12) - 512);j++)
+					kstrcat(buf,&tmpbuf[j]);
+				offset = ((i + 12) - 512);
+			}
+			struct __INFFS_INFOBLK tmp;
+			tmp.isalloc = buf[i];
+			if(tmp.isalloc == 0)
+				return 0;
+			i++;
+			tmp.len = buf[i];
+			i++;
+			tmp.blk = buf[i] << 24 | buf[++i] << 16 | buf[++i] << 8 | buf[++i];
+			i++;
+			tmp.sizeinblocks = buf[i] << 24 | buf[++i] << 16 | buf[++i] << 8 | buf[++i];
+			i++;
+			int namelen = buf[i];
+			i++;
+			char name[80];
+			for(int j = 0; j < namelen;j++)
+				name[j] = buf[i];
+			if(strcmp(name,rname) == 0)
+				return 1;
+			i++;
+		}
+		lba++;
+	}
+	return 0;
+}
 struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,struct __INFFS_FILE *ret) {
+	int _file_exists;
+
 	struct __INFFS_SUPERBLK *_sblk = malloc(sizeof(struct __INFFS_SUPERBLK *));
 	struct __INFFS_SUPERBLK sblk;
 	_sblk =	__INFFS_PARSE_SUPERBLK(&sblk);
@@ -252,12 +297,17 @@ struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,
 		struct __INFFS_INFOBLK *infblk = __INFFS_GET_INFBLK(_path,sblk);
 		kstrcpy(ret->name,_path->name);
 		//kprintf("%s\n",ret->name);
+		_file_exists = file_exists(_path->name);
 		if(!(_sblk)){
 			debug("INFFS","Failed to parse superblock");
 			return -1;
 		}
 		if(!(infblk)){
 			debug("INFFS","Invalid file\n");
+			return -1;
+		}
+		if(_file_exists){
+			kprintf("File exists!\n");
 			return -1;
 		}
 		int lba = infblk->blk;

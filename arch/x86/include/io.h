@@ -1,7 +1,7 @@
 #ifndef __MINOS_IO_H
 #define __MINOS_IO_H
 #include <stdint.h>
-static inline void outsw(uint16_t port,void *val,unsigned long n);
+static inline void outsw(unsigned short int port,const void *val,unsigned long int n);
 //static inline void outsw(uint16_t port,uint8_t val);
 static inline void outw(uint16_t port,uint8_t val);
 inline static void outb(uint16_t port,uint8_t val);
@@ -23,7 +23,7 @@ static inline uint16_t inportb(uint32_t port){
 static inline void outw(uint16_t port,uint8_t val){
      __asm__ volatile ("outw %w0, %w1" : : "a"(val), "Nd"(port));
 }
-static inline void outsw(uint16_t port,void *val,unsigned long n){
+static inline void outsw(unsigned short int port,const void *val,unsigned long int n){
         unsigned long cnt = 1;
         __asm__ volatile ("rep outsw" :  "+S"(val),"+c"(n) : "d"(port));
 }

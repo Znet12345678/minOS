@@ -11,6 +11,7 @@
 #include <kernel/tty.h>
 #include <kernel/vga.h>
 #include "../mem/mm.h"
+#include "../drivers/fs/drv_fs.h"
 #include "../lib/panic.h"
 #include "../fs/WIP/fat/fat32.h"
 #include "../fs/WIP/inffs/inffs.h"
@@ -23,6 +24,7 @@ typedef struct __attribute__ ((packed)) {
 #include "../fs/broken/ext2/ext2.h"
 //#include "../fs/fat32/dosfs.h"
 #include "../fs/WIP/minfs/minfs.h"
+#include "../fs/WIP/z-fs/zfs.h"
 unsigned long __strlen(const char *s1){
 	int len = 0;
 	while(s1[len] != 0)
@@ -30,8 +32,22 @@ unsigned long __strlen(const char *s1){
 	return len;
 }
 void dev_kmain(){
-	debug("KERNEL","hang");
-	while(1) { };
+	t_init();
+	debug("KERNEL","Starting up...");
+	int fs = detfs();
+	if(fs == -1){
+		debug("KERNEL","Creating New FileSystem");
+		__K_ZFS_CREATE_FS();
+		debug("KERNEL","Restarting kernel");
+		dev_kmain();
+	}
+	debug("KERNEL","done");
+	while(1){
+		kprintf("#");
+		char buf[1024];
+		kstrcpy(buf,kgets());
+		shell_process(buf);
+	}
 }
 void test_init(){
 	kprintf("{[TESTM-INIT] Module Successfully loaded}\n");

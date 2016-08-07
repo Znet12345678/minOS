@@ -1,0 +1,102 @@
+[bits 16]
+[org 0x7c00]
+start:mov ah,0x0e
+mov al,'E'
+int 0x10
+mov al,'L'
+int 0x10
+mov al,'F'
+int 0x10
+mov al,' '
+int 0x10
+mov al,'L'
+int 0x10
+mov al,'o'
+int 0x10
+mov al,'a'
+int 0x010
+mov al,'d'
+int 0x10
+mov al,'e'
+int 0x10
+mov al,'r'
+int 0x10
+mov al,'-'
+int 0x10
+mov dx,0
+mov bl,0
+loop:
+mov ax,dx
+mov bx,1008
+cwd
+div bx
+mov ch,al
+mov ax,bx
+mov bh,63
+div bh
+mov bh,16
+div bh
+mov dh,ah
+mov ax,dx
+mov bh,63
+div bh
+mov cl,ah
+mov al,cl
+inc cl
+mov al,cl
+mov dl,0x80
+mov ah,2
+mov al,1
+mov bx,0x600
+int 0x13
+cmp ah,0
+JZ cmp
+
+inc dx
+JMP loop
+cmp:
+mov al,[0x600]
+cmp al,0x20
+JZ cmp2
+JMP loop
+cmp2:mov al,[0x601]
+cmp al,0x59
+JZ cmp3
+JMP loop
+cmp3:mov al,[0x602]
+cmp al,0xaa
+JZ cmp4
+jmp loop
+cmp4:mov al,[0x603]
+cmp al,0xff
+JZ 0x604
+jmp loop
+times 510 - ($ - $$) db 0
+dw 0xaa55
+;times 1024 - ($ - $$) db 0
+dd 0xffaa5920
+mov al,'F'
+mov ah,0x0e
+int 0x10
+mov al,'o'
+int 0x10
+mov al,'u'
+int 0x10
+mov al,'n'
+int 0x10
+mov al,'d'
+int 0x10
+mov al,' '
+int 0x10
+mov al,'S'
+int 0x10
+mov al,'a'
+int 0x10
+mov al,'g'
+int 0x10
+mov al,'e'
+int 0x10
+mov al,' '
+int 0x10
+mov al,'2'
+int 0x10

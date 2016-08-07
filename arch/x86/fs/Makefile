@@ -7,3 +7,4 @@ all:
 	@make -C WIP/fs
 	@make -C WIP/zfs
 	@make -C WIP/inffs
+	@make -C WIP/z-fs
