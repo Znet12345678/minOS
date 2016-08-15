@@ -1,3 +1,8 @@
+/*
+*minOS memory allocater
+*Writen by:Zachary James Schlotman
+*Public Domain
+*/
 #include <stdlib.h>
 int malloc_init(){
 	int *pntr = (int*)0x01000000;
@@ -28,3 +33,4 @@ void *malloc(unsigned long n){
 	}
 	return (void *)membuf;
 }
+
