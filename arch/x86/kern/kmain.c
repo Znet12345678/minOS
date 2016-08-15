@@ -10,6 +10,7 @@
 #include <string.h>
 #include <kernel/tty.h>
 #include <kernel/vga.h>
+#include "../fs/WIP/fat16/fat16.h"
 #include "../mem/mm.h"
 #include "../drivers/fs/drv_fs.h"
 #include "../lib/panic.h"
@@ -34,7 +35,11 @@ unsigned long __strlen(const char *s1){
 void dev_kmain(){
 	t_init();
 	debug("KERNEL","Starting up...");
-	int fs = detfs();
+	struct fat16_bpb *bpb = parse_bpb();
+	kprintf("bytes_per_sector:[%d] sectors_per_cluster:[%d]  resv_sectors:[%d]\n num_of_fat:[%d] num_of_dir_ent:[%d] total_sectors:[%d]\n mdt:[%d] sectorsperfat:[%d],sectorspertrack:[%d]\n numberofheads:[%d] numberofhiddensectors:[%d] large_sectors:[%d]\n",bpb->bytes_per_sector,bpb->sectors_per_cluster,bpb->resv_sectors,bpb->num_of_fat,bpb->num_of_dir_ent,bpb->total_sectors,bpb->mdt,bpb->sectorsperfat,bpb->sectorspertrack,bpb->numberofheads,bpb->numberofhiddensectors,bpb->large_sectors);
+	while(1)
+		;
+	/*int fs = detfs();
 	if(fs == -1){
 		debug("KERNEL","Creating New FileSystem");
 		__K_ZFS_CREATE_FS();
@@ -47,7 +52,7 @@ void dev_kmain(){
 		char buf[1024];
 		kstrcpy(buf,kgets());
 		shell_process(buf);
-	}
+	}*/
 }
 void test_init(){
 	kprintf("{[TESTM-INIT] Module Successfully loaded}\n");

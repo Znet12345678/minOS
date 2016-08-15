@@ -8,3 +8,4 @@ all:
 	@make -C WIP/zfs
 	@make -C WIP/inffs
 	@make -C WIP/z-fs
+	@make -C WIP/fat16

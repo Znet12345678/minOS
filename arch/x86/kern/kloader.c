@@ -100,6 +100,8 @@ void kernel_loader_main(){
 	/**kprintf("Znet Operating System Open Source\n(c)2015 Zachary James Schlotman\n\n\n");
 	kprintf("Please Enter Any Arguments to pass to kernel\n");
 	kprintf("$>");*/
+	kprintf("Initializing kernel memory...\n");
+	malloc_init();
 	kprintf("MINOS libzOS kernel\n");
 	kprintf("Please set boot options in the following format:\n");
 	kprintf("[ ] means optional * * means required\n");
