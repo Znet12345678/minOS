@@ -21,7 +21,7 @@ int scmp(const char *str1,const char *str2,unsigned int n){
 }
 void shell_process(const char *str){
 	char *arg1 = malloc(1024);
-	char *args = malloc(1024);
+	//char *args = malloc(1024);
 	int i = 0;
 	while(str[i] != ' ' && str[i] != 0x00){
 		//kprintf(".");
@@ -30,8 +30,8 @@ void shell_process(const char *str){
 	}
 	arg1[i] = 0;
 	//kprintf("%s",arg1);
-	const char *commands[MAX_COMMANDS] = { 0 };
-	const char *response[MAX_COMMANDS] = { 0 };
+	const char *commands[MAX_COMMANDS] = {[0 ... MAX_COMMANDS - 1]0};
+	const char *response[MAX_COMMANDS] = {[0 ... MAX_COMMANDS - 1]0};
 	commands[0] = "version";
 	commands[1] = "ls";
 	commands[2] = "help";

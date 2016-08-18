@@ -46,14 +46,14 @@ unsigned int fat_offset;
 unsigned int fat_sector;
 unsigned int ent_offset;
 unsigned short t_val;
-enum FATRIBUTE{
+/*enum FATRIBUTE{
 	READ_ONLY = 0x01,
 	HIDDEN = 0x02,
 	SYSTEM = 0x04,
 	VOLUME_ID = 0x08,
 	DIRECTORY = 0x10,
 	ARCHIVE = 0x20,
-};
+};*/
 struct Fat_DirEnt{
 	char *filename;
 	int atr;
