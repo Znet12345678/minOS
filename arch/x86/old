@@ -1,0 +1,86 @@
+char *membuf;
+	char *pntr = (char *)0x00100000;
+	int sig = 0x7F;
+	struct memory_data d;
+	d.alloc = 1;
+	d.size = n;
+	int i = 0;
+	int t_allocated = 0;
+	int allocated = 0;
+	while(1){
+		if(t_allocated == n)
+			return (void*)membuf;
+		if(*pntr == 0x7f){
+			int size = *pntr;
+			for(int i = 0;i < size;i++)
+				*pntr++;
+			int next_pntr = *pntr;
+			*pntr++;
+		}
+		else{
+			*pntr = d.alloc;
+			*pntr++;
+			*pntr = d.size;
+			*pntr++;
+			char *_pntr = pntr;
+			int avaliable;
+			while(*_pntr != 0x7F && avaliable < n){
+				avaliable++;
+				*_pntr = 0;
+				*_pntr++;
+			}
+			if(avaliable < n){
+				for(int i = 0; i < avaliable;i++){
+       	                        	*membuf = *pntr;
+                                        *membuf++;
+                                        *pntr++;
+                       	                t_allocated++;
+                                }
+				while(t_allocated < n){
+					/*for(int i = 0; i < avaliable;i++){
+						*membuf = *pntr;
+						*membuf++;
+						*pntr++;
+						t_allocated++;
+					}*/
+					_pntr = pntr;
+					while(1){
+						if(*_pntr == 0x7f){
+							*_pntr++;
+							int skip = *_pntr;
+							for(int i = 0; i < skip;i++)
+								*_pntr++;
+							*_pntr++;
+						}
+						else
+							break;
+					}
+					pntr = _pntr;
+					int remaining = n - t_allocated;
+					avaliable = 0;
+					while(*_pntr != 0x7f && avaliable < remaining){
+						avaliable++;
+						*_pntr = 0;
+						*_pntr++;
+					}
+					for(int i = 0; i < avaliable;i++){
+						if(t_allocated == n)
+							return membuf;
+						*membuf = *pntr;
+						*pntr++;
+						*membuf++;
+						t_allocated++;
+					}
+				}
+			}
+			else{
+				for(int i = 0; i < avaliable;i++){
+					*membuf = *pntr;
+					*pntr++;
+					*membuf++;
+					t_allocated++;
+				}
+				return membuf;
+			}
+		}
+	}

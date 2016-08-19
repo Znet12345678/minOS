@@ -35,6 +35,10 @@ unsigned long __strlen(const char *s1){
 void dev_kmain(){
 	t_init();
 	debug("KERNEL","Starting up...");
+	 debug("KERNEL","Version 0.3-alpha");
+        kprintf("******************************DEVELOPMENT BUILD******************************\n");
+        debug("KERNEL","Early kernel,setting things up");
+
 	char *test = malloc(1024);
 	if(!(test)){
 		kprintf("Memory Allocation Error!\n");
@@ -63,7 +67,7 @@ void dev_kmain(){
 	while(1){
 		kprintf("MINOS_KSHELL#");
 		char *buf = malloc(1024);
-		kstrcpy(buf,kgets());
+		buf = kgets();
 		shell_process(buf);
 		free(buf);
 		kprintf("\n");

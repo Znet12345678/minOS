@@ -6,4 +6,11 @@ void t_displayl();
 void t_displaylq();
 void sleep(int n);
 int free(void *v);
+#define LAST_MEM_SEGMENT 0x1f
+struct memory_data{
+	int sig;
+	int alloc;
+	int size;
+	int pntr;
+};
 #endif
