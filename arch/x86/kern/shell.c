@@ -5,6 +5,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <io.h>
+#include <kernel/kern.h>
+#include "../fs/WIP/inffs/inffs.h"
+#include <kernel/tty.h>
 #define MAX_COMMANDS 100
 int scmp(const char *str1,const char *str2,unsigned int n){
 	unsigned int i = n;
@@ -136,7 +140,8 @@ void shell_process(const char *str){
 #ifndef __LIB_BUILD
 void *_fmalloc(unsigned long s){
         char ret[s];
-        return (void *)ret;
+//        return (void *)ret;
+	return malloc(s);
 }
 #else
 void *fmalloc(unsigned long s){
@@ -145,7 +150,7 @@ void *fmalloc(unsigned long s){
 }
 #endif
 char *_kgets(){
-        char *args =fmalloc(80);
+        char *args =malloc(80);
         char oldc = '\n';
         char c;
         int i = 0;

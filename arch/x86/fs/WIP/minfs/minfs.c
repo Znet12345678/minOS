@@ -115,7 +115,7 @@ struct minfs_superblock *parse_superblk(int drivenum,struct minfs_superblock blk
 	//return &ret;*/
 	//while(1) { };
 	blk = ret;
-	return &ret;
+	//return &ret;
 }
 struct miscblk *parse_miscblk(struct miscblk garbage){
 	//while(1){};
@@ -212,7 +212,7 @@ struct miscblk *parse_miscblk(struct miscblk garbage){
 		i++;
 	}
 	debug("PARSE_MISCBLOCK","done");
-	return &garbage;
+	//return &garbage;
 }
 struct inode *read_inode(int drive,int n,struct minfs_superblock *sblk){
 	/*Reads from drive number*/
@@ -230,12 +230,12 @@ struct inode *read_inode(int drive,int n,struct minfs_superblock *sblk){
 	char __buf[] = {buf[2],buf[3],buf[4]};
 	ret.numofdirs = todec(__buf);
 	//...
-	return &ret;
+//	return &ret;
 }
 struct block *read_blk(int drive,int n,struct inode *inode,struct minfs_superblock *sblk){
 	struct block ret;
 	//...
-	return &ret;
+//	return &ret;
 }
 int minfs_mount(int drivenum,int partnum,char *path){
 	//...
@@ -279,7 +279,7 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 		ret.isinfo = 0;
 		ret.isallocated = 0;
 		_blk = ret;
-		return &_blk;
+//		return &_blk;
 	}
 	else if(ret.type == 0x01){
 		debug("PARSE_BUFFER_BLOCK","Found Info block");
@@ -388,7 +388,7 @@ struct block *parse_buffer_block(struct block ret,int lba,struct minfs_superbloc
 	}
 	//_blk = ret;
 	//return &_blk;
-	return &ret;	
+	//return &ret;	
 }
 int mount_p1(char *buf,int drivenum,struct minfs_superblock *_superblk){
 	//#ifdef DEBUG

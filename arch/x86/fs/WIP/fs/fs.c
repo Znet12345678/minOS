@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <io.h>
 #include "fs.h"
 struct superblk *nfs_parse_superblk(struct superblk *ret){
 	char *buf = malloc(1024);

@@ -8,17 +8,16 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <io.h>
+#include <kernel/kern.h>
 #include <kernel/tty.h>
 #include <kernel/vga.h>
 void kernel_loader_init(){
 	t_init();
 }
-void *fmalloc(unsigned long s){
-	char ret[s];
-	return (void *)ret;
-}
+
 char *kgets(){
-	char args[80];
+	char *args = malloc(1024);
 	char oldc = '\n';
 	char c;
 	int i = 0;
@@ -101,7 +100,7 @@ void kernel_loader_main(){
 	kprintf("Please Enter Any Arguments to pass to kernel\n");
 	kprintf("$>");*/
 	kprintf("Initializing kernel memory...\n");
-	malloc_init();
+//	malloc_init();
 	kprintf("MINOS libzOS kernel\n");
 	kprintf("Please set boot options in the following format:\n");
 	kprintf("[ ] means optional * * means required\n");

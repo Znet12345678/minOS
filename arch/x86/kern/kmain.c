@@ -5,12 +5,15 @@
 */
 #include <stdio.h>
 #include "module.h"
+#include <io.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
 #include <kernel/tty.h>
 #include <kernel/vga.h>
+#include "../fs/WIP/z-fs/zfs.h"
 #include "../fs/WIP/_fat/fat.h"
+#include "../mem/mem.h"
 #include "../mem/mm.h"
 #include "../drivers/fs/drv_fs.h"
 #include "../lib/panic.h"
@@ -25,6 +28,7 @@ typedef struct __attribute__ ((packed)) {
 #include "../fs/broken/ext2/ext2.h"
 //#include "../fs/fat32/dosfs.h"
 #include "../fs/WIP/minfs/minfs.h"
+#include <kernel/shell.h>
 #include "../fs/WIP/z-fs/zfs.h"
 unsigned long __strlen(const char *s1){
 	int len = 0;
@@ -38,7 +42,6 @@ void dev_kmain(){
 	 debug("KERNEL","Version 0.3-alpha");
         kprintf("******************************DEVELOPMENT BUILD******************************\n");
         debug("KERNEL","Early kernel,setting things up");
-
 	char *test = malloc(1024);
 	if(!(test)){
 		kprintf("Memory Allocation Error!\n");
@@ -46,11 +49,11 @@ void dev_kmain(){
 			;
 	}
 	kstrcpy(test,"Malloc is working!\n");
-	char *_test = malloc(1024);
+	char *_test = malloc(512);
 	kprintf("%s",test);
 	//while(1)
 	//	;
-	struct fat16_bpb *bpb = parse_bpb();
+	struct fat_bpb *bpb = parse_bpb();
 	//kprintf("bytes_per_sector:[%d] sectors_per_cluster:[%d]  resv_sectors:[%d]\n num_of_fat:[%d] num_of_dir_ent:[%d] total_sectors:[%d]\n mdt:[%d] sectorsperfat:[%d],sectorspertrack:[%d]\n numberofheads:[%d] numberofhiddensectors:[%d] large_sectors:[%d]\n",bpb->bytes_per_sector,bpb->sectors_per_cluster,bpb->resv_sectors,bpb->num_of_fat,bpb->num_of_dir_ent,bpb->total_sectors,bpb->mdt,bpb->sectorsperfat,bpb->sectorspertrack,bpb->numberofheads,bpb->numberofhiddensectors,bpb->large_sectors);
 	struct fat16_ebr *ebr = parse_fat16_ebr();
 	int type = fat_type();
@@ -65,12 +68,13 @@ void dev_kmain(){
 		panic();
 	}
 	while(1){
+		kprintf("\n");
 		kprintf("MINOS_KSHELL#");
 		char *buf = malloc(1024);
 		buf = kgets();
 		shell_process(buf);
 		free(buf);
-		kprintf("\n");
+		//kprintf("\n");
 	}
 	read_root(type);
 	kprintf("Done\n");
@@ -93,11 +97,11 @@ void dev_kmain(){
 }
 void test_init(){
 	kprintf("{[TESTM-INIT] Module Successfully loaded}\n");
-	_kill();
+	//_kill();
 }
 void test_main(){
 	kprintf("{[TESTM-MAIN] Module Successfully loaded}\n");
-	_kill();
+	//_kill();
 }
 int char2int(char c){
 	if(c == 'a')
@@ -289,9 +293,10 @@ int _verbose_kmain(char *arg){
 	int io = 0x1F0;
 	debug("KERNEL",arg);
 	debug("KERNEL","(c) 2016 Zachary James Schlotman");
-	debug("KERNEL","Please reboot with no boot arguments");
-	debug("KERNEL","verbose_panic()");
-	verbose_panic(arg,"KERNEL","_verbose_kmain");
+	//debug("KERNEL","Please reboot with no boot arguments");
+	//debug("KERNEL","verbose_panic()");
+	panic();
+	//verbose_panic(arg,"KERNEL","_verbose_kmain");
 }
 void kernel_main_safe(){
 	debug("KERNEL","Version 0.3-alpha");
@@ -300,6 +305,18 @@ void kernel_main_safe(){
 	while(1){};
 }
 int release_kmain(){
+	t_init();
+        debug("KERNEL","Version 0.3-alpha");
+        kprintf("******************************RELEASE BUILD******************************\n");
+        debug("KERNEL","Early kernel,setting things up");
+	if(__DETFS() == __FS_UNKNOWN){
+		kprintf("Making file system\n");
+		__MKFS();
+		kprintf("Done\nrestarting");
+		release_kmain();
+	}
+}
+int _release_kmain(){
 	t_init();
 	debug("KERNEL","Version 0.3-alpha");
 	kprintf("******************************RELEASE BUILD******************************\n");
@@ -924,16 +941,16 @@ int graphical_kmain(char *arg){
 	//kprintf("		______________\n");
 }
 void kernel_main(int a,char *b){
-	if(strcmp(b,"s") == 0)
-		zsh();
+//	if(strcmp(b,"s") == 0)
+//		zsh();
 	t_init();
 	kprintf("Detecting Hard Drives\n");
-	ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
+	//ide_init(0x1F0,0x3f6,0x170,0x376,0x000);
 	uint16_t drive;
 	if(strcmp(b,"fa") == 0)
 		drive = 0x02;
-	else
-		drive = ddrive();
+//	else
+//		drive = ddrive();
 	kprintf("Detecting Keyboards\n");
 	outb(0x60,0xF2);
 	kprintf("Initializing Devices\n");
@@ -966,12 +983,12 @@ void kernel_main(int a,char *b){
 	kprintf("Mounting Root FileSystem\n");
 //	zfs_mount(offset,endoffset);
 	kprintf("Passing control to init Script\n");
-	exec_script("/init.initsh");
+//	exec_script("/init.initsh");
 }
 void kernel_main_old(int a,char *b){
 	t_init();
 	kprintf("Loading early kernel.\n");
-	ide_init(0x1F0, 0x3F6, 0x170, 0x376, 0x000);
+//	ide_init(0x1F0, 0x3F6, 0x170, 0x376, 0x000);
 	int i = 0;
 	int commandnum = 4;
 	//char *mtest = malloc(80);
@@ -1036,14 +1053,14 @@ void kernel_main_old(int a,char *b){
 			}
 		}
 		else if(nstrcmp(str,"hlt") == 0){
-			kprintf("CPU Halted\n");
-			halt();
+//			kprintf("CPU Halted\n");
+//			halt();
 		}
 		else if(nstrcmp(str,"read") == 0){
 			i = 0;
 			//ide_atapi_read(1,1,1,0,0);
 			char *buffer = malloc(1024);
-			io_read(0,0,1,buffer);
+			//io_read(0,0,1,buffer);
 			kprintf("%s\n",buffer);
 			//kprintf("%c\n",ic);
 		}

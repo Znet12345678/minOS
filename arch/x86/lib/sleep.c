@@ -3,6 +3,7 @@
 *Public Domain
 *Zachary Schlotman
 */
+#include <io.h>
 void msleep(unsigned long time){
 	int mtime = time * 10000;
 	for(int i = 0; i < mtime; i++)

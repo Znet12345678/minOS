@@ -1,148 +1,176 @@
-/*
-*minOS memory allocater
-*Writen by:Zachary James Schlotman
-*Public Domain
-*/
+#include <stdio.h>
 #include <stdlib.h>
-int malloc_init(){
-	/*char *pntr = (char*)0x00100000;
-	int mem = 0x00100000;
-	while(mem < 0x00EFFFFF){
+#include <sys/types.h>
+/*
+*Header:
+*next mem pntr
+*h.size
+*h.free?
+*/
+int free(void *v){
+}
+struct header{
+	int *nxt;
+	int size;
+	int free;
+};
+void init_mem(){
+	int *mem = (int*)0x01000000;
+	*mem = 0x7F;
+}
+int *__find_next_free_head(int *curr){
+	int *dup = curr;
+	while(1){
+		struct header h;
+		
+		h.nxt = *dup;
+		*dup++;
+		h.size = *dup;
+		*dup++;
+		h.free = *dup;
+		*dup++;
+		for(int i = 0; i < h.size;i++)
+			*dup++;
+		if(*dup == 0)
+			return dup;
+	}
+}
+int init_memblk(int *pntr,struct header init){
+	*pntr = init.nxt;
+	*pntr++;
+	*pntr = init.size;
+	*pntr++;
+	*pntr = init.free;
+	*pntr++;
+	int *dup = pntr;
+	for(int i = 0; i < init.size; i++){
 		*pntr = 0;
 		*pntr++;
-		mem++;
 	}
-	*pntr = 0x0f;
-	*pntr = 0x3a;*/
 }
-void *broken_malloc(unsigned long n){
-	char *membuf;
-	char *pntr = (char*)0x01000000;
-	int mem = 0x01000000;
-	int i = 0;
-	while(i < n){
-		if(*pntr == 1){
-			*pntr++;
-			mem++;
-			continue;
-		}
-		else{
-			*membuf = *pntr;
-			*pntr = 1;
-			*pntr++;
-			*membuf++;
-			mem++;
-		}
-		i++;
-	}
-	membuf[n] = 0x0f;
-	membuf[n + 1] = 0x1f;
-	return (void *)membuf;
-}
-int free(void *v){
-	return 1;
-}
-void *malloc(unsigned long n){
-	char *membuf;
-	char *pntr = (char*)0x01000000;
-	int i = 0;
-	struct memory_data d;
-	d.sig = 0x7F;
-	d.alloc = 1;
+void *malloc(size_t n){
+	//kprintf("kmalloc(%d)\n",n);
+	char *ret;
+	int *mem = (int*)0x01000000;
+	int *orig;
 	int allocated = 0;
 	while(allocated < n){
-		if(*pntr == 0x7F){
-			*pntr++;
-			int alloc = *pntr;
-			*pntr++;
-			int size = *pntr;
-			for(int i = 0;i < size;i++)
-				*pntr++;
-			*pntr++;
+		if(*mem == 0x7F || *mem == 0){
+			struct header init;
+			init.size = n;
+			int *nxt = (int*)(0x01000000 + n);
+			init.nxt = nxt;
+			init.free = 0;
+			init_memblk(mem,init);
+			*mem++;
+			for(int i = 0; i < n; i++){
+				*ret = *mem;
+				*ret++;
+				*mem++;
+				allocated++;
+			}
+			struct header nxth;
+			nxth.size = 0;
+			nxth.free = 0;
+			nxth.nxt = 0;
+			init_memblk(mem,nxth);
 		}
 		else{
-			*pntr = 0x7F;
-			*pntr++;
-			*pntr = 1;
-			*pntr++;
-			char *_pntr = pntr;
-			int avaliable = 0;
-			while(*_pntr != 0x7F && avaliable < (n - allocated)){
-				avaliable++;
-				*_pntr++;
-			}
-			if(avaliable == (n - allocated)){
-				*pntr = n;
-				*pntr++;
-				for(int i = 0; i < (n - allocated);i++){
-					*membuf = *pntr;
-					*pntr = 0;
-					*membuf++;
+			*mem++;
+			int size = *mem;
+			*mem++;
+			int free = *mem;
+			*mem++;
+			if(free == 1){
+				for(int i = 0; i < size;i++){
+					*ret = *mem;
+					*ret++;
+					*mem++;
 					allocated++;
-					*pntr++;
 				}
-				*pntr = LAST_MEM_SEGMENT;
-				return membuf;
+			}else{
+				for(int i = 0; i < size;i++)
+					*mem++;
+			}
+		}
+	}
+}
+void *_kmalloc(size_t n){
+	kprintf("[DEBUG]malloc(%d)\n",n);
+	int allocated = 0;
+	int *ret;
+	int *mem = (int*)0x01000000;
+	int *orig;
+	while(allocated < n){
+		orig = mem;
+		struct header h;
+		h.nxt = *mem;
+		*mem++;
+		h.size = *mem;
+		*mem++;
+		h.free = *mem;
+		*mem++;
+		if(h.nxt == 0 && h.size == 0 && h.free == 1){
+			int *struct_start = mem;
+			for(int i = 0; i <= n;i++)
+				*struct_start++;
+			if(struct_start == 0){
+				*struct_start = 0;
+				*struct_start++;
+				*struct_start = 0;
+				*struct_start++;
+				*struct_start = 1;
+			}
+			*mem = struct_start;
+			*mem++;
+			*mem = n;
+			*mem++;
+			*mem = 0;
+			*mem++;
+			for(int i = 0; i < n;i++){
+				*ret = *mem;
+				*mem++;
+				*ret++;
+				allocated++;
+			}
+		}
+		else if(h.free == 1 && h.nxt == 0){
+			*orig = __find_next_free_head(orig);
+			*orig++;
+			*orig = n;
+			*orig++;
+			*orig = 0;
+			*orig++;
+			if(n < h.size){
+				for(int i = 0; i < n;i++){
+					*ret = *mem;
+					*mem++;
+					*ret++;
+					allocated++;
+				}
 			}
 			else{
-				*pntr = avaliable - 1;
-				for(int i = 0; i < (avaliable - 1);i++){
-					*membuf = *pntr;
-					*pntr = 0;
-					*membuf++;
+				for(int i = 0; i < h.size;i++){
+					*ret = *mem;
+					*mem++;
+					*ret++;
 					allocated++;
-					*pntr++;
 				}
-				_pntr = pntr;
-				while(*_pntr != 0x7F)
-				 	*_pntr++;
-				int i = 0;
-				int skip = 0;
-				while(1){
-					if(*_pntr == 0x7F){
-						*_pntr++;
-						skip++;
-						*_pntr++;
-						skip++;
-						int size = *_pntr;
-						for(int i = 0; i < size;i++){
-							skip++;
-							*_pntr++;
-						}
-						skip++;
-						*_pntr++;
-					}
-					else
-						break;
-				}
-				*pntr = skip;
-				pntr = _pntr;
 			}
+			int *struct_start = mem;
+			if(*struct_start == 0){
+				*struct_start = 0;
+				*struct_start++;
+				*struct_start = 0;
+				*struct_start++;
+				*struct_start = 1;
+				*struct_start++;
+			}
+		}else{
+			for(int i = 0; i < h.size;i++)
+				*mem++;
 		}
-	}
-}
-void *old_malloc(unsigned long n){
-	void *ret;
-	char *membuf;
-	char *pntr = (char*)0x00100000;
-	char *_pntr = (char*)0x00100000;
-	int i = 0;
-	while(i < n){
-		if(*pntr == 0x7F){
-			*pntr = 0;
-			*membuf = *pntr;
-			*pntr++;
-			*membuf++;
-		}
-		else{
-			*pntr++;
-			continue;
-		}
-		i++;
-	}
-        membuf[n] = 0x0f;
-        membuf[n + 1] = 0x1f;
 
-	return (void *)membuf;
+	}
+	return (void *)ret;
 }
-

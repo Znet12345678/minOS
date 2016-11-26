@@ -425,7 +425,7 @@ struct file_struct *zfs_request_file(const char *filename,char *op){
 		ret->posx = 0;
 		ret->posy = 0;
 		ret->pos = 0;
-		ret->filename = filename;
+		ret->filename = (char*)filename;
 		ret->opperation = OP_READ;
 		struct zfs_superblock *sblk = malloc(1024);
 		read_superblock(sblk);
@@ -495,7 +495,7 @@ struct file_struct *zfs_request_file(const char *filename,char *op){
 	}
 	if(found != 1){
 		kprintf("Aborted:Couldn't find file\n");
-		return -1;
+		return (struct file_struct *)-1;
 	}
 	/*char *fbuf = malloc(512 * (ret->endingblock - ret->startingblock));
 	char *blk = malloc(1024);

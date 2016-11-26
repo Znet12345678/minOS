@@ -9,7 +9,7 @@
 
 int mod_init(char *modules[]){
 	kprintf("[MOD] Initializing modules...this may take some time (and memory) brace yourself\n");
-	char *_modules[MAX_MODULES] = {malloc(1024)};
+	char *_modules[MAX_MODULES];
 	modules = _modules;
 }
 

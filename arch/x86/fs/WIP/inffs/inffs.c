@@ -300,15 +300,15 @@ struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,
 		_file_exists = file_exists(_path->name);
 		if(!(_sblk)){
 			debug("INFFS","Failed to parse superblock");
-			return -1;
+			return (struct __INFFS_FILE *)-1;
 		}
 		if(!(infblk)){
 			debug("INFFS","Invalid file\n");
-			return -1;
+			return (struct __INFFS_FILE *)-1;
 		}
 		if(_file_exists){
 			kprintf("File exists!\n");
-			return -1;
+			return (struct __INFFS_FILE *)-1;
 		}
 		int lba = infblk->blk;
 		char *buf = malloc(1024);
@@ -316,12 +316,12 @@ struct __INFFS_FILE * __INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,
 		ret->isalloc = buf[0];
 		if(!(ret->isalloc)){
 			debug("INFFS","Something is wrong with your file system!");
-			return -1;
+			return (struct __INFFS_FILE *)-1;
 		}
 		ret->sig = buf[1];
 		if(ret->sig != 0x0F){
 			debug("INFFS","Something is wrong with your file system!");
-			return -1;
+			return (struct __INFFS_FILE *)-1;
 		}
 		ret->fsize = buf[2] << 24 | buf[3] << 16 | buf[4] << 8 | buf[5];
 		ret->start_lba = lba;

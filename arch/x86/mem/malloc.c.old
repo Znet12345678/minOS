@@ -1,0 +1,159 @@
+/*
+*minOS memory allocater
+*Writen by:Zachary James Schlotman
+*Public Domain
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include "mem.h"
+int detect_low_mem(){
+	return __detect_low_mem();
+}
+int malloc_init(){
+	/*char *pntr = (char*)0x00100000;
+	int mem = 0x00100000;
+	while(mem < 0x00EFFFFF){
+		*pntr = 0;
+		*pntr++;
+		mem++;
+	}
+	*pntr = 0x0f;
+	*pntr = 0x3a;*/
+}
+void *broken_malloc(unsigned long n){
+	char *membuf;
+	char *pntr = (char*)0x01000000;
+	int mem = 0x01000000;
+	int i = 0;
+	while(i < n){
+		if(*pntr == 1){
+			*pntr++;
+			mem++;
+			continue;
+		}
+		else{
+			*membuf = *pntr;
+			*pntr = 1;
+			*pntr++;
+			*membuf++;
+			mem++;
+		}
+		i++;
+	}
+	membuf[n] = 0x0f;
+	membuf[n + 1] = 0x1f;
+	return (void *)membuf;
+}
+int free(void *v){
+	char *c = (char *)v;
+	char *pntr = &c[0];
+	int size = *--pntr;
+	//kprintf("%d\n",size);
+	return 1;
+}
+void *malloc(unsigned long n){
+	uint8_t *membuf;
+	//char *pntr = (char*)0x01000000;
+	uint8_t *pntr = (uint8_t *)0xC0000000;
+	int i = 0;
+	struct memory_data d;
+	d.sig = 0x7F;
+	d.alloc = 1;
+	int allocated = 0;
+	while(allocated < n){
+		if(*pntr == 0x7F){
+			*pntr++;
+			int alloc = *pntr;
+			*pntr++;
+			int size = *pntr;
+			for(int i = 0;i < size;i++)
+				*pntr++;
+			*pntr++;
+		}
+		else{
+			*pntr = 0x7F;
+			*pntr++;
+			*pntr = 1;
+			*pntr++;
+			uint8_t *_pntr = pntr;
+			int avaliable = 0;
+			while(*_pntr != 0x7F && avaliable < (n - allocated)){
+				avaliable++;
+				*_pntr++;
+			}
+			if(avaliable == (n - allocated)){
+				*pntr = n;
+				*pntr++;
+				for(int i = 0; i < (n - allocated);i++){
+					*membuf = *pntr;
+					*pntr = 0;
+					*membuf++;
+					allocated++;
+					*pntr++;
+				}
+				*pntr = LAST_MEM_SEGMENT;
+				return membuf;
+			}
+			else{
+				*pntr = avaliable - 1;
+				for(int i = 0; i < (avaliable - 1);i++){
+					*membuf = *pntr;
+					*pntr = 0;
+					*membuf++;
+					allocated++;
+					*pntr++;
+				}
+				_pntr = pntr;
+				while(*_pntr != 0x7F)
+				 	*_pntr++;
+				int i = 0;
+				int skip = 0;
+				while(1){
+					if(*_pntr == 0x7F){
+						*_pntr++;
+						skip++;
+						*_pntr++;
+						skip++;
+						int size = *_pntr;
+						for(int i = 0; i < size;i++){
+							skip++;
+							*_pntr++;
+						}
+						skip++;
+						*_pntr++;
+					}
+					else
+						break;
+				}
+				*pntr = skip;
+				pntr = _pntr;
+			}
+		}
+	}
+}
+void *old_malloc(unsigned long n){
+	void *ret;
+	char *membuf;
+	char *pntr = (char*)0x00100000;
+	char *_pntr = (char*)0x00100000;
+	int i = 0;
+	while(i < n){
+		if(*pntr == 0x7F){
+			*pntr = 0;
+			*membuf = *pntr;
+			*pntr++;
+			*membuf++;
+		}
+		else{
+			*pntr++;
+			continue;
+		}
+		i++;
+	}
+        membuf[n] = 0x0f;
+        membuf[n + 1] = 0x1f;
+
+	return (void *)membuf;
+}
+

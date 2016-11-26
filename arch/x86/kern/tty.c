@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <kernel/types.h>
+#include <io.h>
 ksize_t tr;
 ksize_t tc;
 uint8_t tcolour;
@@ -20,9 +21,6 @@ void t_init(){
     tc = 0;
     tcolour = mkcolour(COLOUR_WHITE,COLOUR_BLACK);
     tbuff = VMEM;
-    int *mem = 0x00000500;
-    for(int i = 0; i < (VH * VW);i++)
-        *mem = 0;
     for(int y = 0; y < VH;y++){
         for(int x = 0;x < VW;x++){
             const ksize_t index = y * VW + x;

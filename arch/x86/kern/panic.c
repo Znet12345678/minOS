@@ -3,6 +3,12 @@
 *panic functions
 */
 #include <stdio.h>
+#include <stdlib.h>
+void error(){
+	kprintf("An assembly function has encountered an error!\n");
+	while(1)
+		;
+}
 void verbose_panic(char *args,char *process,char *subprocess){
 	kprintf("Verbose panic has been called\n");
 	kprintf("Kernel args:%s\n",args);
@@ -22,7 +28,7 @@ void _panic(){
 			break;
 		//asm volatile("cli;hlt");
 	}
-	void *unreachable = malloc(1024);
+	//void *unreachable = malloc(1024);
 }
 char *__kgets(){
 	int i = 0;

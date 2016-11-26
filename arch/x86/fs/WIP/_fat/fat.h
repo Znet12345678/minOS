@@ -72,7 +72,7 @@ struct fat_dirent{
 	int size_in_bytes;
 };
 struct info *fat_parse_info();
-struct fat_bpb * parse_bpb();
+struct fat_bpb *parse_bpb();
 struct fat16_ebr *parse_fat16_ebr();
 struct fat32_ebr *parse_fat32_ebr();
 int fat_type();

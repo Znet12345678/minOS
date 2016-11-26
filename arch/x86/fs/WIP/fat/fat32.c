@@ -2,6 +2,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <io.h>
+#include <kernel/tty.h>
 int fat32_mount(struct bpb boots,struct Fat32_ExtendedBootRecord ExtBootRecord,unsigned char *FAT){
     t_init();
     debug("FAT32_MOUNT","Setting up values");

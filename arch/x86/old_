@@ -1,0 +1,17 @@
+megs:256
+romimage: file=BIOS-bochs-latest, address=0xe0000 
+vgaromimage: file=vgabios-stdvga
+parport1: enablled=1, file="/dev/stdout"
+com1: enabled=1,mode=null
+ata0: enabled=1,ioaddr1=0x1f0,ioaddr2=0x3f0,irq=14
+ata0-master: type=disk, mode=flat, path="hd.img",cylinders=203,heads=2,spt=63
+floppya: 1_44="kernel.elf",status=inserted
+boot:a
+info: action=report
+error: action=report
+panic: action=ask
+#vga_update_interval: 100000
+#ips: 2000000
+log: bochs.log
+mouse: enabled=1
+

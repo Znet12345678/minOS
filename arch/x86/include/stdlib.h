@@ -6,6 +6,8 @@ void t_displayl();
 void t_displaylq();
 void sleep(int n);
 int free(void *v);
+int malloc_init();
+int atoi(const char *str);
 #define LAST_MEM_SEGMENT 0x1f
 struct memory_data{
 	int sig;

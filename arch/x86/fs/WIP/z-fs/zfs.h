@@ -1,84 +1,62 @@
 /*
-*Znet file system driver for minOS kernel
-*(c) 2016 Zachary James Schlotman
+*z-fs header
+*Public domain
 */
-#ifndef __ZFS_H
-#define __ZFS_H
-int __ZFS_SIG[] = {0xff,'z',0xff,'f',0xff,'s',0xff};
-struct __ZFS_SUPERBLK{
-	int alloc;
-	int sig[7];
-	int fs_type;
+#ifndef __Z_FS_H
+#define __Z_FS_H
+#define __FS_T_Z_FS 0
+#define __FS_T_ZFS 1
+#define __FS_T_INFFS 2
+#define __FS_UNKNOWN -1
+#define __VERSION 1
+struct __Z_FS_SUPERBLK{
+	int version;
+	int sig[2];//0x0f 0x1f
+	int first_dent_blk;
 	int first_infblk;
 };
-#define TYPE_DIR 0xff /*Directory*/
-#define TYPE_FILE 0xaa /*File*/
-#define TYPE_DEVICE 0x4a /*Device file*/
-#define F_TYPE_TXT 0x00 /*Text*/
-#define F_TYPE_EXEC 0x80 /*Executable*/
-#define BLK_TYPE_REG 0x10 /*Regular block*/
-#define BLK_TYPE_INF 0x8a /*Info block*/
-struct __ZFS_BLK{
+struct __Z_FS_DENTBLK{
 	int alloc;
-	int type;
+	//data
+	int is_end_of_dir;
+	int next_dent_offset;
+	int next_dent_lba;
 };
-struct __ZFS_INF{
-	int type;
-	//FILE ATRIBUTES (0 if directory)
-	int f_type;
-	//DIRECTORY
-	int dent_pntr;
-	//SHARED
+struct __ZFS_DENT{
 	int size;
-	char name[80];
-	int lba_start;
-	int lba_end;
-	int next_infoblk;
+	char dirname[30];
+	char filename[20];
+	int file_inf_lba;
+	int file_inf_offset;
 };
-struct __ZFS_DIRENT{
-	int numoffiles;
-	int numofdirectories;
-	int start;
-	int end;
+struct __Z_FS_INF{
+	int alloc;
+	char name[20];
+	char containing_dname[30];
+	int datablk_start;
+	int next_inf_offset;
+	int next_inf_lba;
 };
-#define OP_WR 0x00
-#define OP_RD 0x20
-#define OP_DT 0x40
-#define OP_APND 0x80
-struct __ZFS_FILE{
-	char name[80];
-	int operation;
-	int lba_start;
-	int lba_end;
-	int sizeinbytes;
-	int end_offset;
-	int begin_offset;
+struct __Z_FS_DATABLK{
+	int alloc;
+	//data
+	int is_last;
+	int next_data_blk;
 };
-struct __ZFS_FILE *__ZFS_FOPEN(const char *name,int op);
-int update_dir(int arga,int argb,char *dir_name);
-#ifdef KERNBUILD
-/*
-*returns:
-*1 on success
-*<0 on fail
-*Creates whole disk file system
-*/
-int __K_ZFS_CREATE_FS();
-/*
-*returns:
-*1 on success
-*<0 on failure
-*WIPES ALL DATA ON BLOCK
-*Initializes block
-*/
-int __K_ZFS_WRITE_BLK(int lba,struct __ZFS_BLK *blk);
-/*
-*returns:
-*0 for unalloc
-*1 for regular
-*2 for info
-*reads block info
-*/
-int __K_ZFS_GETBLK_INF(int lba);
+struct __FILE{
+	struct __Z_FS_INF *inf;
+	int pos;
+	int opperation;
+	int currlba;
+	int nextlba;
+};
+#ifdef KBUILD
+struct __Z_FS_SUPERBLK *__parse_superblock();
+struct __Z_FS_DENT *read_dent(const char *name);
+struct __Z_FS_INF *read_inf(const char *name,const char *dir);
+int write_datablk(struct __Z_FS_DATABLK *dblk,char *data);
+struct __FILE *__fopen(const char *fname,const char *opperation);
+int __MKFS();
+int __DETFS();
 #endif
 #endif

@@ -5,10 +5,11 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <kernel/tty.h>
 #include <kernel/vga.h>
-
+#include <io.h>
 enum INPUT_KEYS{
 	A = 0x9E,
 	B = 0xB0,

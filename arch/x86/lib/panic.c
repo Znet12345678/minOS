@@ -3,6 +3,9 @@
 *(c) 2015 Zachary James Schlotman
 *Zachary Schlotman
 */
+#include <stdio.h>
+#include <io.h>
+#include <stdlib.h>
 #include "panic.h"
 void panic(){
 	//t_init();

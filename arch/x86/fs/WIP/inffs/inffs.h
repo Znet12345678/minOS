@@ -63,4 +63,5 @@ struct __INFFS_FILE *__INFFS_FULLDISK_FS_FOPEN(const char *path,int opperation,s
 int __INFFS_MKFS_FULLDISK();
 int __INFFS_FULLDISK_FS_FREAD(struct __INFFS_FILE *file,int *buf,int n);
 int __INFFS_FULLDISK_FS_FWRITE(struct __INFFS_FILE *file,uint8_t *buf,int n);
+int __IS_INFFS();
 #endif /* defined(____inffs__) */

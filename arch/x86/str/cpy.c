@@ -3,6 +3,7 @@
 *(c) 2015 Zachary James Schlotman
 */
 #include <kernel/types.h>
+#include <stdlib.h>
 #include <string.h>
 void kstrcpy(char *dest,const char *src){
 	int i = strlen(dest);
@@ -31,10 +32,10 @@ struct div *div(int num, int denom)
 		k++;
 		j -= denom;
 	}
-	struct div ret;
-	ret.quot = k;
-	ret.rem = j;
-	return &ret;
+	struct div *ret = malloc(sizeof(struct div *));
+	ret->quot = k;
+	ret->rem = j;
+	return ret;
 
 }
 struct ldiv{
@@ -42,14 +43,14 @@ struct ldiv{
 	long rem;
 };
 struct ldiv *ldiv(long num,long denom){
-	struct ldiv ret;
-	ret.quot = num / denom;
-	ret.rem = num % denom;
-	if(num >= 0 && ret.rem < 0){
-		ret.quot++;
-		ret.rem -=denom;
+	struct ldiv *ret = malloc(sizeof(struct ldiv *));
+	ret->quot = num / denom;
+	ret->rem = num % denom;
+	if(num >= 0 && ret->rem < 0){
+		ret->quot++;
+		ret->rem -=denom;
 	}
-	return &ret;
+	return ret;
 };
 char *strncpy(char *dest,const char *src,size_t n){
 	int i = 0;

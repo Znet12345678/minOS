@@ -2,25 +2,35 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdint.h>
 #include "zfs.h"
-int __K_ZFS_WRITE_BLK(int lba,struct __ZFS_BLK *blk){
-	char wr[1024] = {blk->alloc,blk->type};
-	//kprintf("%c\n",wr[0] + '0');
-	if(ata_write_master(wr,lba) < 0)
-		return -1;
-	return 1;
+struct __Z_FS_SUPERBLK *__parse_superblock(){
+	struct __Z_FS_SUPERBLK *ret = malloc(sizeof(struct __Z_FS_SUPERBLK *));
+	char buf[513];
+	ata_read_master(buf,2,0);
 }
-int __K_ZFS_CREATE_FS(){
-	int lba = 2;
-	char data[11] = {1,0xff,'z',0xff,'f',0xff,'s',0xff,1,5};
-	ata_write_master_n(data,2,11);
-	struct __ZFS_BLK blk;
-	blk.alloc = 1;
-	blk.type = BLK_TYPE_INF;
-	if(__K_ZFS_WRITE_BLK(5,&blk) != 1){
-		debug("ZFS","Couldn't make file system,panicing!");
-		return -1;
+int __DETFS(){
+	char buf[513];
+	ata_read_master(buf,2,0);
+	if(buf[0] == 1){
+		if(buf[1] == 0x0f && buf[2] == 0x1f)
+			return __FS_T_Z_FS;
+		else
+			return __FS_UNKNOWN;
 	}
-	debug("ZFS","Done");
-	return 1;
+	return __FS_UNKNOWN;
+}
+int __MKFS(){
+	int ret = 1;
+	struct __Z_FS_SUPERBLK *sblk = malloc(sizeof(struct __Z_FS_SUPERBLK *));
+	if(!(sblk))
+		panic();
+	sblk->version = __VERSION;
+	char sig[] = {0x0f,0x1f};
+	memcpy(sblk->sig,sig,2);
+	sblk->first_dent_blk = 0;
+	sblk->first_infblk = 0;
+	int write[] = {sblk->version,sblk->sig[0],sblk->sig[1],sblk->first_dent_blk >> 8,sblk->first_dent_blk,sblk->first_infblk >> 8,sblk->first_infblk};
+	ata_write_master_n(write,2,0);
+	return ret;
 }

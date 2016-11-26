@@ -4,7 +4,7 @@
 #include <string.h>
 #include "fat.h"
 struct fat_bpb * parse_bpb(){
-	struct fat_bpb *ret = malloc(sizeof(struct fat_bpb *));
+	struct fat_bpb *ret = malloc(sizeof(struct fat_bpb *) * sizeof(*ret));
 	char *buf = malloc(1024);
 	ata_read_master(buf,0,0);
 	ret->bytes_per_sector = buf[11] << 8 | buf[12];
@@ -24,7 +24,7 @@ struct fat_bpb * parse_bpb(){
 struct fat16_ebr *parse_fat16_ebr(){
 	char *buf = malloc(513);
 	ata_read_master(buf,0,0);
-	struct fat16_ebr *ret = malloc(sizeof(struct fat16_ebr *));
+	struct fat16_ebr *ret = malloc(sizeof(struct fat16_ebr *) * sizeof(*ret));
 	ret->drive_number = buf[36];
 	ret->flags_nt = buf[37];
 	ret->sig = buf[38];
@@ -42,7 +42,7 @@ struct fat16_ebr *parse_fat16_ebr(){
 struct fat32_ebr *parse_fat32_ebr(){
 	char *buf = malloc(513);
 	ata_read_master(buf,0,0);
-	struct fat32_ebr *ret = malloc(sizeof(struct fat32_ebr *));
+	struct fat32_ebr *ret = malloc(sizeof(struct fat32_ebr *) * sizeof(*ret));
 	ret->sectorsperfat = buf[36] << 24 | buf[37] << 16 | buf[38] << 8 | buf[39];
 	ret->flags = buf[40] << 8 | buf[41];
 	ret->fat_version = buf[42] << 8 | buf[43];
@@ -65,7 +65,7 @@ struct fat32_ebr *parse_fat32_ebr(){
 }
 struct info *fat_parse_info(){
 	struct fat_bpb *boot_sector = parse_bpb();
-	struct info *ret = malloc(sizeof(struct info *));
+	struct info *ret = malloc(sizeof(struct info *) * sizeof(*ret));
 	ret->total_sectors = boot_sector->total_sectors;
 	ret->fat_size = boot_sector->sectorsperfat;
 	ret->root_dir_sectors = ((boot_sector->num_of_dir_ent * 32) + (boot_sector->bytes_per_sector - 1))/boot_sector->bytes_per_sector;
@@ -88,7 +88,7 @@ int fat_type(){
 }
 int read_root(int type){
 	struct info *inf = fat_parse_info();
-	struct fat_dirent *dent = malloc(sizeof(struct fat_dirent *));
+	struct fat_dirent *dent = malloc(sizeof(struct fat_dirent *) * sizeof(*dent));
 	struct fat_bpb *bpb = parse_bpb();
 	int clusternum = 0;
 	if(type < 0x02){
